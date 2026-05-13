@@ -276,15 +276,15 @@
     /* HERO BLOBS */
     .gb-1 {
       width: 500px; height: 500px; top: -100px; right: -80px;
-      background: rgba(255,255,255,0.6);
+      background: #FF8902;
     }
     .gb-2 {
       width: 400px; height: 400px; top: 25%; left: -100px;
-      background: rgba(150,190,0,0.6);
+      background: #EA8BED;
     }
     .gb-3 {
       width: 350px; height: 350px; bottom: -60px; right: 18%;
-      background: rgba(255,255,200,0.55);
+      background: #FF8902;
     }
     /* ABOUT BLOBS */
     .about-blob-wrap {
@@ -987,6 +987,43 @@ function handleSubmit(){
     ctx.globalCompositeOperation = 'source-over';
   }
   draw();
+})();
+
+
+// ── NAV LOGO colour switch on light sections
+(function() {
+  const logo = document.querySelector('.logo-white');
+  if (!logo) return;
+
+  // Sections that have a light background
+  const lightSections = document.querySelectorAll('.hero, #projects, .strip, .video-hero');
+
+  const observer = new IntersectionObserver(entries => {
+    // Check if any light section is intersecting with the nav zone
+    let anyLight = false;
+    entries.forEach(e => { if (e.isIntersecting) anyLight = true; });
+
+    // Also check all light sections currently
+    lightSections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      // If section overlaps the nav bar (top 80px of screen)
+      if (rect.top < 80 && rect.bottom > 0) anyLight = true;
+    });
+
+    logo.classList.toggle('dark-mode', anyLight);
+  }, { threshold: 0, rootMargin: '-0px 0px -90% 0px' });
+
+  lightSections.forEach(sec => observer.observe(sec));
+
+  // Also update on scroll for accuracy
+  window.addEventListener('scroll', () => {
+    let anyLight = false;
+    lightSections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top < 80 && rect.bottom > 0) anyLight = true;
+    });
+    logo.classList.toggle('dark-mode', anyLight);
+  }, { passive: true });
 })();
 
 </script>
