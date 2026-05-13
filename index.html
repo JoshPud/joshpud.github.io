@@ -52,8 +52,8 @@
     .nav-logo { display: flex; align-items: center; }
     .logo-img { display: block; height: 36px; width: auto; }
     
-    .logo-black { }
-    .logo-black { filter: none; }
+    
+    
     .nav-links { display: flex; gap: 2.5rem; list-style: none; }
     .nav-links a { text-decoration: none; color: var(--cream); font-size: .72rem; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; opacity: .7; transition: opacity .2s; }
     .nav-links a:hover { opacity: 1; }
@@ -580,19 +580,19 @@
     #videoCanvas { display: block; }
 
     .logo-img { display: block; height: 36px; width: auto; }
-    .logo-white {
-      height: 36px;
-      width: auto;
-      display: block;
-      transition: filter 0.3s ease;
-    }
-    .logo-white.dark-mode {
-      filter: brightness(0);
-    }
+    
+    
+    
+    
+    
     nav {
       background: transparent !important;
     }
     .hero-title em { color: #ffffff !important; }
+        .logo-img { height: 36px; width: auto; display: block; }
+    #logoBlack { display: none; }
+    .nav-logo.on-light #logoWhite { display: none; }
+    .nav-logo.on-light #logoBlack { display: block; }
     </style>
 </head>
 <body>
@@ -605,7 +605,10 @@
 
 <nav>
   <div class="nav-left"><span class="chrome-badge">Available 2025</span></div>
-  <div class="nav-logo"><img src="logo-white.png" alt="Joshua Crossley Creative" class="logo-img logo-white"/></div>
+  <div class="nav-logo" id="navLogo">
+    <img src="logo-white.png" alt="Joshua Crossley Creative" class="logo-img" id="logoWhite"/>
+    <img src="logo-black.png" alt="Joshua Crossley Creative" class="logo-img" id="logoBlack" style="display:none;"/>
+  </div>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#projects">Work</a></li>
@@ -995,59 +998,61 @@ function handleSubmit(){
 
 
 
-// ── NAV LOGO switches dark/light based on scroll position
+
+
+
+
+
+
+
+
+
+// ── NAV LOGO swap on light/dark sections
 (function() {
-  const logo = document.querySelector('.logo-white');
-  if (!logo) return;
+  var navLogo = document.querySelector('.nav-logo');
+  if (!navLogo) return;
+  var lightEls = [
+    document.querySelector('.video-hero'),
+    document.querySelector('.hero'),
+    document.querySelector('.strip'),
+    document.querySelector('#projects')
+  ].filter(Boolean);
 
-  // Light bg sections — IDs and classes
-  const LIGHT_SELECTORS = ['.video-hero', '.hero', '.strip', '#projects'];
-
-  function checkLogo() {
-    const navBottom = 80; // nav height approx
-    let isLight = false;
-
-    LIGHT_SELECTORS.forEach(sel => {
-      const el = document.querySelector(sel);
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      // Element is behind the nav if its top is above nav bottom and bottom is below 0
-      if (r.top <= navBottom && r.bottom >= 0) isLight = true;
+  function check() {
+    var logoBottom = navLogo.getBoundingClientRect().bottom;
+    var light = lightEls.some(function(el) {
+      var r = el.getBoundingClientRect();
+      return r.top < logoBottom && r.bottom > 0;
     });
-
-    logo.classList.toggle('dark-mode', isLight);
+    navLogo.classList.toggle('on-light', light);
   }
 
-  // Run on scroll and on load
-  window.addEventListener('scroll', checkLogo, { passive: true });
-  checkLogo();
+  window.addEventListener('scroll', check, {passive: true});
+  setTimeout(check, 200);
 })();
 
 
-// ── NAV LOGO colour switch
+// ── NAV LOGO: swap white/black based on section background
 (function() {
-  const logo = document.querySelector('.logo-white');
-  if (!logo) return;
-  const LIGHT = ['.video-hero', '.hero', '.strip', '#projects'];
+  var navLogo = document.getElementById('navLogo');
+  if (!navLogo) return;
+  var lightSections = ['.video-hero', '.hero', '.strip', '#projects'];
 
   function check() {
-    const navRect = logo.getBoundingClientRect();
-    const navMidY = (navRect.top + navRect.bottom) / 2;
-    let light = false;
-    LIGHT.forEach(sel => {
-      const el = document.querySelector(sel);
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      if (r.top <= navMidY && r.bottom >= navMidY) light = true;
+    var navBottom = navLogo.getBoundingClientRect().bottom;
+    var onLight = lightSections.some(function(sel) {
+      var el = document.querySelector(sel);
+      if (!el) return false;
+      var r = el.getBoundingClientRect();
+      return r.top < navBottom && r.bottom > 0;
     });
-    logo.classList.toggle('dark-mode', light);
+    navLogo.classList.toggle('on-light', onLight);
   }
 
   window.addEventListener('scroll', check, { passive: true });
   window.addEventListener('load', check);
   check();
 })();
-
 </script>
 </body>
 </html>
