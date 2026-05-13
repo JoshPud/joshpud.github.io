@@ -1023,6 +1023,31 @@ function handleSubmit(){
   checkLogo();
 })();
 
+
+// ── NAV LOGO colour switch
+(function() {
+  const logo = document.querySelector('.logo-white');
+  if (!logo) return;
+  const LIGHT = ['.video-hero', '.hero', '.strip', '#projects'];
+
+  function check() {
+    const navRect = logo.getBoundingClientRect();
+    const navMidY = (navRect.top + navRect.bottom) / 2;
+    let light = false;
+    LIGHT.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      if (r.top <= navMidY && r.bottom >= navMidY) light = true;
+    });
+    logo.classList.toggle('dark-mode', light);
+  }
+
+  window.addEventListener('scroll', check, { passive: true });
+  window.addEventListener('load', check);
+  check();
+})();
+
 </script>
 </body>
 </html>
