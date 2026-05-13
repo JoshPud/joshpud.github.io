@@ -990,40 +990,33 @@ function handleSubmit(){
 })();
 
 
-// ── NAV LOGO colour switch on light sections
+
+// ── NAV LOGO switches dark/light based on scroll position
 (function() {
   const logo = document.querySelector('.logo-white');
   if (!logo) return;
 
-  // Sections that have a light background
-  const lightSections = document.querySelectorAll('.hero, #projects, .strip, .video-hero');
+  // Light bg sections — IDs and classes
+  const LIGHT_SELECTORS = ['.video-hero', '.hero', '.strip', '#projects'];
 
-  const observer = new IntersectionObserver(entries => {
-    // Check if any light section is intersecting with the nav zone
-    let anyLight = false;
-    entries.forEach(e => { if (e.isIntersecting) anyLight = true; });
+  function checkLogo() {
+    const navBottom = 80; // nav height approx
+    let isLight = false;
 
-    // Also check all light sections currently
-    lightSections.forEach(sec => {
-      const rect = sec.getBoundingClientRect();
-      // If section overlaps the nav bar (top 80px of screen)
-      if (rect.top < 80 && rect.bottom > 0) anyLight = true;
+    LIGHT_SELECTORS.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      // Element is behind the nav if its top is above nav bottom and bottom is below 0
+      if (r.top <= navBottom && r.bottom >= 0) isLight = true;
     });
 
-    logo.classList.toggle('dark-mode', anyLight);
-  }, { threshold: 0, rootMargin: '-0px 0px -90% 0px' });
+    logo.classList.toggle('dark-mode', isLight);
+  }
 
-  lightSections.forEach(sec => observer.observe(sec));
-
-  // Also update on scroll for accuracy
-  window.addEventListener('scroll', () => {
-    let anyLight = false;
-    lightSections.forEach(sec => {
-      const rect = sec.getBoundingClientRect();
-      if (rect.top < 80 && rect.bottom > 0) anyLight = true;
-    });
-    logo.classList.toggle('dark-mode', anyLight);
-  }, { passive: true });
+  // Run on scroll and on load
+  window.addEventListener('scroll', checkLogo, { passive: true });
+  checkLogo();
 })();
 
 </script>
