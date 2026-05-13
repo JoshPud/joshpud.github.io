@@ -74,10 +74,10 @@
     /* No veil needed on chartreuse hero */
     /* Hero text */
     .hero-title { color: #231F20; transition: color .3s; }
-    .hero-label { color: rgba(35,31,32,0.7); opacity: 0; animation: fadeUp .7s .2s ease forwards; }
+    
     .hero-desc  { color: #231F20; }
-    .hero-label { font-family: 'Share Tech Mono', monospace; font-size: .78rem; letter-spacing: 3px; text-transform: uppercase; color: var(--lime); margin-bottom: 1.2rem; display: flex; align-items: center; gap: .8rem; opacity: 0; animation: fadeUp .7s .2s ease forwards; }
-    .hero-label::before { content: ''; display: block; width: 32px; height: 1px; background: #231F20; }
+    .hero-label { display: inline-flex; align-items: center; gap: .6rem; background: transparent; color: #231F20; border: 1.5px solid #231F20; padding: .25rem .75rem; border-radius: 100px; width: fit-content; opacity: 0; animation: fadeUp .7s .2s ease forwards; font-family: 'Share Tech Mono', monospace; font-size: .78rem; letter-spacing: 3px; text-transform: uppercase; color: var(--lime); margin-bottom: 1.2rem; display: flex; align-items: center; gap: .8rem; opacity: 0; animation: fadeUp .7s .2s ease forwards; }
+    .hero-label::before { content: ''; display: block; width: 6px; height: 6px; border-radius: 50%; background: #231F20; }
     .hero-title { font-family: 'Poppins', sans-serif; font-size: clamp(3rem, 7vw, 7rem); line-height: .88; letter-spacing: -1px; color: #231F20; opacity: 0; animation: fadeUp .7s .35s ease forwards; will-change: transform; }
     .hero-title em,
     .about-text h2 em {
@@ -275,16 +275,19 @@
     }
     /* HERO BLOBS */
     .gb-1 {
-      width: 500px; height: 500px; top: -100px; right: -80px;
-      background: #FF8902;
+      width: 500px; height: 500px; top: -100px; right: -60px;
+      background: #f5ff80;
+      filter: blur(45px);
     }
     .gb-2 {
-      width: 400px; height: 400px; top: 25%; left: -100px;
-      background: #EA8BED;
+      width: 450px; height: 450px; top: 20%; left: -100px;
+      background: #feff99;
+      filter: blur(50px);
     }
     .gb-3 {
-      width: 350px; height: 350px; bottom: -60px; right: 18%;
-      background: #FF8902;
+      width: 300px; height: 300px; bottom: -40px; right: 20%;
+      background: #eeff55;
+      filter: blur(40px);
     }
     /* ABOUT BLOBS */
     .about-blob-wrap {
@@ -306,7 +309,7 @@
       border-radius: 50%;
     }
     /* Blob movement — uses --rx/--ry for cursor repel offset */
-    .gb { position: absolute; border-radius: 50%; filter: blur(80px); }
+    .gb { position: absolute; border-radius: 50%; }
     @keyframes gMove1 {
       0%   { transform: translate(0px, 0px);   }
       25%  { transform: translate(60px,   40px);  }
@@ -604,7 +607,7 @@
 <div class="cursor-ring" id="cursorRing"></div>
 
 <nav>
-  <div class="nav-left"><span class="chrome-badge">Available 2025</span></div>
+  <div class="nav-left"><span class="chrome-badge">Available 2026</span></div>
   <div class="nav-logo" id="navLogo">
     <img src="logo-white.png" alt="Joshua Crossley Creative" class="logo-img" id="logoWhite"/>
     <img src="logo-black.png" alt="Joshua Crossley Creative" class="logo-img" id="logoBlack" style="display:none;"/>
@@ -620,7 +623,7 @@
 <section class="video-hero">
   <canvas id="videoCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
   <div class="video-hero-overlay"></div>
-  <div class="video-hero-label">Joshua Crossley Creative — Portfolio 2025</div>
+  <div class="video-hero-label">Joshua Crossley Creative — Portfolio 2026</div>
   <div class="video-scroll-line"></div>
   <span class="video-scroll-hint">Scroll</span>
 </section>
@@ -635,7 +638,7 @@
   </div>
   <div class="hero-grid" id="heroGrid"></div>
   <div class="hero-content">
-    <div class="hero-label">Creative Portfolio — 2025</div>
+    <div class="hero-label">Creative Portfolio — 2026</div>
     <h1 class="hero-title neon" id="heroTitle">Designed<br/>to <em>stand</em> out.</h1>
     <div class="hero-sub">
       <p class="hero-desc">I craft bold visual identities, expressive illustrations, and digital experiences that people actually remember.</p>
@@ -734,7 +737,7 @@
     <img src="logo-white.png" alt="Joshua Crossley Creative" class="footer-full-img"/>
   </div>
   <div class="logo-footer-bottom">
-    <span style="color:rgba(255,255,255,0.45);font-size:.8rem;letter-spacing:1px;font-family:'Share Tech Mono',monospace;">© 2025 — All rights reserved</span>
+    <span style="color:rgba(255,255,255,0.45);font-size:.8rem;letter-spacing:1px;font-family:'Share Tech Mono',monospace;">© 2026 — All rights reserved</span>
     <canvas id="miniGlobe" width="36" height="36" style="display:block;width:36px;height:36px;"></canvas>
     <span style="font-size:.8rem;color:rgba(255,255,255,0.45);letter-spacing:1px;font-family:'Share Tech Mono',monospace;">Joshua Crossley Creative</span>
   </div>
@@ -1052,6 +1055,36 @@ function handleSubmit(){
   window.addEventListener('scroll', check, { passive: true });
   window.addEventListener('load', check);
   check();
+})();
+
+// ── BLOB ANIMATION + REPEL
+(function() {
+  var blobs = Array.from(document.querySelectorAll('.gb'));
+  if (!blobs.length) return;
+  var configs = [
+    { ax: 55,  ay: 65,  vx: 0.30, vy: 0.20 },
+    { ax: -50, ay: 75,  vx: 0.20, vy: 0.32 },
+    { ax: 65,  ay: -45, vx: 0.35, vy: 0.25 },
+  ];
+  var repel = blobs.map(function() { return { x: 0, y: 0 }; });
+  window.addEventListener('mousemove', function(e) {
+    blobs.forEach(function(blob, i) {
+      var rect = blob.getBoundingClientRect();
+      var cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+      var dx = e.clientX - cx, dy = e.clientY - cy;
+      var dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      if (dist < 500) { var f=(1-dist/500)*130; repel[i].x+=(-dx/dist)*f; repel[i].y+=(-dy/dist)*f; }
+    });
+  });
+  var t=0;
+  (function loop() {
+    requestAnimationFrame(loop); t+=0.008;
+    blobs.forEach(function(blob,i) {
+      var c=configs[i]||configs[0];
+      repel[i].x*=0.88; repel[i].y*=0.88;
+      blob.style.transform='translate('+(Math.sin(t*c.vx+i*1.2)*c.ax+repel[i].x)+'px,'+(Math.cos(t*c.vy+i*0.8)*c.ay+repel[i].y)+'px)';
+    });
+  })();
 })();
 </script>
 </body>
