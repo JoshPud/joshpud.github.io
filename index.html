@@ -1145,6 +1145,44 @@
       opacity: 0.08;
       background-image: url("data:image/png;base64,");
     }
+
+    /* ── FROG SPEECH BUBBLE ── */
+    .frog-bubble {
+      position: absolute;
+      bottom: 105%;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      transform-origin: bottom center;
+      background: #f5f2ec;
+      border: 3px solid #231F20;
+      padding: 0.5rem 0.8rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      color: #231F20;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: transform 0.15s steps(3);
+      /* Pixel style corners */
+      clip-path: polygon(
+        4px 0%, calc(100% - 4px) 0%,
+        100% 4px, 100% calc(100% - 4px),
+        calc(100% - 4px) 100%, calc(50% + 8px) 100%,
+        calc(50% + 4px) calc(100% + 6px),
+        calc(50%) calc(100% + 10px),
+        calc(50% - 4px) calc(100% + 6px),
+        calc(50% - 8px) 100%,
+        4px 100%, 0% calc(100% - 4px),
+        0% 4px
+      );
+      z-index: 10;
+    }
+    .frog-bubble.visible {
+      transform: translateX(-50%) scale(1);
+    }
+    .frog-push-wrap {
+      position: relative;
+    }
 </style>
 </head>
 <body>
@@ -1350,7 +1388,8 @@
       </div>
     </div>
     <div class="frog-push-wrap">
-      <img src="FROG-PUSH.png" alt="Frog Mage" class="frog-push-img"/>
+      <div class="frog-bubble" id="frogBubble">PUSHUS PROJECTUS!</div>
+      <img src="FROG-PUSH.png" alt="Frog Mage" class="frog-push-img" id="frogPushImg"/>
     </div>
 </div></div>
     </section>
@@ -1851,5 +1890,22 @@ function toggleService(btn){
   el.style.backgroundSize = '256px 256px';
 })();
 </script>
+<script>
+// FROG PUSH BUBBLE
+(function(){
+  var img = document.getElementById('frogPushImg');
+  var bubble = document.getElementById('frogBubble');
+  if (!img || !bubble) return;
+  var timeout;
+  img.style.pointerEvents = 'auto';
+  img.style.cursor = 'pointer';
+  img.addEventListener('click', function() {
+    clearTimeout(timeout);
+    bubble.classList.add('visible');
+    timeout = setTimeout(function() {
+      bubble.classList.remove('visible');
+    }, 2000);
+  });
+})();</script>
 </body>
 </html>
