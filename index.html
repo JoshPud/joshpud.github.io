@@ -218,7 +218,6 @@
       margin: 0;
       transform: scale(0.85);
       transform-origin: center center;
-      transition: transform 0.6s ease;
     }
     .logo-footer-track {
       display: flex; white-space: nowrap;
@@ -1098,12 +1097,12 @@
     .p-thumb-ghost {
       transition: background 0.3s ease;
     }
-    .p-thumb-ghost.tapped {
-      background: #EA8BED !important;
-      border-color: #231F20 !important;
+    .p-thumb-ghost:hover {
+      background: #EA8BED;
+      border-color: #231F20;
     }
-    .p-thumb-ghost.tapped .ghost-arrow { color: #231F20 !important; }
-    .p-thumb-ghost.tapped .ghost-label { color: #231F20 !important; }
+    .p-thumb-ghost:hover .ghost-arrow { color: #231F20; }
+    .p-thumb-ghost:hover .ghost-label { color: #231F20; }
 
     .mobile-nav-link { position: relative; }
     .mobile-nav-link.active { color: var(--lime); }
@@ -1124,12 +1123,27 @@
       align-items: flex-end;
       padding-left: 1.5rem;
       align-self: flex-end;
+      max-height: calc(100vh - 7rem);
+      overflow: hidden;
     }
     .frog-push-img {
-      height: 40vh;
+      height: calc((100vh - 7rem) * 0.5);
+      max-height: calc((100vh - 7rem) * 0.5);
       width: auto;
       display: block;
       image-rendering: pixelated;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9997;
+      opacity: 0.08;
+      background-image: url("data:image/png;base64,");
     }
 </style>
 </head>
@@ -1326,7 +1340,7 @@
       <div class="chrome-frame"></div><div class="p-info reveal"><div class="p-tag">UI Design</div><h3>Project Three</h3><p>App design &amp; prototype</p></div>
     </div>
       <div class="project-card project-card-ghost">
-      <div class="p-thumb p-thumb-ghost" onclick="this.classList.toggle('tapped')">
+      <div class="p-thumb p-thumb-ghost">
         <div class="ghost-arrow"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
   <line x1="8" y1="32" x2="32" y2="8" stroke="currentColor" stroke-width="1.5"/>
   <line x1="14" y1="8" x2="32" y2="8" stroke="currentColor" stroke-width="1.5"/>
@@ -1792,6 +1806,7 @@ function toggleService(btn){
 
 </script>
 <div class="scroll-line" id="scrollLine"></div>
+<div class="noise-overlay"></div>
 <div class="cursor-dot" id="cursorDot">✶</div>
 <div class="cursor-ring" id="cursorRing"></div>
 
@@ -1800,14 +1815,40 @@ function toggleService(btn){
 (function(){
   var img = document.querySelector('.footer-full-img');
   if (!img) return;
+  // Remove CSS transition so scale is tied directly to scroll
+  img.style.transition = 'none';
   window.addEventListener('scroll', function() {
     var scrollBottom = window.scrollY + window.innerHeight;
     var pageH = document.body.scrollHeight;
     var footerH = 300;
     var progress = Math.max(0, Math.min(1, (scrollBottom - (pageH - footerH)) / footerH));
-    var scale = 0.85 + (progress * 0.15);
+    var scale = 0.90 + (progress * 0.10);
     img.style.transform = 'scale(' + scale + ')';
   }, {passive: true});
+})();
+</script>
+
+<script>
+// NOISE OVERLAY GENERATOR
+(function(){
+  var el = document.querySelector('.noise-overlay');
+  if (!el) return;
+  var canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 256;
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.createImageData(256, 256);
+  var data = imageData.data;
+  for (var i = 0; i < data.length; i += 4) {
+    var val = Math.random() * 255;
+    data[i] = val;
+    data[i+1] = val;
+    data[i+2] = val;
+    data[i+3] = 255;
+  }
+  ctx.putImageData(imageData, 0, 0);
+  el.style.backgroundImage = 'url(' + canvas.toDataURL() + ')';
+  el.style.backgroundRepeat = 'repeat';
+  el.style.backgroundSize = '256px 256px';
 })();
 </script>
 </body>
