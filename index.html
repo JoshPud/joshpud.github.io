@@ -77,7 +77,7 @@
     .hero-title { color: #ffffff; transition: color .3s; }
     
     .hero-desc  { color: #ffffff; }
-    .hero-label { display: inline-flex; align-items: center; gap: .6rem; background: transparent; color: #ffffff; border: 1.5px solid #ffffff; padding: .25rem .75rem; border-radius: 100px; width: fit-content; font-family: 'Share Tech Mono', monospace; font-size: .78rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1.2rem; opacity: 0; animation: fadeUp .7s .2s ease forwards; }
+    .hero-label { display: inline-flex; align-items: center; gap: .6rem; background: transparent; color: #231F20; border: 1.5px solid #231F20; padding: .25rem .75rem; border-radius: 100px; width: fit-content; font-family: 'Share Tech Mono', monospace; font-size: .78rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1.2rem; opacity: 0; animation: fadeUp .7s .2s ease forwards; }
     .hero-label::before { content: none; }
     .hero-title { font-family: 'Poppins', sans-serif; font-size: clamp(3rem, 7vw, 7rem); line-height: .88; letter-spacing: -1px; color: #231F20; opacity: 0; animation: fadeUp .7s .35s ease forwards; will-change: transform; }
     .hero-title em,
@@ -157,12 +157,12 @@
     .skill-tag { font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(245,242,236,.35); font-family: 'Share Tech Mono', monospace; }
 
     #projects { background: #ffffff; color: #231F20; position: relative; z-index: 4; }
-    .projects-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; margin: 0 3rem 2rem 0; flex-shrink: 0; }
+    .projects-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; margin: 0 0 2rem 0; flex-shrink: 0; padding-right: 3rem; }
     .projects-header h2 { font-family: 'Poppins', sans-serif; font-size: clamp(3rem,6vw,6rem); letter-spacing: 1px; line-height: 1; margin-top: 0; }
     .projects-header h2 em { font-family: 'Poppins', sans-serif; font-style: normal; font-weight: 400; color: var(--accent); }
     .projects-header p { max-width: 260px; font-size: .9rem; line-height: 1.7; color: #555; }
     .projects-grid-wrap { overflow: visible; flex: 1; display: flex; min-height: 0; }
-    .projects-grid { display: grid; grid-template-columns: 1.4fr 1fr; grid-template-rows: auto auto; gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+    .projects-grid { display: grid; grid-template-columns: 1.4fr 1fr; grid-template-rows: auto auto; gap: 1.5rem; max-width: 1200px; margin: 0; }
     .project-card { border-radius: 16px; overflow: hidden; position: relative; cursor: none; }
     .project-card:nth-child(1) { grid-row: span 2; }
     .p-thumb { width: 100%; aspect-ratio: 4/3; position: relative; overflow: hidden; background: #111; }
@@ -177,7 +177,7 @@
     .p-info h3 { font-family: 'Poppins', sans-serif; font-size: 1.6rem; letter-spacing: 1px; }
     .p-info p { font-size: .85rem; opacity: .75; margin-top: .3rem; }
 
-    #contact { padding: 10rem 3rem 12rem; position: relative; background: var(--lime); color: #231F20; border-radius: 0 0 3rem 3rem; z-index: 3; }
+    #contact { padding: 10rem 3rem 12rem; position: relative; background: var(--lime); color: #231F20; border-radius: 0 0 3rem 3rem; z-index: 5; }
     .contact-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; }
     .contact-left h2 { font-family: 'Poppins', sans-serif; font-size: clamp(2.8rem,5vw,5rem); line-height: 1.0; letter-spacing: 1px; margin-bottom: 2rem; }
     .contact-left h2 em { font-family: 'Poppins', sans-serif; font-style: normal; font-weight: 400; color: var(--lime); }
@@ -196,11 +196,12 @@
 
     /* ── Parallax logo footer — fixed behind the page, reveals on scroll ── */
     .logo-footer {
-      position: relative;
+      position: fixed;
+      bottom: 0;
+      left: 0;
       width: 100%;
       background: #231F20;
-      min-height: 200px;
-      display: block;
+      z-index: 1;
     }
     .logo-scroll-wrap { display: none; }
     .footer-full-logo {
@@ -215,6 +216,9 @@
       display: block;
       padding: 0;
       margin: 0;
+      transform: scale(0.85);
+      transform-origin: center center;
+      transition: transform 0.6s ease;
     }
     .logo-footer-track {
       display: flex; white-space: nowrap;
@@ -342,6 +346,7 @@
     /* Ensure footer can be fully scrolled into view */
     .contact-footer-wrap {
       position: relative;
+      padding-bottom: 300px;
     }
 
 
@@ -939,10 +944,9 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
-      padding: 0.5rem 0 3rem 3rem;
+      padding: 6rem 0 3rem 3rem;
       background: #ffffff;
       box-shadow: 0 -20px 60px rgba(35,31,32,0.6), 0 -4px 12px rgba(35,31,32,0.4);
-      padding-top: 2.5rem;
     }
     .projects-header {
       flex-shrink: 0;
@@ -1122,7 +1126,7 @@
       align-self: flex-end;
     }
     .frog-push-img {
-      height: 50%;
+      height: calc((100vh - 7rem) * 0.5);
       width: auto;
       display: block;
       image-rendering: pixelated;
@@ -1177,7 +1181,7 @@
 
   <div class="hero-content">
     <div class="hero-label"><span>✶</span> Creative Portfolio — 2026</div>
-    <h1 class="hero-title neon" id="heroTitle"><span class="blur-word">Woven</span> <span class="blur-word" style="transition-delay:.2s;">to</span> <span class="blur-word" style="transition-delay:.4s;">wander</span><br/><em><span class="blur-word" style="transition-delay:.6s;">the</span> <span class="blur-word" style="transition-delay:.8s;">world.</span></em></h1>
+    <h1 class="hero-title" id="heroTitle"><span class="blur-word">Woven</span> <span class="blur-word" style="transition-delay:.2s;">to</span> <span class="blur-word" style="transition-delay:.4s;">wander</span><br/><em><span class="neon" style="white-space:nowrap;"><span class="blur-word" style="transition-delay:.6s;">the</span> <span class="blur-word" style="transition-delay:.8s;">world.</span></span></em></h1>
     <div class="hero-sub">
       <p class="hero-desc word-reveal"><span class="w" style="transition-delay:0.00s;">I</span> <span class="w" style="transition-delay:0.04s;">craft</span> <span class="w" style="transition-delay:0.08s;">bold</span> <span class="w" style="transition-delay:0.12s;">visual</span> <span class="w" style="transition-delay:0.16s;">identities,</span> <span class="w" style="transition-delay:0.20s;">expressive</span> <span class="w" style="transition-delay:0.24s;">illustrations,</span> <span class="w" style="transition-delay:0.28s;">and</span> <span class="w" style="transition-delay:0.32s;">digital</span> <span class="w" style="transition-delay:0.36s;">experiences</span> <span class="w" style="transition-delay:0.40s;">that</span> <span class="w" style="transition-delay:0.44s;">people</span> <span class="w" style="transition-delay:0.48s;">actually</span> <span class="w" style="transition-delay:0.52s;">remember.</span></p>
       <a href="#projects" class="hero-cta">View work ↓</a>
@@ -1364,7 +1368,6 @@
     </div>
   </div>
 </section>
-
 <footer class="logo-footer" id="logoFooter">
   <div class="footer-full-logo">
     <img class="footer-full-img" src="logo-white.png" alt="Joshua Crossley Creative"/>
@@ -1504,10 +1507,23 @@ document.addEventListener('DOMContentLoaded', function(){
   var ring = document.getElementById('cursorRing');
   if (!dot || !ring) return;
   var mx = 0, my = 0, dx = 0, dy = 0;
+  var darkCursor = false;
+  var contact = document.getElementById('contact');
   document.addEventListener('mousemove', function(e) {
     mx = e.clientX;
     my = e.clientY;
     ring.style.transform = 'translate(' + (mx - 18) + 'px,' + (my - 18) + 'px)';
+    // Switch cursor dark on chartreuse contact section
+    if (contact) {
+      var r = contact.getBoundingClientRect();
+      var onContact = e.clientY >= r.top && e.clientY <= r.bottom;
+      if (onContact !== darkCursor) {
+        darkCursor = onContact;
+        var colour = darkCursor ? '#231F20' : '#d5e709';
+        dot.style.color = colour;
+        ring.style.borderColor = colour;
+      }
+    }
   });
   (function loop() {
     requestAnimationFrame(loop);
