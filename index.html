@@ -1896,15 +1896,13 @@ function toggleService(btn){
   var img = document.getElementById('frogPushImg');
   var bubble = document.getElementById('frogBubble');
   if (!img || !bubble) return;
-  var timeout;
   img.style.pointerEvents = 'auto';
   img.style.cursor = 'pointer';
-  img.addEventListener('click', function() {
-    clearTimeout(timeout);
+  img.addEventListener('mouseenter', function() {
     bubble.classList.add('visible');
-    timeout = setTimeout(function() {
-      bubble.classList.remove('visible');
-    }, 2000);
+  });
+  img.addEventListener('mouseleave', function() {
+    bubble.classList.remove('visible');
   });
 })();</script>
 </body>
