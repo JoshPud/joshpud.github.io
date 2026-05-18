@@ -201,7 +201,7 @@
       left: 0;
       width: 100%;
       background: #231F20;
-      z-index: 1;
+      z-index: -1;
     }
     .logo-scroll-wrap { display: none; }
     .footer-full-logo {
@@ -988,7 +988,7 @@
       background: #231F20;
       padding: 1rem 0 2rem;
       overflow: hidden;
-    }
+     z-index: 3; }
     .logo-strip-label {
       font-family: 'Share Tech Mono', monospace;
       font-size: .75rem;
@@ -1126,7 +1126,7 @@
       align-self: flex-end;
     }
     .frog-push-img {
-      height: calc((100vh - 7rem) * 0.5);
+      height: 40vh;
       width: auto;
       display: block;
       image-rendering: pixelated;
@@ -1794,5 +1794,21 @@ function toggleService(btn){
 <div class="scroll-line" id="scrollLine"></div>
 <div class="cursor-dot" id="cursorDot">✶</div>
 <div class="cursor-ring" id="cursorRing"></div>
+
+<script>
+// FOOTER LOGO ZOOM
+(function(){
+  var img = document.querySelector('.footer-full-img');
+  if (!img) return;
+  window.addEventListener('scroll', function() {
+    var scrollBottom = window.scrollY + window.innerHeight;
+    var pageH = document.body.scrollHeight;
+    var footerH = 300;
+    var progress = Math.max(0, Math.min(1, (scrollBottom - (pageH - footerH)) / footerH));
+    var scale = 0.85 + (progress * 0.15);
+    img.style.transform = 'scale(' + scale + ')';
+  }, {passive: true});
+})();
+</script>
 </body>
 </html>
