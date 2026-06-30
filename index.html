@@ -1240,7 +1240,7 @@
       pointer-events: none;
     }
     .preloader-logo {
-      width: min(60vw, 500px);
+      width: min(90vw, 1000px);
       height: auto;
     }
     .preloader-counter {
@@ -2032,15 +2032,15 @@ function toggleService(btn){
     } else {
       counter.textContent = 100;
       setTimeout(function(){
+        // Start video scale-up FIRST, visible underneath as preloader fades
+        if (heroVideo) heroVideo.classList.add('expanded');
         preloader.classList.add('fade-out');
+        // Fade out the intro logo shortly after preloader clears
+        if (introLogo) {
+          setTimeout(function(){ introLogo.classList.add('hidden'); }, 700);
+        }
         setTimeout(function(){
           preloader.style.display = 'none';
-          // Trigger video scale-up
-          if (heroVideo) heroVideo.classList.add('expanded');
-          // Fade out the intro logo as video covers it
-          if (introLogo) {
-            setTimeout(function(){ introLogo.classList.add('hidden'); }, 500);
-          }
         }, 600);
       }, 300);
     }
