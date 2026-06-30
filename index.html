@@ -1184,9 +1184,109 @@
     .frog-push-wrap {
       position: relative;
     }
+
+    /* ── PRELOADER ── */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #d5e709;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease;
+    }
+    #preloader.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .preloader-logo {
+      width: 40%;
+      max-width: 420px;
+      height: auto;
+    }
+    .preloader-counter {
+      position: absolute;
+      bottom: 4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Inknut Antiqua', serif;
+      font-weight: 300;
+      font-size: 1.4rem;
+      color: #231F20;
+      letter-spacing: 2px;
+    }
+
+    /* ── PRELOADER ── */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #d5e709;
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #preloader.loaded {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .preloader-logo {
+      width: min(60vw, 500px);
+      height: auto;
+    }
+    .preloader-counter {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Inknut Antiqua', serif;
+      font-weight: 300;
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      color: #231F20;
+    }
+
+    /* ── VIDEO SCALE INTRO ── */
+    .hero video {
+      transform: scale(0.15);
+      transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .hero video.expanded {
+      transform: scale(1);
+    }
+    .intro-logo {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(60vw, 500px);
+      z-index: 6;
+      opacity: 1;
+      transition: opacity 0.5s ease 0.5s;
+      pointer-events: none;
+    }
+    .intro-logo.hidden {
+      opacity: 0;
+    }
 </style>
 </head>
 <body>
+
+<div id="preloader">
+  <img src="logo-black.png" alt="Joshua Crossley Creative" class="preloader-logo"/>
+  <div class="preloader-counter" id="preloaderCounter">0</div>
+</div>
+
+</div>
+
 <div class="page-wrap" id="pageWrap">
 
 
@@ -1229,7 +1329,8 @@
 </section>
 
 <section class="hero">
-  <video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;"><source src="WAVE BANNER.mp4" type="video/mp4"></video>
+  <video autoplay muted loop playsinline id="heroVideo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;"><source src="WAVE BANNER.mp4" type="video/mp4"></video>
+  <img src="logo-white.png" alt="Joshua Crossley Creative" class="intro-logo" id="introLogo"/>
 
 
   <div class="hero-content">
@@ -1906,5 +2007,50 @@ function toggleService(btn){
     bubble.classList.remove('visible');
   });
 })();</script>
+
+<script>
+// ── PRELOADER
+(function(){
+  var counter = document.getElementById('preloaderCounter');
+  var preloader = document.getElementById('preloader');
+  var heroVideo = document.getElementById('heroVideo');
+  var introLogo = document.getElementById('introLogo');
+  if (!counter || !preloader) return;
+  var current = 0;
+  var target = 100;
+  var duration = 1800; // ms
+  var startTime = null;
+
+  function tick(timestamp) {
+    if (!startTime) startTime = timestamp;
+    var elapsed = timestamp - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    current = Math.floor(progress * target);
+    counter.textContent = current;
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      counter.textContent = 100;
+      setTimeout(function(){
+        preloader.classList.add('fade-out');
+        setTimeout(function(){
+          preloader.style.display = 'none';
+          // Trigger video scale-up
+          if (heroVideo) heroVideo.classList.add('expanded');
+          // Fade out the intro logo as video covers it
+          if (introLogo) {
+            setTimeout(function(){ introLogo.classList.add('hidden'); }, 500);
+          }
+        }, 600);
+      }, 300);
+    }
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+
+<script>
+</script>
+
 </body>
 </html>
