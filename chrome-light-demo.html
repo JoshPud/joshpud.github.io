@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chrome logo, moving light</title>
+<style>
+  html, body { margin: 0; background: #0d0d0d; color: #f5f2ec; font-family: Georgia, serif; }
+  .big { position: sticky; top: 0; z-index: 2; display: flex; justify-content: center; padding: 44px 0 30px; background: #0d0d0d; }
+  .big img { height: 150px; width: auto; }
+  .small { position: fixed; top: 16px; left: 24px; z-index: 5; height: 48px; width: auto; }
+  .block { max-width: 640px; margin: 0 auto; padding: 60px 24px; line-height: 1.7; font-size: 1.15rem; }
+  .block h2 { color: #d5e709; font-weight: normal; font-style: italic; }
+  .metals { position: fixed; top: 16px; right: 20px; z-index: 6; display: flex; gap: 8px; }
+  .metals button { font: 12px 'Courier New', monospace; letter-spacing: 0.08em; padding: 8px 12px; background: #111; color: #d5e709; border: 2px solid #3a3a3a; cursor: pointer; }
+  .metals button.on { border-color: #d5e709; }
+  .hint { text-align: center; padding: 40px 0 0; color: #8a9a0c; font-family: 'Courier New', monospace; font-size: 0.8rem; letter-spacing: 0.15em; }
+</style>
+</head>
+<body>
+<div class="metals"><button data-m="chrome">CHROME</button><button data-m="gold">RICH GOLD</button><button data-m="champagne" class="on">CHAMPAGNE</button></div>
+<img class="small" data-chrome-light src="JCC_LOGO_CHAMPAGNE_NAV.png" alt="Joshua Crossley Creative">
+<div class="big"><img data-chrome-light src="JCC_LOGO_CHAMPAGNE_NAV.png" alt="Joshua Crossley Creative"></div>
+<div class="hint">SCROLL AND WATCH THE LIGHT MOVE ACROSS THE CHAMPAGNE GOLD</div>
+<div class="block"><h2>One</h2><p>The logo is lit live from a surface map, so the reflections and the bright glints travel across the letters as the light moves round it. Scroll slowly and watch the highlights slide along each stroke.</p></div>
+<div class="block"><h2>Two</h2><p>Nothing here is a video or a set of pictures. It is one small image of the logo's shape, shaded in the browser as you scroll.</p></div>
+<div class="block"><h2>Three</h2><p>If the browser cannot do this, it quietly shows the normal chrome logo instead.</p></div>
+<div class="block"><h2>Four</h2><p>The smaller copy in the top left is the size it would be in the site's top bar.</p></div>
+<div class="block"><h2>Five</h2><p>Keep going. The light does a full turn every few thousand pixels of scrolling.</p></div>
+<div class="block"><h2>Six</h2><p>That is the whole effect.</p></div>
+<div style="height:60vh"></div>
+<script src="chrome-logo.js?v=3"></script>
+<script>
+  var btns = document.querySelectorAll('.metals button');
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(x){ x.classList.toggle('on', x === b); });
+      if(window.jccSetMetal) window.jccSetMetal(b.getAttribute('data-m'));
+    });
+  });
+</script>
+</body>
+</html>

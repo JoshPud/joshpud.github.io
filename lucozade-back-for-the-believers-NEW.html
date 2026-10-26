@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title> — Joshua Crossley Creative</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@400&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --lime: #d5e709;
+    --dark: #231F20;
+    --orange: #FF8902;
+    --cream: #F5F2EC;
+  }
+
+  html, body { overflow-x: hidden; }
+  body {
+    background: #0d0d0d;
+    color: var(--cream);
+    font-family: 'Inknut Antiqua', serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.12) 3px,
+      rgba(0,0,0,0.12) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 2rem;
+    background: transparent;
+  }
+
+  .top-bar-logo {
+    height: 48px;
+    width: auto;
+    opacity: 1;
+    cursor: pointer;
+  }
+
+
+
+  /* ── HERO ── */
+  .hero {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    background: #111;
+    z-index: 0;
+  }
+  .hero-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    will-change: transform;
+  }
+
+  .hero-spacer {
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Spacer to push content below the fixed hero */
+  .hero-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: transform;
+  }
+
+  .hero-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a1f0a 50%, #0d1a0d 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-placeholder-text {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 2px;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13,13,13,0.8) 0%, transparent 50%);
+  }
+
+  .hero-label {
+    position: absolute;
+    bottom: 3rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+
+  .hero-label-eyebrow {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    color: var(--orange);
+    letter-spacing: 3px;
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .hero-label-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: #fff;
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(0,0,0,0.8);
+  }
+
+  /* ── CONTEXT ── */
+  .content-wrap {
+    position: relative;
+    z-index: 2;
+    background: #0d0d0d;
+  }
+
+  .context {
+    padding: 10rem 3rem 5rem;
+    max-width: 900px;
+    margin: 0 auto;
+
+  }
+
+  .context-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+
+  }
+
+  .context-eyebrow {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: var(--orange);
+    letter-spacing: 3px;
+    margin-bottom: 2.5rem;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-transform: uppercase;
+  }
+  .context-eyebrow::before,
+  .context-eyebrow::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: var(--orange);
+    opacity: 0.6;
+  }
+
+  .context-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 144px;
+    color: #ECE5D4;
+    line-height: 126.7px;
+    letter-spacing: -2.9px;
+  }
+
+  .context-title em {
+    font-style: italic;
+    color: #ECE5D4;
+  }
+
+  .context-role {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 2.2px;
+    color: rgba(236,229,212,0.55);
+    margin-top: 2.5rem;
+    text-transform: uppercase;
+  }
+
+  .context-role-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: 0px;
+    color: #ECE5D4;
+    margin-top: 0.4rem;
+  }
+
+  .context-tagline {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 24px;
+    color: rgba(236,229,212,0.8);
+    margin-top: 2.5rem;
+    letter-spacing: -0.5px;
+    max-width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .context-description-wrap {
+    background: #191715;
+    border-top: 1px solid rgba(255,137,2,0.35);
+    border-bottom: 1px solid rgba(255,137,2,0.35);
+    padding: 4rem 3rem;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .context-description {
+    text-align: center;
+    max-width: 60%;
+    margin: 0 auto;
+  }
+
+  .context-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 29.8px;
+    letter-spacing: 0.6px;
+    color: rgba(236,229,212,0.72);
+    margin-bottom: 1.5rem;
+  }
+  .context-text:last-child { margin-bottom: 0; }
+
+  /* ── WORK GRID ── */
+  .work {
+    padding: 2rem 0;
+  }
+
+  .work-item {
+    margin-bottom: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    background: #111;
+  }
+
+  .work-item.full {
+    width: 100%;
+    aspect-ratio: 16/9;
+  }
+
+  .work-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .work-row .work-item {
+    aspect-ratio: 4/3;
+    margin-bottom: 0;
+  }
+
+  .work-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .work-item:hover .work-media {
+    transform: scale(1.02);
+  }
+
+  .work-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a1a, #2a1f0a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .work-placeholder span {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 2px;
+  }
+
+  /* ── NAV ── */
+  .project-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: visible;
+    background: #0d0d0d;
+    position: relative;
+    z-index: 2;
+  }
+
+  .project-nav-item {
+    padding: 3rem;
+    text-decoration: none;
+    color: var(--cream);
+    transition: background 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.75rem;
+    pointer-events: none;
+  }
+  .project-nav-item:hover { background: rgba(255,255,255,0.03); }
+  .project-nav-item.next { text-align: right; border-left: 1px solid rgba(255,255,255,0.06); }
+  .nav-direction, .nav-title { pointer-events: auto; cursor: pointer; }
+  .nav-text-inner { display: inline-block; }
+
+  .nav-direction {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    color: var(--lime);
+    letter-spacing: 3px;
+    opacity: 0.6;
+    display: inline;
+  }
+  /* The arrow glyph in Press Start 2P renders tiny and thin at NEXT's own
+     0.45rem size, near-invisible, so it's scaled up separately. Centring
+     it against NEXT with a measured pixel offset turned out to depend on
+     which font actually loads, right for a fallback font, wrong for the
+     real pixel font. Flexbox instead: the browser centres both against
+     each other's actual rendered line box, correct regardless of font. */
+  .nav-direction .nav-text-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+  /* An SVG rather than a text arrow: Press Start 2P almost certainly has
+     no arrow glyph, so the browser was silently substituting a different
+     fallback font just for that one character, with its own different
+     vertical metrics, no amount of flexbox centering could fix that. An
+     SVG has no font or baseline to fall back to, so its centre is exactly
+     where its viewBox says it is, on any browser. */
+  .nav-arrow {
+    display: inline-block;
+    width: 1.6em;
+    height: 1.6em;
+    color: var(--lime);
+    /* Press Start 2P (a pixel font, which I can't load to verify directly)
+       commonly carries extra built-in space below its glyphs within its
+       own character box; flexbox centres NEXT's box, not its visible ink,
+       so the text reads slightly higher than its box suggests. A small
+       manual nudge, since I can't measure the real font to compute this
+       precisely the way the rest of the alignment was done. */
+    position: relative;
+    top: -1px;
+  }
+
+  .nav-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: rgba(255,255,255,0.8);
+    display: inline;
+  }
+
+  /* ── PORTAL FADE ── */
+  #portalFlash {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 999999;
+    transition: opacity 0.5s ease;
+  }
+
+  /* ── SOIL STRIP ── */
+  .soil-strip {
+    width: 100%;
+    height: 220px;
+    /* No background-color here: this element's own transparent gaps need
+       to reach all the way through to whatever's actually behind it (the
+       nav, where this overlaps it), not stop at a flat fallback colour
+       sitting directly behind the image itself. */
+    background-image: url('soil-repeat-tile.png');
+    background-repeat: repeat-x;
+    background-size: auto 220px;
+    background-position: top center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .soil-frog {
+    position: absolute;
+    bottom: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 240px;
+    width: auto;
+    image-rendering: pixelated;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .soil-strip-wrap {
+    position: relative;
+    overflow: visible;
+    /* The tile's own top ~50px (at this render scale) is a natural sparse
+       taper, i.e. exactly where the blades were cut out. Overlapping by
+       that same amount lets it sit over the nav itself, so its gaps show
+       the nav's own dark glass rather than the plain page beyond it, and
+       the two blend into each other using the PNG's own transparency. */
+    margin-top: -20px;
+    /* Above the logo footer (4), which tucks underneath this strip. */
+    z-index: 5;
+  }
+
+  /* ═══════════ LOGO FOOTER (curtain reveal) ═══════════
+     The footer box is exactly the logo's height (no padding) and clips
+     anything outside itself. Inside it, a track runs from one logo-height
+     ABOVE the footer down to the footer's bottom, with the logo sitting at
+     the bottom of that track and sticky to the bottom of the viewport.
+     So while the footer is still partly below the screen, the logo is
+     pushed up to stay pinned to the screen's bottom edge, and the footer's
+     clip only shows the part of it the soil has already moved off.
+     Result: the nav / frog / soil slide up and uncover the logo from
+     behind, bottom first, and it settles in place at the end of the page.
+     Pure CSS (sticky), so it can't lag behind the scroll. */
+  .logo-footer {
+    position: relative;
+    /* Above .smoke-zone (2): its smoke backdrop is sticky with a -100vh
+       bottom margin, so it can hang up to a screen's height below the nav
+       and was painting over the footer. Below the soil strip (5) so the
+       footer can still tuck underneath the PNG's ragged edge. */
+    z-index: 4;
+    /* Tucks the top of the footer up under the soil strip's ragged bottom
+       edge, so the PNG's transparent pixels there show the footer and logo
+       behind it, rather than the page/header layer. The matching padding
+       keeps the logo itself exactly where it was. */
+    margin-top: -60px;
+    padding: 60px 0 0;
+    background: transparent; /* no fill: the smoke backdrop shows through */
+    overflow: hidden;   /* fallback: logo simply sits static */
+    overflow: clip;     /* clip, not hidden, so the sticky logo still works */
+  }
+  /* In-flow, invisible copy: gives the footer its exact height (the logo's
+     own proportions at full width). */
+  .logo-footer .logo-footer-spacer {
+    display: block;
+    width: 100%;
+    height: auto;
+    visibility: hidden;
+  }
+  .logo-footer-track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 200%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .logo-footer .logo-footer-img {
+    /* Moved by the script at the end of the page: it drifts up slower
+       than the page scrolls, so the footer eases to a stop. Without the
+       script it just scrolls in normally. */
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0.92;
+    pointer-events: none;
+    /* Scales up subtly as it's revealed (see script at end of page).
+       Anchored to the bottom so it grows up out of the footer edge. */
+    transform-origin: 50% 100%;
+    will-change: transform;
+  }
+
+  .project-nav-item {
+    overflow: hidden;
+  }
+  .nav-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(213,231,9,0.4) 0%, rgba(213,231,9,0) 70%);
+    transform: scale(0);
+    animation: navRipple 0.6s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes navRipple {
+    to { transform: scale(4); opacity: 0; }
+  }
+
+  #fireballCanvas {
+    position: fixed;
+    bottom: 15%;
+    left: 0;
+    width: 100vw;
+    height: 200px;
+    pointer-events: none;
+    z-index: 12;
+  }
+
+  .quote-section {
+    position: relative;
+    z-index: 2;
+    background: #0d0d0d;
+    padding: 6rem 3rem 10rem;
+    text-align: center;
+
+  }
+
+  .quote-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,137,2,0.20) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .quote-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 52px;
+    letter-spacing: 0.6px;
+    color: #ECE5D4;
+    max-width: 50%;
+    margin: 0 auto 2rem;
+  }
+
+  .quote-text .quote-mark,
+  .quote-text .quote-first {
+    color: var(--orange);
+  }
+
+  .quote-expert {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 2.2px;
+    color: rgba(236,229,212,0.55);
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+  }
+
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    background: #000;
+    cursor: pointer;
+  }
+  .video-wrap video {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid #d5e709;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+  }
+  /* Base layer: the smoky glass material, always filling the full circle */
+  .video-play-btn .vpb-glass {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(12,11,8,0.4);
+    background-image:
+      linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 20%, transparent 80%, rgba(255,255,255,0.05) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: no-repeat, repeat;
+    background-size: cover, 220px 220px;
+    background-blend-mode: normal, soft-light;
+    -webkit-backdrop-filter: blur(8px) brightness(1.2) saturate(115%);
+    backdrop-filter: blur(8px) brightness(1.2) saturate(115%);
+  }
+  /* Two fixed-shape green layers, cross-faded by opacity rather than
+     animating a single clip-path between them: a triangle shape morphing
+     into a ring (circle with a triangular hole) are different topologies,
+     and browsers don't interpolate that cleanly, the shape mostly just
+     collapses. Fixed shapes with an opacity transition sidesteps that. */
+  .video-play-btn .vpb-green-triangle,
+  .video-play-btn .vpb-green-ring {
+    position: absolute;
+    inset: 0;
+    background: #d5e709;
+    transition: opacity 0.4s ease;
+  }
+  .video-play-btn .vpb-green-triangle {
+    clip-path: path('M38.3,34.8 L38.3,51.2 L51.2,43 Z');
+    opacity: 1;
+  }
+  .video-play-btn .vpb-green-ring {
+    clip-path: path(evenodd, 'M43,5 A38,38 0 0,1 43,81 A38,38 0 0,1 43,5 Z M38.3,34.8 L38.3,51.2 L51.2,43 Z');
+    opacity: 0;
+  }
+  .video-wrap:hover .video-play-btn .vpb-green-triangle { opacity: 0; }
+  .video-wrap:hover .video-play-btn .vpb-green-ring { opacity: 1; }
+  .video-play-btn svg {
+    display: none;
+    fill: #d5e709;
+    width: 28px;
+    height: 28px;
+    margin-left: 4px;
+  }
+  .video-wrap.playing .video-play-btn {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .video-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.2rem;
+    background: #111;
+    border-top: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .video-ctrl-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #d5e709;
+  }
+  .video-ctrl-btn svg { width: 18px; height: 18px; fill: #d5e709; }
+  .video-progress-wrap {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+  }
+  .video-progress-bar {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+  .video-time {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    color: rgba(236,229,212,0.5);
+    white-space: nowrap;
+  }
+  .video-volume {
+    width: 60px;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+  }
+  .video-volume-bar {
+    height: 100%;
+    background: #d5e709;
+    border-radius: 2px;
+    width: 100%;
+  }
+
+  .gf-carousel-track {
+    width: 100%;
+    overflow: hidden;
+    background: #0d0d0d;
+    padding: 0 0 3rem;
+  }
+
+  .gf-carousel-strip {
+    display: flex;
+    gap: 1rem;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .gf-carousel-strip img {
+    height: 340px;
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+    transition: filter 0.3s ease;
+  }
+
+  .gf-carousel-strip:hover img {
+    filter: brightness(0.45);
+  }
+
+  .gf-carousel-strip img:hover {
+    filter: brightness(1);
+  }
+
+  .floating-wrap {
+    display: block;
+    max-width: min(320px, 70vw);
+    margin: 5rem auto 4rem;
+    will-change: transform;
+    position: relative;
+    overflow: visible;
+  }
+
+  .floating-wrap::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(255,20,147,0.45) 0%, rgba(255,20,147,0.2) 40%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .floating-image {
+    display: block;
+    width: 100%;
+    transition: transform 0.4s ease;
+  }
+
+  .floating-image:hover {
+    transform: rotate(-2deg) scale(1.05);
+  }
+
+  /* ── SCROLL CUE ──
+     Lives inside the fixed hero, so it stays put with the video and is
+     covered by the content as it slides up, rather than floating on top. */
+  .scroll-cue {
+    position: absolute;
+    left: 50%;
+    bottom: calc(44px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    opacity: 0;
+    animation: scrollCueIn 0.6s steps(4) 2s forwards;
+  }
+  .scroll-cue-text {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    color: #f5f2ec;
+    white-space: nowrap;
+  }
+  .scroll-cue svg {
+    display: block;
+    width: 22px;
+    height: 36px;
+    shape-rendering: crispEdges;
+  }
+  .scroll-cue-wheel {
+    animation: scrollCueWheel 1.4s step-end infinite;
+  }
+  @keyframes scrollCueIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scrollCueWheel {
+    0%   { transform: translateY(0); }
+    20%  { transform: translateY(2px); }
+    40%  { transform: translateY(4px); }
+    60%  { transform: translateY(6px); }
+    80%  { transform: translateY(6px); opacity: 0.3; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue { animation-duration: 0.01s; animation-delay: 1s; }
+    .scroll-cue-wheel { animation: none; }
+  }
+
+  /* ── MOBILE TYPE SCALE ── */
+  @media (max-width: 640px) {
+    .context-title {
+      font-size: 3.25rem;
+      line-height: 1.08;
+      letter-spacing: -0.5px;
+    }
+    .context-tagline {
+      font-size: 22px;
+      max-width: 88%;
+    }
+    .context-role-title {
+      font-size: 17px;
+    }
+    .context-description {
+      max-width: 88%;
+    }
+    .context-text {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    /* Margin only between multiple stacked description boxes; the last one
+       (or the only one) sits right against .context's own padding-bottom,
+       so giving it a margin too would double the gap to .work below. */
+    .context-description-wrap:not(:last-child) {
+      margin-bottom: 3rem;
+    }
+    .context {
+      padding-bottom: 3rem !important;
+    }
+    .work {
+      margin-top: 3rem !important;
+      margin-bottom: 3rem !important;
+      padding: 0 !important;
+    }
+    /* .context already guarantees 48px via its own padding-bottom above; a
+       .work directly after one would otherwise stack another 48px on top
+       via the margin-top rule, since padding blocks the margin collapse
+       that used to cap this automatically at 48px. */
+    .context + .work {
+      margin-top: 0 !important;
+    }
+    /* This box keeps its full 64px top and bottom padding on mobile,
+       matching desktop. When it's the last thing in .context, its own
+       64px is the whole gap to the next image, so .context's own 48px
+       padding-bottom (above) is dropped here to stop the two stacking. */
+    .context:has(> .context-description-wrap:last-child) {
+      padding-bottom: 0.5rem !important;
+    }
+    .context-description-wrap {
+      padding-top: 4rem !important;
+    }
+    .context-description-wrap:last-child {
+      padding-bottom: 4rem !important;
+    }
+    .content-wrap {
+      padding-bottom: 1px;
+    }
+    .context-title {
+      font-size: 4.25rem;
+    }
+    .project-nav-item {
+      justify-content: center;
+    }
+    .quote-text {
+      font-size: 24px;
+      line-height: 1.35;
+      max-width: 88%;
+    }
+    .floating-wrap {
+      margin-bottom: 3rem !important;
+    }
+    .work-item.full .video-wrap {
+      width: 100% !important;
+      height: auto !important;
+    }
+    .work-item.full .video-wrap video {
+      width: 100% !important;
+      height: auto !important;
+    }
+    .video-backdrop {
+      display: none !important;
+    }
+    /* With the backdrop hidden, this container no longer needs to be
+       forced to 100vh to give the backdrop room to fill; that height was
+       leaving an unpredictable gap of black space below the video itself,
+       varying with the video's own aspect ratio and the device's screen
+       height. Auto-height hugs the real video, then the standard 8px
+       (0.5rem) used everywhere else on the page takes over. */
+    .gf-main-video {
+      height: auto !important;
+      margin-bottom: 0.5rem;
+    }
+    /* .work's own margin-bottom (used generally elsewhere) would otherwise
+       give 48px here; overriding just this specific transition to match
+       the 8px used between the video and the other images. */
+    .work + .gf-carousel-track {
+      margin-top: -2.5rem;
+    }
+    .gf-carousel-strip {
+      gap: 0.5rem;
+    }
+  }
+
+
+  /* ═══════════ SMOKE BACKDROP + GLASS (preview) ═══════════
+     The flat dark page background below the header is replaced by a smoke
+     image that stays still while the content scrolls over it. It lives in
+     .smoke-zone, which wraps the content area and the project nav. The text
+     box is frosted glass: as it passes over the smoke, the smoke behind it
+     is blurred and lifted, so it reads as denser haze inside the glass. */
+  html, body { overflow-x: hidden; overflow-x: clip; }   /* clip, not hidden: hidden turns body into a scroll box and stops sticky working */
+  /* Stops the rubber-band bounce past the top/bottom of the page itself.
+     The header video is fixed to the viewport, not the document, so it
+     keeps rendering into that overscrolled space regardless of what's in
+     the page; this removes the bounce that exposes it. Well supported in
+     Chrome and Firefox; Safari's support has historically been patchier,
+     so the logo reveal below is the real fix for whatever still bounces. */
+  html, body { overscroll-behavior-y: none; }
+  .smoke-zone {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+  }
+  .smoke-bg {
+    /* Sticky, not fixed: a sticky element only starts "pinning" once its
+       own normal-flow position would otherwise scroll past the sticky
+       offset. Since this sits inside .smoke-zone, which only begins after
+       .hero-spacer's height (i.e. after the pinned header video's height),
+       it naturally stays out of the header entirely and only takes over
+       once the content area is actually on screen, which a page-wide
+       position:fixed layer can't do, that covers the header too. */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    margin-bottom: -100vh;
+    z-index: -1;
+    pointer-events: none;
+    background: url("SMOKE_PAGE.jpg") center / cover no-repeat;
+  }
+  .content-wrap,
+  .project-nav,
+  .quote-section,
+  .gf-carousel-track { background: transparent; }
+
+  .context-description-wrap {
+    --glass-blur: 14px;
+    --glass-lift: 1.15;
+    background-color: rgba(12,11,8,0.34);
+    background-image:
+      linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 15%, transparent 85%, rgba(255,255,255,0.04) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: no-repeat, repeat;
+    background-size: cover, 220px 220px;
+    background-blend-mode: normal, soft-light;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) brightness(var(--glass-lift)) saturate(115%);
+    backdrop-filter: blur(var(--glass-blur)) brightness(var(--glass-lift)) saturate(115%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 0 50px rgba(0,0,0,0.2),
+      0 12px 32px rgba(0,0,0,0.35);
+  }
+  .context-description-wrap .context-text { color: rgba(236,229,212,0.86); }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .context-description-wrap { background-color: rgba(20,19,17,0.86); }
+  }
+
+  /* Same frosted-glass treatment as the text box, applied to the bottom
+     nav bar as one continuous panel (rather than each link separately, to
+     avoid a seam down the middle where two blurred regions would meet) */
+  .project-nav {
+    --glass-blur: 14px;
+    --glass-lift: 1.15;
+    background-color: rgba(12,11,8,0.34);
+    background-image:
+      linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 15%, transparent 85%, rgba(255,255,255,0.04) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: no-repeat, repeat;
+    background-size: cover, 220px 220px;
+    background-blend-mode: normal, soft-light;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) brightness(var(--glass-lift)) saturate(115%);
+    backdrop-filter: blur(var(--glass-blur)) brightness(var(--glass-lift)) saturate(115%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 0 50px rgba(0,0,0,0.2),
+      0 -12px 32px rgba(0,0,0,0.25);
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .project-nav { background-color: rgba(20,19,17,0.86); }
+  }
+  /* Lenis smooth-scroll base rules */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-stopped { overflow: clip; }
+  .lenis.lenis-smooth iframe { pointer-events: none; }
+  /* ═══════════ SCROLL FADE-IN (page content only) ═══════════
+     Content fades in, with a slight rise, as it scrolls into view. Only
+     applies once the script has switched it on (html.reveal-on), so if
+     scripts don't run, nothing is ever hidden. Elements whose position is
+     already driven by script (carousel, floating bottle) only fade. */
+  html.reveal-on .reveal {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    transition:
+      opacity 0.9s ease var(--reveal-delay, 0s),
+      transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0s);
+  }
+  html.reveal-on .reveal.reveal-fade {
+    transform: none;
+    transition: opacity 0.9s ease var(--reveal-delay, 0s);
+  }
+  html.reveal-on .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  /* Footer copyright: small, bottom right, same green as the logo.
+     By default the footer gets a slim strip below the logo for it. On
+     wide screens there's enough empty space under the end of the logo
+     ("Creative") for the line to sit there instead, so the strip goes. */
+  .logo-footer {
+    padding-bottom: calc(2.6rem + env(safe-area-inset-bottom, 0px));
+  }
+  .logo-footer-track {
+    bottom: calc(2.6rem + env(safe-area-inset-bottom, 0px));
+  }
+  .footer-copyright {
+    position: absolute;
+    right: clamp(1rem, 3vw, 2.5rem);
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    z-index: 2;
+    margin: 0;
+    max-width: calc(100% - 2rem);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    line-height: 1.8;
+    letter-spacing: 1px;
+    text-align: right;
+    color: #c8c916;
+    opacity: 0.92;
+  }
+  @media (min-width: 1600px) {
+    .logo-footer { padding-bottom: 0; }
+    .logo-footer-track { bottom: 0; }
+    .footer-copyright { bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px)); }
+  }
+  @media (max-width: 560px) {
+    .footer-copyright { font-size: 0.35rem; letter-spacing: 0.5px; }
+  }
+</style>
+<script>
+  // Switch the scroll fade-in on early (before the page paints) so content
+  // doesn't flash visible and then vanish. Safety net: if the fade-in script
+  // hasn't started within 3s for any reason, everything is shown.
+  (function(){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce || !('IntersectionObserver' in window)) return;
+    document.documentElement.classList.add('reveal-on');
+    setTimeout(function(){
+      if(!window.__revealReady) document.documentElement.classList.remove('reveal-on');
+    }, 3000);
+  })();
+</script>
+</head>
+<body>
+
+<div id="portalFlash"></div>
+
+<!-- Top Bar -->
+<header class="top-bar">
+  <img src="JCC_LOGO_CHAMPAGNE_NAV.png" alt="Joshua Crossley Creative" class="top-bar-logo"/>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <video autoplay muted loop playsinline class="hero-media">
+    <source src="LZE_GRAFRUITTI_HEADER_2.mp4" type="video/mp4">
+  </video>
+
+  <div class="scroll-cue" aria-hidden="true">
+    <svg viewBox="0 0 22 36">
+      <path fill="#d5e709" fill-rule="evenodd" d="M2 0H20V2H22V34H20V36H2V34H0V2H2Z M4 2V4H2V32H4V34H18V32H20V4H18V2Z"/>
+      <rect class="scroll-cue-wheel" x="10" y="6" width="2" height="6" fill="#d5e709"/>
+    </svg>
+    <span class="scroll-cue-text">Scroll to descend</span>
+  </div>
+
+</section>
+<div style="height:100vh;width:100%;display:block;"></div>
+<div class="smoke-zone">
+<div class="smoke-bg" aria-hidden="true"></div>
+<div class="content-wrap">
+<!-- Context -->
+<section class="context">
+  <div class="context-header">
+    <div class="context-eyebrow">Lucozade</div>
+    <h1 class="context-title">Back for<br/><em>the Believers</em></h1>
+    <p class="context-tagline">Turning Grafruitti from cult classic to cultural phenomenon.</p>
+    <p class="context-role">ROLE</p>
+    <p class="context-role-title">Lead Creative | Director</p>
+  </div>
+  <div class="context-description-wrap">
+  <div class="context-description">
+    <p class="context-text">It’s been 8 years of national mourning since the iconic Grafruitti left our shelves.</p>
+    <p class="context-text">But the beloved cult-favourite is #BackForTheBelievers.</p>
+    <p class="context-text">Our campaign centred around Grafruitti’s devoted fans, shining a spotlight on their relentless devotion. The ones who tweeted, tagged, begged, petitioned, and literally threatened us to ‘bring it back, you cowards’.</p>
+    <p class="context-text">We fuelled the gossip with carefully crafted tease assets, liking old fan messages and seeding cryptic clues to superfans.</p>
+    <p class="context-text">We launched with a hero film starring Jude Bellingham alongside a run of creators and genuine superfans, then took the holy nectar straight to the door of one fan who's publicly begged for its return online. OOH across the country carried real fans' own words, declaring Grafruitti was finally back.</p>
+    <p class="context-text">To add to the drama, we released it on April 1st, creating engagement around whether the entire thing was an April Fool. (The only fools around here, pal, are the ones who didn’t immediately go and grab a bottle.)</p>
+  </div>
+  </div>
+</section>
+
+<!-- Work -->
+<section class="work">
+  <!-- Full height (9:16) with blurred backdrop fill -->
+  <div class="work-item full gf-main-video" style="overflow:hidden;aspect-ratio:auto;width:100%;height:100vh;position:relative;background:#000;">
+    <video muted loop playsinline class="video-backdrop" style="position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%) scale(1.2);filter:blur(40px) brightness(0.55);">
+      <source src="LZD_Grafruitti_Launch_Film_9x16_FINAL_Clean.mp4" type="video/mp4">
+    </video>
+    <div class="video-wrap" style="position:relative;width:fit-content;height:100%;margin:0 auto;">
+      <video style="width:auto;height:100%;display:block;">
+        <source src="LZD_Grafruitti_Launch_Film_9x16_FINAL_Clean.mp4" type="video/mp4">
+      </video>
+      <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="video-controls">
+        <button class="video-ctrl-btn btn-play-pause"><svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+        <div class="video-progress-wrap"><div class="video-progress-bar"></div></div>
+        <span class="video-time">0:00</span>
+        <button class="video-ctrl-btn btn-mute"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
+        <div class="video-volume"><div class="video-volume-bar"></div></div>
+        <button class="video-ctrl-btn btn-fullscreen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social videos side by side -->
+  <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:0.5rem;margin-bottom:0.5rem;">
+    <div class="video-wrap" style="aspect-ratio:9/16;">
+      <video style="width:100%;height:100%;object-fit:cover;display:block;">
+        <source src="GF_SOCIAL_1.mp4" type="video/mp4">
+      </video>
+      <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="video-controls">
+        <button class="video-ctrl-btn btn-play-pause"><svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+        <div class="video-progress-wrap"><div class="video-progress-bar"></div></div>
+        <span class="video-time">0:00</span>
+        <button class="video-ctrl-btn btn-mute"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
+        <div class="video-volume"><div class="video-volume-bar"></div></div>
+        <button class="video-ctrl-btn btn-fullscreen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+      </div>
+    </div>
+    <div class="video-wrap" style="aspect-ratio:9/16;">
+      <video style="width:100%;height:100%;object-fit:cover;display:block;">
+        <source src="GF_SOCIAL_2.mp4" type="video/mp4">
+      </video>
+      <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="video-controls">
+        <button class="video-ctrl-btn btn-play-pause"><svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+        <div class="video-progress-wrap"><div class="video-progress-bar"></div></div>
+        <span class="video-time">0:00</span>
+        <button class="video-ctrl-btn btn-mute"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
+        <div class="video-volume"><div class="video-volume-bar"></div></div>
+        <button class="video-ctrl-btn btn-fullscreen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+      </div>
+    </div>
+    <div class="video-wrap" style="aspect-ratio:9/16;">
+      <video style="width:100%;height:100%;object-fit:cover;display:block;">
+        <source src="GF_SOCIAL_3.mp4" type="video/mp4">
+      </video>
+      <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="video-controls">
+        <button class="video-ctrl-btn btn-play-pause"><svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+        <div class="video-progress-wrap"><div class="video-progress-bar"></div></div>
+        <span class="video-time">0:00</span>
+        <button class="video-ctrl-btn btn-mute"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
+        <div class="video-volume"><div class="video-volume-bar"></div></div>
+        <button class="video-ctrl-btn btn-fullscreen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+      </div>
+    </div>
+    <div class="video-wrap" style="aspect-ratio:9/16;">
+      <video style="width:100%;height:100%;object-fit:cover;display:block;">
+        <source src="GF_KRYSTAL.mp4" type="video/mp4">
+      </video>
+      <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="video-controls">
+        <button class="video-ctrl-btn btn-play-pause"><svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+        <div class="video-progress-wrap"><div class="video-progress-bar"></div></div>
+        <span class="video-time">0:00</span>
+        <button class="video-ctrl-btn btn-mute"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
+        <div class="video-volume"><div class="video-volume-bar"></div></div>
+        <button class="video-ctrl-btn btn-fullscreen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stills stacked -->
+  <div class="work-item full" style="aspect-ratio:auto;">
+    <img src="GF_STILL_1.jpg" alt="Grafruitti campaign still" class="work-media" style="height:auto;object-fit:initial;">
+  </div>
+  <div class="work-item full" style="aspect-ratio:auto;">
+    <img src="GF_STILL_2.jpg" alt="Grafruitti campaign still" class="work-media" style="height:auto;object-fit:initial;">
+  </div>
+  <div class="work-item full" style="aspect-ratio:auto;">
+    <img src="GF_STILL_3.jpg" alt="Grafruitti campaign still" class="work-media" style="height:auto;object-fit:initial;">
+  </div>
+  <div class="work-item full" style="aspect-ratio:auto;">
+    <img src="GF_STILL_5.jpg" alt="Grafruitti campaign still" class="work-media" style="height:auto;object-fit:initial;">
+  </div>
+  <div class="work-item full" style="aspect-ratio:auto;">
+    <img src="GF_STILL_4.jpg" alt="Grafruitti campaign still" class="work-media" style="height:auto;object-fit:initial;">
+  </div>
+
+  <!-- OOH -->
+  <div class="work-item full" style="aspect-ratio:auto;">
+    <img src="LZD_GRAFRUITTI_BEBE_OOH_LANDSCAPE.jpg" alt="Lucozade Grafruitti Back for the Believers OOH" class="work-media" style="height:auto;object-fit:initial;">
+  </div>
+</section>
+
+<!-- Scroll-linked looping carousel -->
+<div class="gf-carousel-track" id="gfCarouselTrack">
+  <div class="gf-carousel-strip" id="gfCarouselStrip">
+    <img src="GF_SMALL_8.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_10.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_6.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_7.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_15.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_11.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_13.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_9.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_2.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_3.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_14.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_16.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_5.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_12.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_1.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_4.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_8.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_10.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_6.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_7.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_15.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_11.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_13.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_9.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_2.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_3.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_14.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_16.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_5.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_12.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_1.jpeg" alt="Grafruitti campaign moment">
+    <img src="GF_SMALL_4.jpeg" alt="Grafruitti campaign moment">
+  </div>
+</div>
+
+<div class="floating-wrap">
+  <img src="GRAFRUITTI_ANGLE-CONDENSATION.png" alt="Lucozade Grafruitti bottle" class="floating-image">
+</div>
+
+  <div class="quote-section">
+    <p class="quote-text"><span class="quote-mark">“</span><span class="quote-first">T</span>his launch generated a surge in organic UGC leading to Lucozade’s most successful NPD launch ever. Graffrutti sold more in week one than all our other NPD launches combined.”</p>
+    <p class="quote-expert">LUCOZADE CLIENT</p>
+  </div>
+
+</div><!-- /content-wrap -->
+
+<!-- Project Nav -->
+<audio id="teleportSound" src="TELEPORT_SOUND.MP3" preload="auto"></audio>
+<audio id="fireballScream" src="FROG_SCREAM.mp3" preload="auto"></audio>
+<script src="chrome-logo.js?v=3"></script>
+<audio id="logoCroak" src="FROG_CROAK.mp3" preload="auto"></audio>
+<nav class="project-nav">
+  <a href="home.html" class="project-nav-item prev" id="returnBtn">
+    <span class="nav-direction" style="position:absolute; visibility:hidden;"><span class="nav-text-inner">placeholder</span></span>
+    <span class="nav-title"><span class="nav-text-inner">Return to the Kingdom of Portfolia</span></span>
+  </a>
+  <a href="somersby.html?from=1" class="project-nav-item next">
+    <span class="nav-direction"><span class="nav-text-inner"><span class="nav-label">NEXT</span><svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"></line><polyline points="13 5 20 12 13 19"></polyline></svg></span></span>
+    <span class="nav-title"><span class="nav-text-inner">Somersby</span></span>
+  </a>
+</nav>
+</div><!-- /smoke-zone -->
+<div class="soil-strip-wrap">
+  <canvas id="fireballCanvas"></canvas>
+  <canvas id="zzzCanvas" style="position:absolute;bottom:85%;left:50%;transform:translateX(-50%);width:320px;height:200px;pointer-events:none;z-index:11;"></canvas>
+  <img src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
+  <div class="soil-strip"></div>
+</div>
+
+<footer class="logo-footer" id="logoFooter">
+  <img src="JCC_LOGO_GREEN.png" alt="" aria-hidden="true" class="logo-footer-spacer">
+  <div class="logo-footer-track">
+    <img src="JCC_LOGO_GREEN.png" alt="Joshua Crossley Creative" class="logo-footer-img" id="logoFooterImg">
+  </div>
+  <p class="footer-copyright">&copy; COPYRIGHT 2026 JOSHUA CROSSLEY CREATIVE. ALL RIGHTS RESERVED.</p>
+</footer>
+
+<script>
+// Get which portal we came from
+var params = new URLSearchParams(window.location.search);
+var fromPortal = params.get('from') || '0';
+
+// Fade in from black on page load
+var portalFadeInTimer = null;
+(function(){
+  var flash = document.getElementById('portalFlash');
+  if(flash){
+    sfxSunriseArpeggio();
+    portalFadeInTimer = setTimeout(function(){ flash.style.opacity = '0'; }, 100);
+  }
+})();
+
+// ── ZZZ ANIMATION
+var zzzCanvas = document.getElementById('zzzCanvas');
+var soilFrog = document.getElementById('soilFrog');
+
+if(zzzCanvas && soilFrog){
+  zzzCanvas.width = 320;
+  zzzCanvas.height = 200;
+  var zctx = zzzCanvas.getContext('2d');
+  var zParticles = [];
+  var zTimer = 0;
+  var frogState = 'sleep';
+
+  // Hover detection against the whole button, not just its text, so the
+  // frog reacts anywhere over "Next Project" / "Return to the Kingdom",
+  // not only when the cursor is exactly over the letters themselves
+  var nextBtn = document.querySelector('.project-nav-item.next');
+  var prevBtn = document.querySelector('.project-nav-item.prev');
+
+  function isOver(el, x, y){
+    if(!el) return false;
+    var r = el.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  }
+
+  document.addEventListener('mousemove', function(e){
+    var x = e.clientX, y = e.clientY;
+    if(isOver(nextBtn, x, y)){
+      if(frogState !== 'cast-right'){
+        frogState = 'cast-right';
+        soilFrog.src = 'frog-cast.png';
+        soilFrog.style.transform = 'translateX(-50%)';
+      }
+    } else if(isOver(prevBtn, x, y)){
+      if(frogState !== 'cast-left'){
+        frogState = 'cast-left';
+        soilFrog.src = 'frog-cast.png';
+        soilFrog.style.transform = 'translateX(-50%) scaleX(-1)';
+      }
+    } else {
+      if(frogState !== 'sleep'){
+        frogState = 'sleep';
+        soilFrog.src = 'frog-sleep.png';
+        soilFrog.style.transform = 'translateX(-50%)';
+      }
+    }
+  });
+
+  function zLoop(){
+    requestAnimationFrame(zLoop);
+    zctx.clearRect(0, 0, zzzCanvas.width, zzzCanvas.height);
+    if(frogState === 'sleep'){
+      zTimer++;
+      if(zTimer % 50 === 0){
+        zParticles.push({
+          x: zzzCanvas.width * 0.6, y: zzzCanvas.height * 0.5,
+          opacity: 1, size: 16 + Math.random() * 8,
+          vy: -0.6 - Math.random() * 0.3, vx: 0.3 + Math.random() * 0.2,
+          life: 90
+        });
+      }
+    } else {
+      zParticles = []; zTimer = 0;
+    }
+    for(var z = zParticles.length - 1; z >= 0; z--){
+      var zp = zParticles[z];
+      zp.x += zp.vx; zp.y += zp.vy; zp.life--;
+      zp.opacity = zp.life / 90; zp.size += 0.06;
+      if(zp.life <= 0){ zParticles.splice(z, 1); continue; }
+      zctx.save();
+      zctx.globalAlpha = zp.opacity;
+      zctx.font = 'bold ' + Math.floor(zp.size) + 'px "Press Start 2P"';
+      zctx.fillStyle = '#d5e709';
+      zctx.textAlign = 'center';
+      zctx.fillText('Z', zp.x, zp.y);
+      zctx.restore();
+    }
+  }
+  zLoop();
+}
+
+// ── REVEAL SOUND (sunrise arpeggio)
+function sfxSunriseArpeggio(){
+  try {
+    var ctx = getNavAudio();
+    function note(freq, start, duration, peakVol){
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'triangle';
+      var t = ctx.currentTime + start;
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(peakVol, t + Math.min(0.05, duration * 0.3));
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+      osc.start(t);
+      osc.stop(t + duration + 0.02);
+    }
+    note(261.63, 0.00, 0.22, 0.06); // C4
+    note(329.63, 0.09, 0.22, 0.06); // E4
+    note(392.00, 0.18, 0.22, 0.06); // G4
+    note(523.25, 0.27, 0.45, 0.08); // C5
+  } catch(e){}
+}
+
+// ── FIREBALL SOUND
+var navAudioCtx = null;
+function getNavAudio(){
+  if(!navAudioCtx) navAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(navAudioCtx.state === "suspended") navAudioCtx.resume();
+  return navAudioCtx;
+}
+function navPlayTone(freq, type, duration, volume, freqEnd){
+  try {
+    var ctx = getNavAudio();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type || 'square';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    if(freqEnd) osc.frequency.linearRampToValueAtTime(freqEnd, ctx.currentTime + duration);
+    gain.gain.setValueAtTime(volume || 0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e){}
+}
+function sfxNavFireball(){
+  var scream = document.getElementById('fireballScream');
+  if(scream){ scream.currentTime = 0; scream.play(); }
+}
+
+// ── NAV CLICK RIPPLE + RETURN TO WORLD
+document.querySelectorAll('.project-nav-item').forEach(function(item){
+  item.style.position = 'relative';
+  item.addEventListener('click', function(e){
+    e.preventDefault();
+    var href = item.getAttribute('href');
+    // Fireball
+    if(window.spawnFireball){
+      var dir = item.id === 'returnBtn' ? 'left' : 'right';
+      window.spawnFireball(dir);
+      sfxNavFireball();
+    }
+    // Ripple
+    var ripple = document.createElement('div');
+    ripple.className = 'nav-ripple';
+    var size = Math.max(item.offsetWidth, item.offsetHeight);
+    var rect = item.getBoundingClientRect();
+    ripple.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + (e.clientX - rect.left - size/2) + 'px;top:' + (e.clientY - rect.top - size/2) + 'px;';
+    item.appendChild(ripple);
+    // Return to world uses portal flash
+    if(item.id === 'returnBtn'){
+      clearTimeout(portalFadeInTimer);
+      var flash = document.getElementById('portalFlash');
+      if(flash){ flash.style.opacity = '1'; }
+      var tSound = document.getElementById('teleportSound');
+      if(tSound){ tSound.currentTime = 0; tSound.play(); }
+      setTimeout(function(){
+        var isPhone = window.matchMedia('(hover: none) and (pointer: coarse)').matches && Math.min(window.innerWidth, window.innerHeight) <= 500;
+        window.location.href = isPhone ? 'mobile.html' : ('home.html?returnPortal=' + fromPortal + '&_=' + Date.now());
+      }, 1200);
+    } else {
+      clearTimeout(portalFadeInTimer);
+      var flashNext = document.getElementById('portalFlash');
+      if(flashNext){ flashNext.style.opacity = '1'; }
+      setTimeout(function(){
+        window.location.href = href;
+      }, 950);
+    }
+  });
+});
+
+// ── FIREBALL
+var fireballCanvas = document.getElementById('fireballCanvas');
+if(fireballCanvas){
+  fireballCanvas.width = window.innerWidth;
+  fireballCanvas.height = 200;
+  var fctx = fireballCanvas.getContext('2d');
+  var fireballs = [];
+
+  function spawnFireball(direction){
+    var frogEl = document.getElementById('soilFrog');
+    var frogRect = frogEl ? frogEl.getBoundingClientRect() : null;
+    var startX = fireballCanvas.width / 2;
+    if(frogRect){
+      startX = direction === 'right' ? frogRect.right : frogRect.left;
+    }
+    fireballs.push({
+      x: startX,
+      y: fireballCanvas.height * 0.5,
+      vx: direction === 'right' ? 14 : -14,
+      frame: 0,
+      active: true
+    });
+  }
+
+  function drawFireball(fb){
+    var cx = fb.x;
+    var cy = fb.y;
+    var r = 14;
+    fctx.save();
+    // Outer glow
+    var grd = fctx.createRadialGradient(cx, cy, 0, cx, cy, r + 6);
+    grd.addColorStop(0, 'rgba(255,255,100,0.9)');
+    grd.addColorStop(0.3, 'rgba(255,140,0,0.8)');
+    grd.addColorStop(0.7, 'rgba(255,60,0,0.5)');
+    grd.addColorStop(1, 'rgba(255,60,0,0)');
+    fctx.beginPath();
+    fctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+    fctx.fillStyle = grd;
+    fctx.fill();
+    // Core
+    fctx.beginPath();
+    fctx.arc(cx, cy + Math.sin(fb.frame * 0.4) * 2, r * 0.6, 0, Math.PI * 2);
+    fctx.fillStyle = '#fff8aa';
+    fctx.fill();
+    // Trails
+    fctx.fillStyle = 'rgba(255,140,0,0.7)';
+    for(var t = 0; t < 3; t++){
+      var tx = cx - (fb.vx > 0 ? 1 : -1) * (r * 0.5 + t * 6);
+      var ty = cy + Math.sin(fb.frame * 0.3 + t) * 4;
+      fctx.beginPath();
+      fctx.arc(tx, ty, r * 0.3 - t * 2, 0, Math.PI * 2);
+      fctx.fill();
+    }
+    fctx.restore();
+  }
+
+  function fireballLoop(){
+    requestAnimationFrame(fireballLoop);
+    fctx.clearRect(0, 0, fireballCanvas.width, fireballCanvas.height);
+    for(var i = fireballs.length - 1; i >= 0; i--){
+      var fb = fireballs[i];
+      fb.x += fb.vx;
+      fb.frame++;
+      if(fb.x < -60 || fb.x > fireballCanvas.width + 60){
+        fireballs.splice(i, 1);
+        continue;
+      }
+      drawFireball(fb);
+    }
+  }
+  fireballLoop();
+
+  window.addEventListener('resize', function(){ fireballCanvas.width = window.innerWidth; });
+
+  // Expose spawnFireball globally
+  window.spawnFireball = spawnFireball;
+}
+
+
+// Prevent overscroll
+document.body.addEventListener('touchmove', function(e){
+  if(e.target === document.body) e.preventDefault();
+}, { passive: false });
+
+
+// Custom video players - initialise every .video-wrap on the page
+function formatTime(s){
+  var m = Math.floor(s/60);
+  var sec = Math.floor(s%60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function initVideoPlayer(wrap){
+  var video = wrap.querySelector('video');
+  if(!video) return;
+
+  var playBtn = wrap.querySelector('.video-play-btn');
+  var playPauseBtn = wrap.querySelector('.btn-play-pause');
+  var playIcon = wrap.querySelector('.icon-play');
+  var pauseIcon = wrap.querySelector('.icon-pause');
+  var progressWrap = wrap.querySelector('.video-progress-wrap');
+  var progressBar = wrap.querySelector('.video-progress-bar');
+  var videoTime = wrap.querySelector('.video-time');
+  var muteBtnV = wrap.querySelector('.btn-mute');
+  var volumeWrap = wrap.querySelector('.video-volume');
+  var volumeBar = wrap.querySelector('.video-volume-bar');
+  var fullscreenBtn = wrap.querySelector('.btn-fullscreen');
+  var controlsBar = wrap.querySelector('.video-controls');
+  var hideTimeout;
+  var controlsHideTimeout;
+
+  function togglePlay(){
+    if(video.paused){ video.play(); } else { video.pause(); }
+  }
+
+  function showPlayBtn(){
+    playBtn.style.opacity = '1';
+    clearTimeout(hideTimeout);
+    if(!video.paused){
+      hideTimeout = setTimeout(function(){ playBtn.style.opacity = '0'; }, 2000);
+    }
+  }
+
+  function showControlsBar(){
+    controlsBar.style.opacity = '1';
+    controlsBar.style.pointerEvents = 'auto';
+    clearTimeout(controlsHideTimeout);
+    if(!video.paused){
+      controlsHideTimeout = setTimeout(function(){
+        controlsBar.style.opacity = '0';
+        controlsBar.style.pointerEvents = 'none';
+      }, 2000);
+    }
+  }
+
+  wrap.addEventListener('mousemove', function(){
+    if(video.paused) showPlayBtn();
+    showControlsBar();
+  });
+  wrap.addEventListener('mouseleave', function(){
+    if(!video.paused){
+      playBtn.style.opacity = '0';
+      clearTimeout(controlsHideTimeout);
+      controlsBar.style.opacity = '0';
+      controlsBar.style.pointerEvents = 'none';
+    }
+  });
+  wrap.addEventListener('touchstart', function(){
+    showControlsBar();
+    if(video.paused) showPlayBtn();
+  }, { passive: true });
+
+  video.addEventListener('play', function(){
+    wrap.classList.add('playing');
+    playIcon.style.display = 'none';
+    pauseIcon.style.display = 'block';
+    playBtn.style.opacity = '0';
+    clearTimeout(controlsHideTimeout);
+    controlsBar.style.opacity = '0';
+    controlsBar.style.pointerEvents = 'none';
+  });
+  video.addEventListener('pause', function(){
+    wrap.classList.remove('playing');
+    playIcon.style.display = 'block';
+    pauseIcon.style.display = 'none';
+    clearTimeout(hideTimeout);
+    playBtn.style.opacity = '1';
+    showControlsBar();
+  });
+  video.addEventListener('timeupdate', function(){
+    var pct = (video.currentTime / video.duration) * 100;
+    progressBar.style.width = pct + '%';
+    videoTime.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
+  });
+
+  wrap.addEventListener('click', function(e){
+    if(e.target.closest('.video-controls')) return;
+    togglePlay();
+  });
+  playPauseBtn.addEventListener('click', togglePlay);
+
+  progressWrap.addEventListener('click', function(e){
+    var rect = progressWrap.getBoundingClientRect();
+    var pct = (e.clientX - rect.left) / rect.width;
+    video.currentTime = pct * video.duration;
+  });
+
+  muteBtnV.addEventListener('click', function(){
+    video.muted = !video.muted;
+    volumeBar.style.width = video.muted ? '0%' : '100%';
+  });
+
+  volumeWrap.addEventListener('click', function(e){
+    var rect = volumeWrap.getBoundingClientRect();
+    var vol = (e.clientX - rect.left) / rect.width;
+    video.volume = Math.max(0, Math.min(1, vol));
+    volumeBar.style.width = (vol * 100) + '%';
+    video.muted = false;
+  });
+
+  fullscreenBtn.addEventListener('click', function(){
+    if(video.requestFullscreen) video.requestFullscreen();
+    else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+  });
+}
+
+document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
+
+// Sync any blurred backdrop video with its foreground player, so the
+// backdrop only plays when the foreground does, and stays time-matched.
+document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
+  var wrap = backdrop.parentElement.querySelector('.video-wrap');
+  var fg = wrap ? wrap.querySelector('video') : null;
+  if(!fg) return;
+
+  fg.addEventListener('play', function(){
+    backdrop.currentTime = fg.currentTime;
+    backdrop.play();
+  });
+  fg.addEventListener('pause', function(){
+    backdrop.pause();
+  });
+  fg.addEventListener('seeked', function(){
+    backdrop.currentTime = fg.currentTime;
+  });
+  // Guard against gradual drift between the two independent decoders
+  fg.addEventListener('timeupdate', function(){
+    if(Math.abs(backdrop.currentTime - fg.currentTime) > 0.3){
+      backdrop.currentTime = fg.currentTime;
+    }
+  });
+});
+
+// Hero video is permanently fixed via CSS now — no JS toggling needed.
+// The spacer div + content-wrap's solid background handle covering it on scroll.
+
+// Grafruitti carousel - drifts at a steady pace (no longer tied to page
+// scroll). Click/touch and drag to pull it; let go mid-swipe and it keeps
+// spinning with the momentum of your throw, slowing gradually like a
+// roulette wheel before easing back into its normal drift.
+var gfStrip = document.getElementById('gfCarouselStrip');
+var gfTrack = document.getElementById('gfCarouselTrack');
+if(gfStrip && gfTrack){
+  var GF_BASE_SPEED = 72;     // resting drift, px per second (leftwards)
+  var GF_SPIN_DOWN  = 1.5;    // seconds for a throw to mostly die away; higher = longer spin
+  var GF_MAX_THROW  = 6000;   // cap on throw speed, px per second
+
+  var gfHalfWidth = 0;
+  var gfTotalOffset = 0;
+  var gfVelocity = GF_BASE_SPEED;  // px per second, positive = moving left
+  var gfDragging = false;
+  var gfLastPointerX = 0;
+  var gfSamples = [];              // recent drag positions, for measuring throw speed
+  var gfLastT = 0;
+
+  function measureGfStrip(){
+    // The strip contains the image set twice back-to-back, so half its
+    // total width is exactly one full loop.
+    gfHalfWidth = gfStrip.scrollWidth / 2;
+  }
+  window.addEventListener('load', measureGfStrip);
+  window.addEventListener('resize', measureGfStrip);
+  measureGfStrip();
+
+  function renderGfStrip(){
+    if(!gfHalfWidth) return;
+    var offset = ((gfTotalOffset % gfHalfWidth) + gfHalfWidth) % gfHalfWidth;
+    gfStrip.style.transform = 'translate3d(-' + offset.toFixed(2) + 'px,0,0)';
+  }
+
+  function gfTick(t){
+    var dt = gfLastT ? Math.min(0.05, (t - gfLastT) / 1000) : 1/60;
+    gfLastT = t;
+    if(!gfDragging){
+      // Friction: the throw speed eases smoothly back to the resting drift.
+      gfVelocity += (GF_BASE_SPEED - gfVelocity) * (1 - Math.exp(-dt / (GF_SPIN_DOWN / 3)));
+      gfTotalOffset += gfVelocity * dt;
+      renderGfStrip();
+    }
+    requestAnimationFrame(gfTick);
+  }
+  requestAnimationFrame(gfTick);
+
+  function gfDragStart(x){
+    gfDragging = true;
+    gfLastPointerX = x;
+    gfSamples = [{ x: x, t: performance.now() }];
+    gfTrack.style.cursor = 'grabbing';
+  }
+  function gfDragMove(x){
+    if(!gfDragging) return;
+    var deltaX = x - gfLastPointerX;
+    gfLastPointerX = x;
+    gfTotalOffset -= deltaX;
+    renderGfStrip();
+    var now = performance.now();
+    gfSamples.push({ x: x, t: now });
+    while(gfSamples.length > 2 && now - gfSamples[0].t > 100) gfSamples.shift();
+  }
+  function gfDragEnd(){
+    if(!gfDragging) return;
+    gfDragging = false;
+    gfTrack.style.cursor = 'grab';
+    // Throw speed = how fast the pointer was moving over the last ~100ms.
+    // If it was held still before letting go, there's no throw.
+    var now = performance.now();
+    var first = gfSamples[0], last = gfSamples[gfSamples.length - 1];
+    var v = 0;
+    if(first && last && last.t > first.t && now - last.t < 80){
+      v = -(last.x - first.x) / ((last.t - first.t) / 1000);
+    }
+    gfVelocity = Math.max(-GF_MAX_THROW, Math.min(GF_MAX_THROW, v));
+  }
+
+  gfTrack.style.cursor = 'grab';
+
+  gfTrack.addEventListener('mousedown', function(e){
+    gfDragStart(e.clientX);
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', function(e){ gfDragMove(e.clientX); });
+  window.addEventListener('mouseup', gfDragEnd);
+
+  gfTrack.addEventListener('touchstart', function(e){
+    gfDragStart(e.touches[0].clientX);
+  }, { passive: true });
+  gfTrack.addEventListener('touchmove', function(e){
+    gfDragMove(e.touches[0].clientX);
+  }, { passive: true });
+  gfTrack.addEventListener('touchend', gfDragEnd);
+  gfTrack.addEventListener('touchcancel', gfDragEnd);
+
+  // Trackpad/mouse-wheel horizontal scroll pans the strip directly, the
+  // same distance and direction as native page scrolling would
+  gfTrack.addEventListener('wheel', function(e){
+    var dx = e.shiftKey ? e.deltaY : e.deltaX;
+    if(Math.abs(dx) <= Math.abs(e.deltaY) && !e.shiftKey) return; // let vertical page scroll pass through
+    e.preventDefault();
+    gfTotalOffset += dx;
+    renderGfStrip();
+  }, { passive: false });
+
+  gfStrip.querySelectorAll('img').forEach(function(img){
+    img.addEventListener('dragstart', function(e){ e.preventDefault(); });
+  });
+}
+
+// Grafruitti bottle - subtle floating tied to scroll position
+var gfBottleWrap = document.querySelector('.floating-wrap');
+if(gfBottleWrap){
+  window.addEventListener('scroll', function(){
+    var rect = gfBottleWrap.getBoundingClientRect();
+    var center = window.innerHeight / 2;
+    var distanceFromCenter = (rect.top + rect.height / 2) - center;
+    var offset = Math.max(-20, Math.min(20, distanceFromCenter * -0.05));
+    gfBottleWrap.style.transform = 'translateY(' + offset + 'px)';
+  }, { passive: true });
+}
+
+</script>
+
+<script>
+// ── TOP LOGO: hover bounce + croak (same as the home page), click goes back to the landing page
+(function(){
+  var logo = document.querySelector('.top-bar-logo');
+  if(!logo) return;
+  var bobbing = false;
+  var leaving = false;
+  var OFFSETS = [0, -4, -6, -4, 0, 2, 0];
+
+  logo.addEventListener('mouseenter', function(){
+    if(bobbing || leaving) return;
+    bobbing = true;
+    var croak = document.getElementById('logoCroak');
+    if(croak){
+      croak.volume = 0.5;
+      croak.currentTime = 0;
+      croak.play().catch(function(){});
+    }
+    var step = 0;
+    (function nextStep(){
+      if(step < OFFSETS.length){
+        logo.style.transform = 'translateY(' + OFFSETS[step] + 'px)';
+        step++;
+        setTimeout(nextStep, 70);
+      } else {
+        logo.style.transform = '';
+        bobbing = false;
+      }
+    })();
+  });
+
+  logo.addEventListener('click', function(){
+    if(leaving) return;
+    leaving = true;
+    if(typeof portalFadeInTimer !== 'undefined') clearTimeout(portalFadeInTimer);
+    var flash = document.getElementById('portalFlash');
+    if(flash) flash.style.opacity = '1';
+    setTimeout(function(){ window.location.href = 'index.html'; }, 700);
+  });
+})();
+</script>
+
+
+<script>
+  // Scroll fade-in for the page content (not the header video or footer).
+  (function(){
+    var root = document.documentElement;
+    if(!root.classList.contains('reveal-on')) return;
+    window.__revealReady = true;
+
+    var STAGGER = 0.12; // seconds between items in a group (e.g. the 4 social videos)
+
+    function mark(selector, opts){
+      opts = opts || {};
+      var els = document.querySelectorAll(selector);
+      for(var i = 0; i < els.length; i++){
+        var el = els[i];
+        el.classList.add('reveal');
+        if(opts.fadeOnly) el.classList.add('reveal-fade');
+        if(opts.stagger) el.style.setProperty('--reveal-delay', (i * STAGGER) + 's');
+      }
+    }
+    // Tagline, ROLE and role title are left out on purpose: they show straight away.
+    mark('.context-header > :not(.context-tagline):not(.context-role):not(.context-role-title)', { stagger: true });
+    mark('.context-description .context-text');
+    mark('.work > .gf-main-video');
+    mark('.work > div:not(.work-item) > .video-wrap', { stagger: true });
+    mark('.work > .work-item:not(.gf-main-video)');
+    mark('#gfCarouselTrack', { fadeOnly: true });
+    mark('.floating-wrap', { fadeOnly: true });
+    mark('.quote-section > *', { stagger: true });
+
+    var items = document.querySelectorAll('.reveal');
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('is-visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
+
+    for(var i = 0; i < items.length; i++){
+      // Anything already above the screen (e.g. reloading mid-page) is shown straight away.
+      if(items[i].getBoundingClientRect().bottom < 0){
+        items[i].classList.add('is-visible');
+      } else {
+        io.observe(items[i]);
+      }
+    }
+  })();
+</script>
+
+<!-- Smooth scrolling (Lenis): gives the page momentum so it glides and
+     eases to rest, most noticeable as the footer settles at the bottom.
+     It only smooths mouse-wheel / trackpad scrolling; touch on phones
+     stays native. If the library fails to load, scrolling is just normal. -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script>
+  (function(){
+    if(typeof Lenis === 'undefined') return;
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var lenis = new Lenis({
+      lerp: 0.08,          // lower = longer, floatier glide (0.05 to 0.15 is sensible)
+      wheelMultiplier: 1,
+      smoothWheel: true
+    });
+    window.lenis = lenis;
+    function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  })();
+</script>
+
+<script>
+  // Logo footer: rises from behind the soil, slowing as it nears its
+  // resting place, and scales up subtly. Tied to the (now smoothed) scroll
+  // position, so it glides to rest along with the page.
+  // Purely cosmetic: if this doesn't run, the logo scrolls in normally.
+  (function(){
+    var footer = document.getElementById('logoFooter');
+    var img = document.getElementById('logoFooterImg');
+    if(!footer || !img) return;
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var START_SPEED = 1;     // logo speed vs. the page as the reveal begins (eases to 0)
+    var START_SCALE = 0.9;   // size when the reveal begins (1 = full size)
+    var ticking = false;
+    function update(){
+      ticking = false;
+      var r = footer.getBoundingClientRect();
+      var R = r.height;
+      if(!R || r.top > window.innerHeight || r.bottom < 0) return;
+      var remaining = Math.max(0, Math.min(R, r.bottom - window.innerHeight));
+      var y = START_SPEED * remaining * remaining / (2 * R) - remaining;
+      var p = 1 - remaining / R;
+      p = 1 - Math.pow(1 - p, 2);
+      var scale = START_SCALE + (1 - START_SCALE) * p;
+      img.style.transform = 'translate3d(0,' + y.toFixed(1) + 'px,0) scale(' + scale.toFixed(4) + ')';
+    }
+    function request(){ if(!ticking){ ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    img.addEventListener('load', request);
+    update();
+  })();
+</script>
+
+</body>
+</html>

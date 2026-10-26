@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project 01 — Joshua Crossley Creative</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@400&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --lime: #d5e709;
+    --dark: #231F20;
+    --orange: #FF8902;
+    --cream: #F5F2EC;
+  }
+
+  html, body { overflow-x: hidden; }
+  body {
+    background: #0d0d0d;
+    color: var(--cream);
+    font-family: 'Inknut Antiqua', serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.12) 3px,
+      rgba(0,0,0,0.12) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(to bottom, rgba(13,13,13,0.7) 0%, transparent 100%);
+  }
+
+  .top-bar-logo {
+    height: 32px;
+    width: auto;
+    opacity: 0.9;
+  }
+
+
+
+  /* ── HERO ── */
+  .hero {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    background: #111;
+    z-index: 0;
+  }
+
+  /* Spacer to push content below the fixed hero */
+  .hero-spacer {
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+  }
+
+  .hero-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a1f0a 50%, #0d1a0d 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-placeholder-text {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 2px;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13,13,13,0.8) 0%, transparent 50%);
+  }
+
+  .hero-label {
+    position: absolute;
+    bottom: 3rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+
+  .hero-label-eyebrow {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    color: var(--orange);
+    letter-spacing: 3px;
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .hero-label-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: #fff;
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(0,0,0,0.8);
+  }
+
+  /* ── CONTEXT ── */
+  .content-wrap {
+    position: relative;
+    z-index: 2;
+    background: #0d0d0d;
+  }
+
+  .context {
+    padding: 10rem 3rem 5rem;
+    max-width: 900px;
+    margin: 0 auto;
+
+  }
+
+  .context-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+
+  }
+
+  .context-eyebrow {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: var(--orange);
+    letter-spacing: 3px;
+    margin-bottom: 2.5rem;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-transform: uppercase;
+  }
+  .context-eyebrow::before,
+  .context-eyebrow::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: var(--orange);
+    opacity: 0.6;
+  }
+
+  .context-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 144px;
+    color: #ECE5D4;
+    line-height: 126.7px;
+    letter-spacing: -2.9px;
+  }
+
+  .context-title em {
+    font-style: italic;
+    color: #ECE5D4;
+  }
+
+  .context-role {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 2.2px;
+    color: rgba(236,229,212,0.55);
+    margin-top: 2.5rem;
+    text-transform: uppercase;
+  }
+
+  .context-role-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: 0px;
+    color: #ECE5D4;
+    margin-top: 0.4rem;
+  }
+
+  .context-tagline {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 24px;
+    color: rgba(236,229,212,0.8);
+    margin-top: 2.5rem;
+    letter-spacing: -0.5px;
+    max-width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .context-description-wrap {
+    background: #191715;
+    border-top: 1px solid rgba(255,137,2,0.35);
+    border-bottom: 1px solid rgba(255,137,2,0.35);
+    padding: 4rem 3rem;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .context-description {
+    text-align: center;
+    max-width: 60%;
+    margin: 0 auto;
+  }
+
+  .context-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 29.8px;
+    letter-spacing: 0.6px;
+    color: rgba(236,229,212,0.72);
+  }
+
+  /* ── WORK GRID ── */
+  .work {
+    padding: 2rem 0;
+  }
+
+  .work-item {
+    margin-bottom: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    background: #111;
+  }
+
+  .work-item.full {
+    width: 100%;
+    aspect-ratio: 16/9;
+  }
+
+  .work-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .work-row .work-item {
+    aspect-ratio: 4/3;
+    margin-bottom: 0;
+  }
+
+  .work-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .work-item:hover .work-media {
+    transform: scale(1.02);
+  }
+
+  .work-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a1a, #2a1f0a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .work-placeholder span {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 2px;
+  }
+
+  /* ── NAV ── */
+  .project-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: visible;
+  }
+
+  .project-nav-item {
+    padding: 3rem;
+    text-decoration: none;
+    color: var(--cream);
+    transition: background 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+  }
+  .project-nav-item:hover { background: rgba(255,255,255,0.03); }
+  .project-nav-item.next { text-align: right; border-left: 1px solid rgba(255,255,255,0.06); }
+  .nav-direction, .nav-title { pointer-events: auto; cursor: pointer; }
+  .nav-text-inner { display: inline-block; }
+
+  .nav-direction {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    color: var(--lime);
+    letter-spacing: 3px;
+    opacity: 0.6;
+    display: inline;
+  }
+
+  .nav-title {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: rgba(255,255,255,0.8);
+    display: inline;
+  }
+
+  /* ── PORTAL FADE ── */
+  #portalFlash {
+    position: fixed;
+    inset: 0;
+    background: var(--lime);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 99999;
+    transition: opacity 0.2s ease;
+  }
+
+  /* ── SOIL STRIP ── */
+  .soil-strip {
+    width: 100%;
+    height: 220px;
+    background-image: url('soil-repeat-tile.png');
+    background-repeat: repeat-x;
+    background-size: auto 220px;
+    background-position: top center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .soil-frog {
+    position: absolute;
+    bottom: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 240px;
+    width: auto;
+    image-rendering: pixelated;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .soil-strip-wrap {
+    position: relative;
+    overflow: visible;
+  }
+
+  .project-nav-item {
+    overflow: hidden;
+  }
+  .nav-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(213,231,9,0.4) 0%, rgba(213,231,9,0) 70%);
+    transform: scale(0);
+    animation: navRipple 0.6s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes navRipple {
+    to { transform: scale(4); opacity: 0; }
+  }
+
+  #fireballCanvas {
+    position: fixed;
+    bottom: 15%;
+    left: 0;
+    width: 100vw;
+    height: 200px;
+    pointer-events: none;
+    z-index: 12;
+  }
+
+  .quote-section {
+    position: relative;
+    z-index: 2;
+    background: #0d0d0d;
+    padding: 6rem 3rem;
+    text-align: center;
+
+  }
+
+  .quote-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,137,2,0.20) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .quote-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 52px;
+    letter-spacing: 0.6px;
+    color: #ECE5D4;
+    max-width: 50%;
+    margin: 0 auto 2rem;
+  }
+
+  .quote-text .quote-mark,
+  .quote-text .quote-first {
+    color: var(--orange);
+  }
+
+  .quote-expert {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 2.2px;
+    color: rgba(236,229,212,0.55);
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+  }
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    background: #000;
+    cursor: pointer;
+  }
+  .video-wrap video {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(13,13,13,0.6);
+    border: 2px solid #d5e709;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .video-play-btn svg {
+    fill: #d5e709;
+    width: 28px;
+    height: 28px;
+    margin-left: 4px;
+  }
+  .video-wrap.playing .video-play-btn {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .video-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.2rem;
+    background: #111;
+    border-top: 1px solid rgba(213,231,9,0.2);
+    position: relative;
+    z-index: 3;
+  }
+  .video-ctrl-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #d5e709;
+  }
+  .video-ctrl-btn svg { width: 18px; height: 18px; fill: #d5e709; }
+  .video-progress-wrap {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+  }
+  .video-progress-bar {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+  .video-time {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    color: rgba(236,229,212,0.5);
+    white-space: nowrap;
+  }
+  .video-volume {
+    width: 60px;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+  }
+  .video-volume-bar {
+    height: 100%;
+    background: #d5e709;
+    border-radius: 2px;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<div id="portalFlash"></div>
+
+<!-- Top Bar -->
+<header class="top-bar">
+  <img src="JCC_LOGO_WHITE.png" alt="Joshua Crossley Creative" class="top-bar-logo"/>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-placeholder">
+    <span class="hero-placeholder-text">HERO VIDEO / IMAGE</span>
+  </div>
+  <div class="hero-overlay"></div>
+</section>
+<div class="hero-spacer"></div>
+
+<div class="content-wrap">
+<!-- Context -->
+<section class="context">
+  <div class="context-header">
+    <div class="context-eyebrow">CLIENT NAME</div>
+    <h1 class="context-title">Project Title<br/><em>Goes Here</em></h1>
+    <p class="context-tagline">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+    <p class="context-role">ROLE</p>
+    <p class="context-role-title">Creative Director</p>
+  </div>
+  <div class="context-description-wrap">
+  <div class="context-description">
+    <p class="context-text">A short description of the project. Keep it to two or three sentences maximum. Let the work do the talking.</p>
+  </div>
+</section>
+
+<!-- Work -->
+<section class="work">
+  <!-- CASE STUDY VIDEO - replace src with your video filename -->
+  <div class="work-item full" style="overflow:visible;">
+    <div class="video-wrap" id="videoWrap">
+      <video id="caseVideo" style="width:100%;height:auto;display:block;">
+        <source src="YOUR-VIDEO.mp4" type="video/mp4">
+      </video>
+      <div class="video-play-btn">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <div class="video-controls">
+        <button class="video-ctrl-btn" id="playPauseBtn">
+          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <div class="video-progress-wrap" id="progressWrap">
+          <div class="video-progress-bar" id="progressBar"></div>
+        </div>
+        <span class="video-time" id="videoTime">0:00</span>
+        <button class="video-ctrl-btn" id="muteBtnV">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+        <div class="video-volume" id="volumeWrap">
+          <div class="video-volume-bar" id="volumeBar"></div>
+        </div>
+        <button class="video-ctrl-btn" id="fullscreenBtn">
+          <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side by side -->
+  <div class="work-row">
+    <div class="work-item">
+      <div class="work-placeholder"><span>IMAGE</span></div>
+    </div>
+    <div class="work-item">
+      <div class="work-placeholder"><span>IMAGE</span></div>
+    </div>
+  </div>
+
+  <!-- CASE STUDY VIDEO - replace src with your video filename -->
+  <div class="work-item full" style="overflow:visible;">
+    <div class="video-wrap" id="videoWrap">
+      <video id="caseVideo" style="width:100%;height:auto;display:block;">
+        <source src="YOUR-VIDEO.mp4" type="video/mp4">
+      </video>
+      <div class="video-play-btn">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <div class="video-controls">
+        <button class="video-ctrl-btn" id="playPauseBtn">
+          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <div class="video-progress-wrap" id="progressWrap">
+          <div class="video-progress-bar" id="progressBar"></div>
+        </div>
+        <span class="video-time" id="videoTime">0:00</span>
+        <button class="video-ctrl-btn" id="muteBtnV">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+        <div class="video-volume" id="volumeWrap">
+          <div class="video-volume-bar" id="volumeBar"></div>
+        </div>
+        <button class="video-ctrl-btn" id="fullscreenBtn">
+          <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side by side -->
+  <div class="work-row">
+    <div class="work-item">
+      <div class="work-placeholder"><span>IMAGE</span></div>
+    </div>
+    <div class="work-item">
+      <div class="work-placeholder"><span>IMAGE</span></div>
+    </div>
+  </div>
+
+  <!-- CASE STUDY VIDEO - replace src with your video filename -->
+  <div class="work-item full" style="overflow:visible;">
+    <div class="video-wrap" id="videoWrap">
+      <video id="caseVideo" style="width:100%;height:auto;display:block;">
+        <source src="YOUR-VIDEO.mp4" type="video/mp4">
+      </video>
+      <div class="video-play-btn">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <div class="video-controls">
+        <button class="video-ctrl-btn" id="playPauseBtn">
+          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <div class="video-progress-wrap" id="progressWrap">
+          <div class="video-progress-bar" id="progressBar"></div>
+        </div>
+        <span class="video-time" id="videoTime">0:00</span>
+        <button class="video-ctrl-btn" id="muteBtnV">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+        <div class="video-volume" id="volumeWrap">
+          <div class="video-volume-bar" id="volumeBar"></div>
+        </div>
+        <button class="video-ctrl-btn" id="fullscreenBtn">
+          <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+  <div class="quote-section">
+    <p class="quote-text"><span class="quote-mark">“</span><span class="quote-first">L</span>orem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.”</p>
+    <p class="quote-expert">Expert Name</p>
+  </div>
+</div><!-- /content-wrap -->
+
+<!-- Project Nav -->
+<nav class="project-nav">
+  <a href="#" class="project-nav-item prev" id="returnBtn">
+    <span class="nav-direction" style="visibility:hidden;"><span class="nav-text-inner">placeholder</span></span>
+    <span class="nav-title"><span class="nav-text-inner">Return to the Kingdom of Portfolia</span></span>
+  </a>
+  <a href="project-2.html" class="project-nav-item next">
+    <span class="nav-direction"><span class="nav-text-inner">NEXT →</span></span>
+    <span class="nav-title"><span class="nav-text-inner">Project 02</span></span>
+  </a>
+</nav>
+<div class="soil-strip-wrap">
+  <canvas id="fireballCanvas"></canvas>
+  <canvas id="zzzCanvas" style="position:absolute;bottom:85%;left:50%;transform:translateX(-50%);width:320px;height:200px;pointer-events:none;z-index:11;"></canvas>
+  <img src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
+  <div class="soil-strip"></div>
+</div>
+
+<script>
+// Get which portal we came from
+var params = new URLSearchParams(window.location.search);
+var fromPortal = params.get('from') || '0';
+
+// ── ZZZ ANIMATION
+var zzzCanvas = document.getElementById('zzzCanvas');
+var soilFrog = document.getElementById('soilFrog');
+
+if(zzzCanvas && soilFrog){
+  zzzCanvas.width = 320;
+  zzzCanvas.height = 200;
+  var zctx = zzzCanvas.getContext('2d');
+  var zParticles = [];
+  var zTimer = 0;
+  var frogState = 'sleep';
+
+  // Precise hover detection
+  var nextText = document.querySelector('.project-nav-item.next .nav-direction .nav-text-inner');
+  var nextTitle = document.querySelector('.project-nav-item.next .nav-title .nav-text-inner');
+  var prevText = document.querySelector('.project-nav-item.prev .nav-direction .nav-text-inner');
+  var prevTitle = document.querySelector('.project-nav-item.prev .nav-title .nav-text-inner');
+
+  function isOver(el, x, y){
+    if(!el) return false;
+    var r = el.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  }
+
+  document.addEventListener('mousemove', function(e){
+    var x = e.clientX, y = e.clientY;
+    if(isOver(nextText, x, y) || isOver(nextTitle, x, y)){
+      if(frogState !== 'cast-right'){
+        frogState = 'cast-right';
+        soilFrog.src = 'frog-cast.png';
+        soilFrog.style.transform = 'translateX(-50%)';
+      }
+    } else if(isOver(prevText, x, y) || isOver(prevTitle, x, y)){
+      if(frogState !== 'cast-left'){
+        frogState = 'cast-left';
+        soilFrog.src = 'frog-cast.png';
+        soilFrog.style.transform = 'translateX(-50%) scaleX(-1)';
+      }
+    } else {
+      if(frogState !== 'sleep'){
+        frogState = 'sleep';
+        soilFrog.src = 'frog-sleep.png';
+        soilFrog.style.transform = 'translateX(-50%)';
+      }
+    }
+  });
+
+  function zLoop(){
+    requestAnimationFrame(zLoop);
+    zctx.clearRect(0, 0, zzzCanvas.width, zzzCanvas.height);
+    if(frogState === 'sleep'){
+      zTimer++;
+      if(zTimer % 50 === 0){
+        zParticles.push({
+          x: zzzCanvas.width * 0.6, y: zzzCanvas.height * 0.5,
+          opacity: 1, size: 16 + Math.random() * 8,
+          vy: -0.6 - Math.random() * 0.3, vx: 0.3 + Math.random() * 0.2,
+          life: 90
+        });
+      }
+    } else {
+      zParticles = []; zTimer = 0;
+    }
+    for(var z = zParticles.length - 1; z >= 0; z--){
+      var zp = zParticles[z];
+      zp.x += zp.vx; zp.y += zp.vy; zp.life--;
+      zp.opacity = zp.life / 90; zp.size += 0.06;
+      if(zp.life <= 0){ zParticles.splice(z, 1); continue; }
+      zctx.save();
+      zctx.globalAlpha = zp.opacity;
+      zctx.font = 'bold ' + Math.floor(zp.size) + 'px "Press Start 2P"';
+      zctx.fillStyle = '#d5e709';
+      zctx.textAlign = 'center';
+      zctx.fillText('Z', zp.x, zp.y);
+      zctx.restore();
+    }
+  }
+  zLoop();
+}
+
+// ── NAV CLICK RIPPLE + RETURN TO WORLD
+document.querySelectorAll('.project-nav-item').forEach(function(item){
+  item.style.position = 'relative';
+  item.addEventListener('click', function(e){
+    e.preventDefault();
+    var href = item.getAttribute('href');
+    // Fireball
+    if(window.spawnFireball){
+      var dir = item.id === 'returnBtn' ? 'left' : 'right';
+      window.spawnFireball(dir);
+    }
+    // Ripple
+    var ripple = document.createElement('div');
+    ripple.className = 'nav-ripple';
+    var size = Math.max(item.offsetWidth, item.offsetHeight);
+    var rect = item.getBoundingClientRect();
+    ripple.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + (e.clientX - rect.left - size/2) + 'px;top:' + (e.clientY - rect.top - size/2) + 'px;';
+    item.appendChild(ripple);
+    // Return to world uses portal flash
+    if(item.id === 'returnBtn'){
+      var flash = document.getElementById('portalFlash');
+      if(flash){ flash.style.opacity = '1'; }
+      setTimeout(function(){
+        window.location.href = 'game.html?returnPortal=' + fromPortal;
+      }, 500);
+    } else {
+      setTimeout(function(){
+        window.location.href = href;
+      }, 500);
+    }
+  });
+});
+
+// ── FIREBALL
+var fireballCanvas = document.getElementById('fireballCanvas');
+if(fireballCanvas){
+  fireballCanvas.width = window.innerWidth;
+  fireballCanvas.height = 200;
+  var fctx = fireballCanvas.getContext('2d');
+  var fireballs = [];
+
+  function spawnFireball(direction){
+    var frogEl = document.getElementById('soilFrog');
+    var frogRect = frogEl ? frogEl.getBoundingClientRect() : null;
+    var startX = fireballCanvas.width / 2;
+    if(frogRect){
+      startX = direction === 'right' ? frogRect.right : frogRect.left;
+    }
+    fireballs.push({
+      x: startX,
+      y: fireballCanvas.height * 0.5,
+      vx: direction === 'right' ? 14 : -14,
+      frame: 0,
+      active: true
+    });
+  }
+
+  function drawFireball(fb){
+    var cx = fb.x;
+    var cy = fb.y;
+    var r = 14;
+    fctx.save();
+    // Outer glow
+    var grd = fctx.createRadialGradient(cx, cy, 0, cx, cy, r + 6);
+    grd.addColorStop(0, 'rgba(255,255,100,0.9)');
+    grd.addColorStop(0.3, 'rgba(255,140,0,0.8)');
+    grd.addColorStop(0.7, 'rgba(255,60,0,0.5)');
+    grd.addColorStop(1, 'rgba(255,60,0,0)');
+    fctx.beginPath();
+    fctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+    fctx.fillStyle = grd;
+    fctx.fill();
+    // Core
+    fctx.beginPath();
+    fctx.arc(cx, cy + Math.sin(fb.frame * 0.4) * 2, r * 0.6, 0, Math.PI * 2);
+    fctx.fillStyle = '#fff8aa';
+    fctx.fill();
+    // Trails
+    fctx.fillStyle = 'rgba(255,140,0,0.7)';
+    for(var t = 0; t < 3; t++){
+      var tx = cx - (fb.vx > 0 ? 1 : -1) * (r * 0.5 + t * 6);
+      var ty = cy + Math.sin(fb.frame * 0.3 + t) * 4;
+      fctx.beginPath();
+      fctx.arc(tx, ty, r * 0.3 - t * 2, 0, Math.PI * 2);
+      fctx.fill();
+    }
+    fctx.restore();
+  }
+
+  function fireballLoop(){
+    requestAnimationFrame(fireballLoop);
+    fctx.clearRect(0, 0, fireballCanvas.width, fireballCanvas.height);
+    for(var i = fireballs.length - 1; i >= 0; i--){
+      var fb = fireballs[i];
+      fb.x += fb.vx;
+      fb.frame++;
+      if(fb.x < -60 || fb.x > fireballCanvas.width + 60){
+        fireballs.splice(i, 1);
+        continue;
+      }
+      drawFireball(fb);
+    }
+  }
+  fireballLoop();
+
+  window.addEventListener('resize', function(){ fireballCanvas.width = window.innerWidth; });
+
+  // Expose spawnFireball globally
+  window.spawnFireball = spawnFireball;
+}
+
+// Custom video player
+var video = document.getElementById('caseVideo');
+var wrap = document.getElementById('videoWrap');
+var playPauseBtn = document.getElementById('playPauseBtn');
+var playIcon = document.getElementById('playIcon');
+var pauseIcon = document.getElementById('pauseIcon');
+var progressBar = document.getElementById('progressBar');
+var progressWrap = document.getElementById('progressWrap');
+var videoTime = document.getElementById('videoTime');
+var muteBtnV = document.getElementById('muteBtn');
+var volumeBar = document.getElementById('volumeBar');
+var volumeWrap = document.getElementById('volumeWrap');
+var fullscreenBtn = document.getElementById('fullscreenBtn');
+
+if(video){
+  function formatTime(s){
+    var m = Math.floor(s/60);
+    var sec = Math.floor(s%60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function togglePlay(){
+    if(video.paused){ video.play(); } else { video.pause(); }
+  }
+
+  var playBtn = wrap.querySelector('.video-play-btn');
+  var hideTimeout;
+
+  function showPlayBtn(){
+    playBtn.style.opacity = '1';
+    clearTimeout(hideTimeout);
+    if(!video.paused){
+      hideTimeout = setTimeout(function(){ playBtn.style.opacity = '0'; }, 2000);
+    }
+  }
+
+  wrap.addEventListener('mousemove', function(){
+    if(video.paused) showPlayBtn();
+  });
+  wrap.addEventListener('mouseleave', function(){
+    if(!video.paused) playBtn.style.opacity = '0';
+  });
+
+  video.addEventListener('play', function(){
+    wrap.classList.add('playing');
+    playIcon.style.display = 'none';
+    pauseIcon.style.display = 'block';
+    playBtn.style.opacity = '0';
+  });
+  video.addEventListener('pause', function(){
+    wrap.classList.remove('playing');
+    playIcon.style.display = 'block';
+    pauseIcon.style.display = 'none';
+    clearTimeout(hideTimeout);
+    playBtn.style.opacity = '1';
+  });
+  video.addEventListener('timeupdate', function(){
+    var pct = (video.currentTime / video.duration) * 100;
+    progressBar.style.width = pct + '%';
+    videoTime.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
+  });
+
+  wrap.addEventListener('click', function(e){
+    if(e.target.closest('.video-controls')) return;
+    togglePlay();
+  });
+  playPauseBtn.addEventListener('click', togglePlay);
+
+  progressWrap.addEventListener('click', function(e){
+    var rect = progressWrap.getBoundingClientRect();
+    var pct = (e.clientX - rect.left) / rect.width;
+    video.currentTime = pct * video.duration;
+  });
+
+  muteBtnV.addEventListener('click', function(){
+    video.muted = !video.muted;
+    volumeBar.style.width = video.muted ? '0%' : '100%';
+  });
+
+  volumeWrap.addEventListener('click', function(e){
+    var rect = volumeWrap.getBoundingClientRect();
+    var vol = (e.clientX - rect.left) / rect.width;
+    video.volume = Math.max(0, Math.min(1, vol));
+    volumeBar.style.width = (vol * 100) + '%';
+    video.muted = false;
+  });
+
+  fullscreenBtn.addEventListener('click', function(){
+    if(video.requestFullscreen) video.requestFullscreen();
+    else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+  });
+}
+
+</script>
+
+</body>
+</html>

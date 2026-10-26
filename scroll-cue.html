@@ -1,0 +1,55 @@
+<!-- ===== SCROLL CUE: paste this whole block inside <section class="hero">, right after the </video> tag ===== -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@1&display=swap">
+<style>
+  .scroll-cue {
+    position: absolute;
+    left: 50%;
+    bottom: calc(44px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    opacity: 0;
+    animation: scrollCueIn 0.6s steps(4) 2s forwards;
+  }
+  .scroll-cue-text {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    color: #f5f2ec;
+    white-space: nowrap;
+  }
+  .scroll-cue svg {
+    display: block;
+    width: 22px;
+    height: 36px;
+    shape-rendering: crispEdges;
+  }
+  .scroll-cue-wheel {
+    animation: scrollCueWheel 1.4s step-end infinite;
+  }
+  @keyframes scrollCueIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scrollCueWheel {
+    0%   { transform: translateY(0); }
+    20%  { transform: translateY(2px); }
+    40%  { transform: translateY(4px); }
+    60%  { transform: translateY(6px); }
+    80%  { transform: translateY(6px); opacity: 0.3; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue { animation-duration: 0.01s; animation-delay: 1s; }
+    .scroll-cue-wheel { animation: none; }
+  }
+</style>
+<div class="scroll-cue" aria-hidden="true">
+  <svg viewBox="0 0 22 36">
+    <path fill="#d5e709" fill-rule="evenodd" d="M2 0H20V2H22V34H20V36H2V34H0V2H2Z M4 2V4H2V32H4V34H18V32H20V4H18V2Z"/>
+    <rect class="scroll-cue-wheel" x="10" y="6" width="2" height="6" fill="#d5e709"/>
+  </svg>
+  <span class="scroll-cue-text">Scroll to descend</span>
+</div>
+<!-- ===== END SCROLL CUE ===== -->
