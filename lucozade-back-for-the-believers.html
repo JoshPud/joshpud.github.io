@@ -1044,21 +1044,20 @@
      applies once the script has switched it on (html.reveal-on), so if
      scripts don't run, nothing is ever hidden. Elements whose position is
      already driven by script (carousel, floating bottle) only fade. */
+  /* Fade-only items never have their transform touched, so anything already
+     positioned with a transform (e.g. a centred full-width text box) stays put. */
   html.reveal-on .reveal {
     opacity: 0;
+    transition: opacity 0.9s ease var(--reveal-delay, 0s);
+  }
+  html.reveal-on .reveal:not(.reveal-fade) {
     transform: translate3d(0, 24px, 0);
     transition:
       opacity 0.9s ease var(--reveal-delay, 0s),
       transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0s);
   }
-  html.reveal-on .reveal.reveal-fade {
-    transform: none;
-    transition: opacity 0.9s ease var(--reveal-delay, 0s);
-  }
-  html.reveal-on .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-  }
+  html.reveal-on .reveal.is-visible { opacity: 1; }
+  html.reveal-on .reveal:not(.reveal-fade).is-visible { transform: none; }
   /* Footer copyright: small, bottom right, same green as the logo.
      By default the footer gets a slim strip below the logo for it. On
      wide screens there's enough empty space under the end of the logo
@@ -1544,7 +1543,21 @@ if(fireballCanvas){
   var fctx = fireballCanvas.getContext('2d');
   var fireballs = [];
 
+  // Keep the fireball strip level with the frog's staff, wherever the frog
+  // is on screen (the page can still be gliding when you click, and the
+  // footer below the soil changes where the frog sits). Re-checked every
+  // frame while a fireball is in flight, so it travels with the frog.
+  function alignFireballCanvas(){
+    var frogEl = document.getElementById('soilFrog');
+    if(!frogEl) return;
+    var r = frogEl.getBoundingClientRect();
+    if(!r.height) return;
+    fireballCanvas.style.bottom = 'auto';
+    fireballCanvas.style.top = Math.round(r.top + r.height * 0.8 - fireballCanvas.height / 2) + 'px';
+  }
+
   function spawnFireball(direction){
+    alignFireballCanvas();
     var frogEl = document.getElementById('soilFrog');
     var frogRect = frogEl ? frogEl.getBoundingClientRect() : null;
     var startX = fireballCanvas.width / 2;
@@ -1595,6 +1608,7 @@ if(fireballCanvas){
   function fireballLoop(){
     requestAnimationFrame(fireballLoop);
     fctx.clearRect(0, 0, fireballCanvas.width, fireballCanvas.height);
+    if(fireballs.length) alignFireballCanvas();
     for(var i = fireballs.length - 1; i >= 0; i--){
       var fb = fireballs[i];
       fb.x += fb.vx;
@@ -1954,8 +1968,10 @@ if(gfBottleWrap){
       var els = document.querySelectorAll(selector);
       for(var i = 0; i < els.length; i++){
         var el = els[i];
+        // Anything that already uses a transform for its layout only fades.
+        var ownTransform = getComputedStyle(el).transform !== 'none';
         el.classList.add('reveal');
-        if(opts.fadeOnly) el.classList.add('reveal-fade');
+        if(opts.fadeOnly || ownTransform) el.classList.add('reveal-fade');
         if(opts.stagger) el.style.setProperty('--reveal-delay', (i * STAGGER) + 's');
       }
     }
