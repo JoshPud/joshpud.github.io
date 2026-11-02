@@ -4,6 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Anything Goes — Joshua Crossley Creative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@400&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1035,7 +1038,7 @@
   <!-- Announcement video -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="McCain_Baga_Announcement.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1052,10 +1055,10 @@
 
   <!-- Teaser videos side by side -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
-    <video autoplay muted loop playsinline style="width:100%;height:auto;display:block;">
+    <video preload="metadata" data-autoplay muted loop playsinline style="width:100%;height:auto;display:block;">
       <source src="MCCAIN_BAGA_TEASER%201%20GLOVE.mp4" type="video/mp4">
     </video>
-    <video autoplay muted loop playsinline style="width:100%;height:auto;display:block;">
+    <video preload="metadata" data-autoplay muted loop playsinline style="width:100%;height:auto;display:block;">
       <source src="MCCAIN_BAGA_TEASER%202%20POUT.mp4" type="video/mp4">
     </video>
   </div>
@@ -1064,7 +1067,7 @@
   <!-- Baga Butty -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="McCain_Baga_Butty.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1082,7 +1085,7 @@
   <!-- Baga Smiles -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="McCain_Baga_Smiles.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1100,7 +1103,7 @@
   <!-- Baga Inspiration -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="McCain_Baga_Inspiration.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1139,7 +1142,7 @@
 <div class="soil-strip-wrap">
   <canvas id="fireballCanvas"></canvas>
   <canvas id="zzzCanvas" style="position:absolute;bottom:85%;left:50%;transform:translateX(-50%);width:320px;height:200px;pointer-events:none;z-index:11;"></canvas>
-  <img src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
+  <img loading="lazy" decoding="async" src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
   <div class="soil-strip"></div>
 </div>
 
@@ -1764,6 +1767,27 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     var all = function(){ wraps.forEach(fit); };
     window.addEventListener('resize', all); window.addEventListener('load', all); all();
   }
+})();
+</script>
+
+<script>
+// ── PERFORMANCE: start videos only when they're on (or near) screen ──
+// Videos below the hero used to all start downloading and playing the
+// moment the page opened. Now each waits until it's close to coming into
+// view, plays while visible and pauses once it's well off screen. Covers
+// carousels too, since it follows the videos as they slide sideways.
+(function(){
+  var vids = document.querySelectorAll('video[data-autoplay]');
+  if(!vids.length) return;
+  function play(v){ v.muted = true; var p = v.play(); if(p && p.catch) p.catch(function(){}); }
+  if(!('IntersectionObserver' in window)){ vids.forEach(play); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting) play(e.target);
+      else if(!e.target.paused) e.target.pause();
+    });
+  }, { rootMargin: '50% 50% 50% 50%', threshold: 0 });
+  vids.forEach(function(v){ io.observe(v); });
 })();
 </script>
 

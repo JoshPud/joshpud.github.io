@@ -4,6 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title> — Joshua Crossley Creative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@400&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1049,7 +1052,7 @@
   <!-- Full width -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="UE_Case_Study_Video.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1066,7 +1069,7 @@
 
   <!-- Cannes Board -->
   <div class="work-item full" style="aspect-ratio:auto;">
-    <img src="UE_CASE-STUDY_BOARD_CANNES_FINAL.png" alt="Uber Eats #bringit Cannes case study board" class="work-media" style="height:auto;object-fit:initial;">
+    <img loading="lazy" decoding="async" src="UE_CASE-STUDY_BOARD_CANNES_FINAL.jpg" alt="Uber Eats #bringit Cannes case study board" class="work-media" style="height:auto;object-fit:initial;">
   </div>
 </section>
 
@@ -1093,7 +1096,7 @@
 <div class="soil-strip-wrap">
   <canvas id="fireballCanvas"></canvas>
   <canvas id="zzzCanvas" style="position:absolute;bottom:85%;left:50%;transform:translateX(-50%);width:320px;height:200px;pointer-events:none;z-index:11;"></canvas>
-  <img src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
+  <img loading="lazy" decoding="async" src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
   <div class="soil-strip"></div>
 </div>
 

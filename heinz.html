@@ -4,6 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bursting with Chunkier Textures — Joshua Crossley Creative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@400&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1044,19 +1047,19 @@
 <section class="work">
   <!-- Hero image -->
   <div class="work-item full" style="aspect-ratio:auto;">
-    <img src="Heinz_2.jpg" alt="Heinz for baby Bursting with Chunkier Textures poster" class="work-media" style="height:auto;object-fit:initial;">
+    <img loading="lazy" decoding="async" src="Heinz_2.jpg" alt="Heinz for baby Bursting with Chunkier Textures poster" class="work-media" style="height:auto;object-fit:initial;">
   </div>
 
   <!-- Behind the scenes side by side -->
   <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.5rem;">
     <div style="aspect-ratio:4/3;overflow:hidden;">
-      <img src="HEINZ_BTS_1.jpg" alt="Behind the scenes on the Heinz shoot" class="work-media" style="width:100%;height:100%;object-fit:cover;">
+      <img loading="lazy" decoding="async" src="HEINZ_BTS_1.jpg" alt="Behind the scenes on the Heinz shoot" class="work-media" style="width:100%;height:100%;object-fit:cover;">
     </div>
     <div style="aspect-ratio:4/3;overflow:hidden;">
-      <img src="HEINZ_BTS_2.jpeg" alt="Behind the scenes on the Heinz shoot" class="work-media" style="width:100%;height:100%;object-fit:cover;">
+      <img loading="lazy" decoding="async" src="HEINZ_BTS_2.jpeg" alt="Behind the scenes on the Heinz shoot" class="work-media" style="width:100%;height:100%;object-fit:cover;">
     </div>
     <div style="aspect-ratio:4/3;overflow:hidden;">
-      <img src="HEINZ_BTS_3.jpeg" alt="Behind the scenes on the Heinz shoot" class="work-media" style="width:100%;height:100%;object-fit:cover;">
+      <img loading="lazy" decoding="async" src="HEINZ_BTS_3.jpeg" alt="Behind the scenes on the Heinz shoot" class="work-media" style="width:100%;height:100%;object-fit:cover;">
     </div>
   </div>
 </section>
@@ -1070,7 +1073,7 @@
 <section class="work">
   <!-- Motherland clip -->
   <div class="work-item full">
-    <video autoplay muted loop playsinline class="work-media">
+    <video preload="metadata" data-autoplay muted loop playsinline class="work-media">
       <source src="HEINZ_MOTHERLAND.mp4" type="video/mp4">
     </video>
   </div>
@@ -1095,7 +1098,7 @@
 <div class="soil-strip-wrap">
   <canvas id="fireballCanvas"></canvas>
   <canvas id="zzzCanvas" style="position:absolute;bottom:85%;left:50%;transform:translateX(-50%);width:320px;height:200px;pointer-events:none;z-index:11;"></canvas>
-  <img src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
+  <img loading="lazy" decoding="async" src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
   <div class="soil-strip"></div>
 </div>
 
@@ -1720,6 +1723,27 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     var all = function(){ wraps.forEach(fit); };
     window.addEventListener('resize', all); window.addEventListener('load', all); all();
   }
+})();
+</script>
+
+<script>
+// ── PERFORMANCE: start videos only when they're on (or near) screen ──
+// Videos below the hero used to all start downloading and playing the
+// moment the page opened. Now each waits until it's close to coming into
+// view, plays while visible and pauses once it's well off screen. Covers
+// carousels too, since it follows the videos as they slide sideways.
+(function(){
+  var vids = document.querySelectorAll('video[data-autoplay]');
+  if(!vids.length) return;
+  function play(v){ v.muted = true; var p = v.play(); if(p && p.catch) p.catch(function(){}); }
+  if(!('IntersectionObserver' in window)){ vids.forEach(play); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting) play(e.target);
+      else if(!e.target.paused) e.target.pause();
+    });
+  }, { rootMargin: '50% 50% 50% 50%', threshold: 0 });
+  vids.forEach(function(v){ io.observe(v); });
 })();
 </script>
 

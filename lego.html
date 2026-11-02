@@ -4,6 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title> — Joshua Crossley Creative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@400&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1044,7 +1047,7 @@
   <!-- Princess -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="PRINCESS_30_16_9.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1062,7 +1065,7 @@
   <!-- Party Bus -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="PARTY_BUS_30_16_9.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1080,7 +1083,7 @@
   <!-- Robot -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="ROBOT_30_16_9.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1098,7 +1101,7 @@
   <!-- Glasses -->
   <div class="work-item full" style="overflow:visible;">
     <div class="video-wrap">
-      <video style="width:100%;height:auto;display:block;">
+      <video preload="metadata" style="width:100%;height:auto;display:block;">
         <source src="GLASSES_30_16_9.mp4" type="video/mp4">
       </video>
       <div class="video-play-btn"><div class="vpb-glass"></div><div class="vpb-green-triangle"></div><div class="vpb-green-ring"></div><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
@@ -1133,7 +1136,7 @@
 <div class="soil-strip-wrap">
   <canvas id="fireballCanvas"></canvas>
   <canvas id="zzzCanvas" style="position:absolute;bottom:85%;left:50%;transform:translateX(-50%);width:320px;height:200px;pointer-events:none;z-index:11;"></canvas>
-  <img src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
+  <img loading="lazy" decoding="async" src="frog-sleep.png" alt="" class="soil-frog" id="soilFrog"/>
   <div class="soil-strip"></div>
 </div>
 
