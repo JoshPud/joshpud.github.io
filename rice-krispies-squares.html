@@ -2282,6 +2282,14 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     .pm-div span { width: 5px; height: 5px; border: 1px solid rgba(251,206,160,0.9); transform: rotate(45deg); }
     html.pm-lock, html.pm-lock body { overflow: hidden; }
   }
+
+  /* Divider centre: a small gold frog foot (drawn for this site) in place
+     of the diamond, on phones and desktop. */
+  .title-divider span {
+    width: 15px !important; height: 14px !important;
+    border: 0 !important; transform: none !important;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
+  }
 </style>
 <button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
