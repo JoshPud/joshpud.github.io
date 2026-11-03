@@ -2140,5 +2140,67 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
 })();
 </script>
 
+<script>
+// ── PHONE ROUND 5: video playback, one-tap full screen, silent-mode sound ──
+(function(){
+  var touch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  function playMuted(v){ if(!v || typeof v.play !== 'function' || !v.paused) return; v.muted = true; var p = v.play(); if(p && p.catch) p.catch(function(){}); }
+  function near(v){ var r = v.getBoundingClientRect(); return r.bottom > -window.innerHeight * 0.5 && r.top < window.innerHeight * 1.5 && r.right > -window.innerWidth && r.left < window.innerWidth * 2; }
+  function wakeVisible(){
+    playMuted(document.querySelector('.hero-media'));
+    document.querySelectorAll('video[data-autoplay]').forEach(function(v){ if(near(v)) playMuted(v); });
+  }
+  // Back/Forward: the browser pauses every video when you leave a page and
+  // doesn't restart them when you come back. Start them again.
+  window.addEventListener('pageshow', function(e){ if(e.persisted) wakeVisible(); });
+  if(!touch) return;
+
+  // Silent-mode sound: iPhones mute sounds a page makes itself (music,
+  // chimes, effects) when the phone is on silent. Playing a tiny silent
+  // audio loop, started by your tap, moves the page into "media" mode, where
+  // those sounds are allowed through, like a video's sound.
+  var keepAlive = new Audio('data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAABTQALCwsLDc3Nzc3QUFBQUtLS0tLVVVVVV9fX19faWlpaXNzc3NzfX19fYeHh4eHkZGRkZubm5ubpaWlpaWvr6+vubm5ubnDw8PDzc3Nzc3X19fX4eHh4eHr6+vr9fX19fX/////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQELwAAAAAAAAU0bbRwgwAAAAAAAAAAAAAAAAD/8yDEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MixCcAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDETwAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxHYAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIMSdAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVX/8yLExAAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIsTXAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MixNcAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/8yLE1wAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zIsTXAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+  keepAlive.loop = true; keepAlive.volume = 0.01;
+  function startKeepAlive(){ var p = keepAlive.play(); if(p && p.catch) p.catch(function(){}); }
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) keepAlive.pause(); });
+
+  // First touch anywhere: start and "unlock" every looping video while the
+  // phone allows it (it only does during a tap, e.g. in Low Power Mode), so
+  // later ones can start by themselves as you scroll to them.
+  var unlocked = false;
+  function unlock(){
+    if(unlocked) return; unlocked = true;
+    startKeepAlive();
+    document.querySelectorAll('video[data-autoplay], video.hero-media').forEach(function(v){
+      v.muted = true;
+      var p = v.play();
+      if(p && p.then) p.then(function(){ if(!v.classList.contains('hero-media') && !near(v)) v.pause(); }).catch(function(){});
+    });
+  }
+  document.addEventListener('touchend', unlock, { passive: true });
+  // After each scroll, nudge any looping video that's on screen but paused.
+  var st;
+  window.addEventListener('scroll', function(){ clearTimeout(st); st = setTimeout(wakeVisible, 150); }, { passive: true });
+
+  // One tap on a video with a play button: plays it full screen, with sound.
+  document.querySelectorAll('.video-wrap').forEach(function(w){
+    var v = w.querySelector('video');
+    if(!v || v.hasAttribute('data-autoplay')) return;
+    var sx = 0, sy = 0, t0 = 0;
+    w.addEventListener('touchstart', function(e){ var t = e.touches[0]; sx = t.clientX; sy = t.clientY; t0 = Date.now(); }, { passive: true });
+    w.addEventListener('touchend', function(e){
+      var t = e.changedTouches[0];
+      if(Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10 || Date.now() - t0 > 600) return; // a scroll, not a tap
+      if(e.target.closest('.video-controls')) return;
+      e.preventDefault();
+      unlock();
+      v.muted = false;
+      var p = v.play(); if(p && p.catch) p.catch(function(){});
+      if(v.webkitEnterFullscreen){ try { v.webkitEnterFullscreen(); } catch(err){} }
+      else if(v.requestFullscreen){ var q = v.requestFullscreen(); if(q && q.catch) q.catch(function(){}); }
+    }, { passive: false });
+  });
+})();
+</script>
 </body>
 </html>
