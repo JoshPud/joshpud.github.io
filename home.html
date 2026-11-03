@@ -1280,10 +1280,12 @@ var RETURN_PORTAL = null;
     // starting spot and the first portal (world space, behind the frog).
     var signImg = sprites['shelltonSign'];
     if(signImg && signImg.complete && signImg.naturalWidth > 0){
-      var SIGN_H = 230, SIGN_X = 330;
+      var SIGN_H = 170, SIGN_X = 360;
       var signW = SIGN_H * signImg.naturalWidth / signImg.naturalHeight;
       if(SIGN_X + signW > cam.x - 50 && SIGN_X < cam.x + canvas.width + 50){
-        ctx.drawImage(signImg, SIGN_X, GROUND_Y - SIGN_H + 14, signW, SIGN_H);
+        // Bottom of the post on the same line as the frog's feet (GROUND_Y),
+        // so the sign reads as standing on the same ground as him.
+        ctx.drawImage(signImg, SIGN_X, GROUND_Y - SIGN_H, signW, SIGN_H);
       }
     }
 
