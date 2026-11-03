@@ -982,6 +982,13 @@
     }, 4000);
   })();
 </script>
+<script>
+  // iPhones mute web page sound effects and music when the phone's silent
+  // switch is on (sound made by the page itself, as opposed to video).
+  // Tell Safari this site's sounds are part of the experience, like a game,
+  // so they play like other media do. Ignored by browsers that don't support it.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+</script>
 </head>
 <body>
 <div class="stage">
@@ -1503,5 +1510,15 @@
 })();
 </script>
 
+<script>
+// Back button: clear the fade-to-black the page was left with.
+window.addEventListener('pageshow', function(e){
+  if(!e.persisted) return;
+  var veil = document.getElementById('pageLeave');
+  if(veil) veil.classList.remove('on');
+  var flash = document.getElementById('portalFlash');
+  if(flash) flash.style.opacity = '0';
+});
+</script>
 </body>
 </html>

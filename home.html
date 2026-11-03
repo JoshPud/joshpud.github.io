@@ -245,6 +245,13 @@
     cursor: pointer;
   }
 </style>
+<script>
+  // iPhones mute web page sound effects and music when the phone's silent
+  // switch is on (sound made by the page itself, as opposed to video).
+  // Tell Safari this site's sounds are part of the experience, like a game,
+  // so they play like other media do. Ignored by browsers that don't support it.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+</script>
 </head>
 <body>
 
@@ -1614,5 +1621,10 @@ var RETURN_PORTAL = null;
   });
 
 })();
+</script>
+<script>
+// Back button: the game was left mid-fade, so start it fresh instead of
+// showing the black screen it was left on.
+window.addEventListener('pageshow', function(e){ if(e.persisted) location.reload(); });
 </script>
 </body>

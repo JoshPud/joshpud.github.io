@@ -1216,6 +1216,37 @@
       background: linear-gradient(to bottom, rgba(28,21,14,0.92) 0%, rgba(28,21,14,0.6) 55%, rgba(28,21,14,0) 100%) !important;
     }
   }
+
+  /* ═══════════ PHONE ROUND 4 ═══════════ Touch phones only. */
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
+    /* First text box: keep its own padding under the text. */
+    .context:has(> .context-description-wrap:last-child) { padding-bottom: 0.5rem !important; }
+    .context-description-wrap { padding-top: 4rem !important; }
+    .context-description-wrap:last-child { padding-bottom: 4rem !important; }
+
+    /* Videos with a blurred backdrop (backdrop hidden on phones): the box no
+       longer needs to be a full screen tall, which left a black block under
+       the video. It now hugs the video. */
+    .work-item.full:has(> .video-backdrop) {
+      height: auto !important;
+      background: transparent !important;
+      margin-bottom: 0.5rem !important;
+    }
+
+    /* Less empty space at the top of quote sections. */
+    .quote-section { padding-top: 3rem !important; }
+  }
+
+  /* Tweets on phones: bigger, in a shorter band (less empty space around
+     the snow), and panned by scrolling rather than a mouse wheel. */
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
+    .tweet-slide { width: 100vw; filter: drop-shadow(0 0 18px rgba(255,255,255,0.6)); }
+    .tweet-scroll-sticky {
+      height: calc(57.5vw + 4rem);
+      top: calc(50svh - (57.5vw + 4rem) / 2);
+    }
+    .tweet-pin-wrap { height: calc(57.5vw + 4rem + 160svh); }
+  }
 </style>
 <script>
   // Switch the scroll fade-in on early (before the page paints) so content
@@ -1229,6 +1260,13 @@
       if(!window.__revealReady) document.documentElement.classList.remove('reveal-on');
     }, 3000);
   })();
+</script>
+<script>
+  // iPhones mute web page sound effects and music when the phone's silent
+  // switch is on (sound made by the page itself, as opposed to video).
+  // Tell Safari this site's sounds are part of the experience, like a game,
+  // so they play like other media do. Ignored by browsers that don't support it.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 </script>
 </head>
 <body>
@@ -1363,7 +1401,7 @@
   </a>
   <a href="pringles-step-up-the-spice.html?from=10" class="project-nav-item next">
     <span class="nav-direction"><span class="nav-text-inner"><span class="nav-label">NEXT</span><svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"></line><polyline points="13 5 20 12 13 19"></polyline></svg></span></span>
-    <span class="nav-title"><span class="nav-text-inner">Next Project</span></span>
+    <span class="nav-title"><span class="nav-text-inner">Pringles • Step Up the Spice</span></span>
   </a>
 </nav>
 </div><!-- /smoke-zone -->
@@ -1732,7 +1770,7 @@ function initVideoPlayer(wrap){
     }
   }
 
-  wrap.addEventListener('mousemove', function(){
+  wrap.addEventListener('mousemove', function(){ if(window.matchMedia('(hover: none)').matches) return; /* tap-to-play works first time on phones */
     if(video.paused) showPlayBtn();
     showControlsBar();
   });
@@ -2291,6 +2329,8 @@ if(snowCanvas){
     t.style.removeProperty('font-size');
     if(!mq.matches) return;
     var want = t.querySelectorAll('br').length + 1;       // lines as written
+    // One-line titles (e.g. #bringit) start bigger, then shrink to fit.
+    if(want === 1) t.style.setProperty('font-size', Math.min(window.innerWidth * 0.26, 112) + 'px', 'important');
     var size = parseFloat(getComputedStyle(t).fontSize); // phone maximum from the CSS
     var lh = parseFloat(getComputedStyle(t).lineHeight) / size;
     var guard = 0;
@@ -2306,5 +2346,32 @@ if(snowCanvas){
 })();
 </script>
 
+<script>
+// ── TWEETS ON PHONES: pan with the page scroll ──
+// On desktop the tweets pan with the mouse wheel. Phones have no wheel, so
+// here the band stays pinned in the middle of the screen while you scroll,
+// and the tweets slide across in step with how far you've scrolled.
+(function(){
+  if(!window.matchMedia('(max-width: 640px) and (hover: none) and (pointer: coarse)').matches) return;
+  var wrap = document.querySelector('.tweet-pin-wrap');
+  var pin = document.getElementById('tweetPin');
+  if(!wrap || !pin) return;
+  var slides = pin.querySelectorAll('.tweet-slide');
+  var max = slides.length - 1;
+  function update(){
+    var w = wrap.getBoundingClientRect();
+    var stickTop = parseFloat(getComputedStyle(pin).top) || 0;
+    var travel = w.height - pin.offsetHeight;
+    var p = travel > 0 ? Math.min(1, Math.max(0, (stickTop - w.top) / travel)) : 0;
+    var prog = p * max;
+    slides.forEach(function(s, i){
+      s.style.transform = 'translate(-50%, -50%) translateX(' + ((i - prog) * 100) + '%)';
+    });
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
 </body>
 </html>
