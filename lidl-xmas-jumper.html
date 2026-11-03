@@ -1237,6 +1237,9 @@
     .quote-section { padding-top: 3rem !important; }
   }
 
+
+  /* Desktop: one screen of scrolling per tweet while the band is pinned. */
+  .tweet-pin-wrap { height: 300vh; }
   /* Tweets on phones: bigger, in a shorter band (less empty space around
      the snow), and panned by scrolling rather than a mouse wheel. */
   @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
@@ -1909,6 +1912,7 @@ if(tweetPin && tweetSlides.length){
   // We only step in once it's close to pinned (generous window so fast
   // scrolls don't skip past the catch entirely).
   window.addEventListener('wheel', function(e){
+    if(window.__tweetScrollPan) return;   // replaced by the scroll-driven pan below
     var rect = tweetPin.getBoundingClientRect();
     var isPinned = rect.top <= 20 && rect.top >= -100 && rect.bottom > 0;
 
@@ -2377,12 +2381,12 @@ if(snowCanvas){
 </script>
 
 <script>
-// ── TWEETS ON PHONES: pan with the page scroll ──
-// On desktop the tweets pan with the mouse wheel. Phones have no wheel, so
-// here the band stays pinned in the middle of the screen while you scroll,
-// and the tweets slide across in step with how far you've scrolled.
+// ── TWEETS: pan sideways with the page scroll (desktop and phones) ──
+// The band pins in place as soon as the first tweet is centred; scrolling
+// then slides the tweets sideways instead of moving the page, until the
+// third is centred, and then the page carries on scrolling down.
 (function(){
-  if(!window.matchMedia('(max-width: 640px) and (hover: none) and (pointer: coarse)').matches) return;
+  window.__tweetScrollPan = true;
   var wrap = document.querySelector('.tweet-pin-wrap');
   var pin = document.getElementById('tweetPin');
   if(!wrap || !pin) return;
