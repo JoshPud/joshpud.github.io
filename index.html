@@ -305,7 +305,37 @@
   .is-mobile-device #bgVideo { object-position: 50% 100%; }
   /* The old "Sequence starting..." development message, hidden everywhere. */
   #status { display: none !important; }
+  /* Phones: the copyright line was wider than the screen; smaller so it fits. */
+  .is-mobile-device #copyrightTag {
+    font-size: 0.42rem;
+    letter-spacing: 1px;
+    max-width: calc(100vw - 2rem);
+  }
+
+  /* ── PHONES: intro text and logo, round 2 ──
+     Text and logo a little higher (between the old position and the open
+     sky), slightly smaller type that fits short lines on one line, tighter
+     leading and balanced lines when it does wrap, a softer shadow, and a
+     much lighter vignette. Desktop is untouched. */
+  .is-mobile-device #crawl { top: 30.5%; padding: 0 7%; }
+  .is-mobile-device #crawl p {
+    font-size: 1.35rem;
+    line-height: 1.3;
+    text-wrap: balance;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.55), 0 0 14px rgba(0,0,0,0.3);
+  }
+  .is-mobile-device #logoWrap { top: 33%; }
+  .is-mobile-device #vignette {
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.28) 100%);
+  }
 </style>
+<script>
+  // iPhones mute web page sound effects and music when the phone's silent
+  // switch is on (sound made by the page itself, as opposed to video).
+  // Tell Safari this site's sounds are part of the experience, like a game,
+  // so they play like other media do. Ignored by browsers that don't support it.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+</script>
 </head>
 <body>
 
@@ -669,6 +699,19 @@ document.querySelector('.logo-stack').addEventListener('mouseenter', playLogoHov
   fit();
   window.addEventListener('orientationchange', function(){ setTimeout(fit, 350); });
 })();
+</script>
+<script>
+// Back button: browsers restore this page exactly as it was left, which is
+// faded to black on the way out. Clear the fade and let the buttons work
+// again, so you come back to the frog scene rather than a black screen.
+window.addEventListener('pageshow', function(e){
+  if(!e.persisted) return;
+  var cover = document.getElementById('blackCover');
+  if(cover) cover.style.opacity = '0';
+  if(typeof launching !== 'undefined') launching = false;
+  var pe = document.getElementById('pressEnter');
+  if(pe && typeof introFinished !== 'undefined' && introFinished) pe.classList.add('pulse');
+});
 </script>
 </body>
 </html>
