@@ -1381,7 +1381,7 @@
 <section class="work">
   <!-- Full height (9:16) with blurred backdrop fill -->
   <div class="work-item full gf-main-video" style="overflow:hidden;aspect-ratio:auto;width:100%;height:100vh;position:relative;background:#000;">
-    <video preload="metadata" muted loop playsinline class="video-backdrop" style="position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%) scale(1.2);filter:blur(40px) brightness(0.55);">
+    <video preload="none" muted loop playsinline class="video-backdrop" style="position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%) scale(1.2);filter:blur(40px) brightness(0.55);">
       <source src="LZD_Grafruitti_Launch_Film_9x16_FINAL_Clean.mp4" type="video/mp4">
     </video>
     <div class="video-wrap" style="position:relative;width:fit-content;height:100%;margin:0 auto;">
@@ -1994,6 +1994,7 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
   if(!fg) return;
 
   fg.addEventListener('play', function(){
+    if(backdrop.offsetParent === null) return;   // hidden on phones: don't download it
     backdrop.currentTime = fg.currentTime;
     backdrop.play();
   });
@@ -2376,13 +2377,21 @@ if(gfBottleWrap){
   //    that hasn't played yet. Asking for the frame at 0.1s makes them load
   //    and show that frame as the thumbnail. (Header video left alone.)
   if(touch){
-    document.querySelectorAll('video:not(.hero-media)').forEach(function(v){
+    document.querySelectorAll('video:not(.hero-media):not([data-autoplay]):not(.video-backdrop)').forEach(function(v){
       var changed = false;
       v.querySelectorAll('source').forEach(function(s){
         var src = s.getAttribute('src');
         if(src && src.indexOf('#t=') === -1){ s.setAttribute('src', src + '#t=0.1'); changed = true; }
       });
-      if(changed){ v.preload = 'metadata'; v.load(); }
+      if(changed){
+        // Load the thumbnail frame only when the video is about a screen away.
+        v.preload = 'none';
+        var wake = function(){ v.preload = 'metadata'; v.load(); };
+        if('IntersectionObserver' in window){
+          var io = new IntersectionObserver(function(es){ if(es[0].isIntersecting){ io.disconnect(); wake(); } }, { rootMargin: '100% 0px' });
+          io.observe(v);
+        } else { wake(); }
+      }
     });
   }
 
@@ -2478,6 +2487,7 @@ if(gfBottleWrap){
     if(unlocked) return; unlocked = true;
     startKeepAlive();
     document.querySelectorAll('video[data-autoplay], video.hero-media').forEach(function(v){
+      if(!v.classList.contains('hero-media') && !near(v)) return;   // only what's on or near the screen
       v.muted = true;
       var p = v.play();
       if(p && p.then) p.then(function(){ if(!v.classList.contains('hero-media') && !near(v)) v.pause(); }).catch(function(){});

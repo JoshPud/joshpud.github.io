@@ -2110,13 +2110,21 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
   //    that hasn't played yet. Asking for the frame at 0.1s makes them load
   //    and show that frame as the thumbnail. (Header video left alone.)
   if(touch){
-    document.querySelectorAll('video:not(.hero-media)').forEach(function(v){
+    document.querySelectorAll('video:not(.hero-media):not([data-autoplay]):not(.video-backdrop)').forEach(function(v){
       var changed = false;
       v.querySelectorAll('source').forEach(function(s){
         var src = s.getAttribute('src');
         if(src && src.indexOf('#t=') === -1){ s.setAttribute('src', src + '#t=0.1'); changed = true; }
       });
-      if(changed){ v.preload = 'metadata'; v.load(); }
+      if(changed){
+        // Load the thumbnail frame only when the video is about a screen away.
+        v.preload = 'none';
+        var wake = function(){ v.preload = 'metadata'; v.load(); };
+        if('IntersectionObserver' in window){
+          var io = new IntersectionObserver(function(es){ if(es[0].isIntersecting){ io.disconnect(); wake(); } }, { rootMargin: '100% 0px' });
+          io.observe(v);
+        } else { wake(); }
+      }
     });
   }
 
@@ -2212,6 +2220,7 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     if(unlocked) return; unlocked = true;
     startKeepAlive();
     document.querySelectorAll('video[data-autoplay], video.hero-media').forEach(function(v){
+      if(!v.classList.contains('hero-media') && !near(v)) return;   // only what's on or near the screen
       v.muted = true;
       var p = v.play();
       if(p && p.then) p.then(function(){ if(!v.classList.contains('hero-media') && !near(v)) v.pause(); }).catch(function(){});

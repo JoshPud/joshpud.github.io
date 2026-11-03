@@ -1469,14 +1469,14 @@
     <img src="MCCAIN_LACI_GRADE_07.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_10.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_03.jpg" alt="Let's All Chip In behind the scenes">
-    <video src="MCCAIN_LACI_UGC_1.mp4" muted loop data-autoplay playsinline preload="metadata"></video>
+    <video src="MCCAIN_LACI_UGC_1.mp4" muted loop data-autoplay playsinline preload="none"></video>
     <img src="MCCAIN_LACI_GRADE_09.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_17.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_11.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_05.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_15.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_18.jpg" alt="Let's All Chip In behind the scenes">
-    <video src="MCCAIN_LACI_UGC_2.mp4" muted loop data-autoplay playsinline preload="metadata"></video>
+    <video src="MCCAIN_LACI_UGC_2.mp4" muted loop data-autoplay playsinline preload="none"></video>
     <img src="MCCAIN_LACI_GRADE_01.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_12.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_16.jpg" alt="Let's All Chip In behind the scenes">
@@ -1489,14 +1489,14 @@
     <img src="MCCAIN_LACI_GRADE_07.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_10.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_03.jpg" alt="Let's All Chip In behind the scenes">
-    <video src="MCCAIN_LACI_UGC_1.mp4" muted loop data-autoplay playsinline preload="metadata"></video>
+    <video src="MCCAIN_LACI_UGC_1.mp4" muted loop data-autoplay playsinline preload="none"></video>
     <img src="MCCAIN_LACI_GRADE_09.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_17.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_11.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_05.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_15.jpg" alt="Let's All Chip In behind the scenes">
     <img src="MCCAIN_LACI_GRADE_18.jpg" alt="Let's All Chip In behind the scenes">
-    <video src="MCCAIN_LACI_UGC_2.mp4" muted loop data-autoplay playsinline preload="metadata"></video>
+    <video src="MCCAIN_LACI_UGC_2.mp4" muted loop data-autoplay playsinline preload="none"></video>
     <img src="MCCAIN_LACI_GRADE_01.jpg" alt="Let's All Chip In behind the scenes">
   </div>
 </div>
@@ -2362,13 +2362,21 @@ initMomentumCarousel('laciCarouselStrip', 'laciCarouselTrack', { baseSpeed: 72 }
   //    that hasn't played yet. Asking for the frame at 0.1s makes them load
   //    and show that frame as the thumbnail. (Header video left alone.)
   if(touch){
-    document.querySelectorAll('video:not(.hero-media)').forEach(function(v){
+    document.querySelectorAll('video:not(.hero-media):not([data-autoplay]):not(.video-backdrop)').forEach(function(v){
       var changed = false;
       v.querySelectorAll('source').forEach(function(s){
         var src = s.getAttribute('src');
         if(src && src.indexOf('#t=') === -1){ s.setAttribute('src', src + '#t=0.1'); changed = true; }
       });
-      if(changed){ v.preload = 'metadata'; v.load(); }
+      if(changed){
+        // Load the thumbnail frame only when the video is about a screen away.
+        v.preload = 'none';
+        var wake = function(){ v.preload = 'metadata'; v.load(); };
+        if('IntersectionObserver' in window){
+          var io = new IntersectionObserver(function(es){ if(es[0].isIntersecting){ io.disconnect(); wake(); } }, { rootMargin: '100% 0px' });
+          io.observe(v);
+        } else { wake(); }
+      }
     });
   }
 
@@ -2464,6 +2472,7 @@ initMomentumCarousel('laciCarouselStrip', 'laciCarouselTrack', { baseSpeed: 72 }
     if(unlocked) return; unlocked = true;
     startKeepAlive();
     document.querySelectorAll('video[data-autoplay], video.hero-media').forEach(function(v){
+      if(!v.classList.contains('hero-media') && !near(v)) return;   // only what's on or near the screen
       v.muted = true;
       var p = v.play();
       if(p && p.then) p.then(function(){ if(!v.classList.contains('hero-media') && !near(v)) v.pause(); }).catch(function(){});
