@@ -1254,6 +1254,15 @@
   /* The gap under the tagline (to the divider) now matches the gap above
      it (from the title). Phones have their own even 32px spacing. */
   .title-divider { margin-top: calc(1.6rem + 42px); }
+
+  /* Phone header gaps (measured on the lettering): label to title 45px,
+     title to tagline 35px, tagline to divider 45px, divider to ROLE 32px,
+     ROLE to role 13px. */
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
+    .context-eyebrow { margin-bottom: 36px !important; }
+    .context-tagline { margin-top: 18px !important; }
+    .title-divider { margin-top: 45px !important; }
+  }
 </style>
 <script>
   // Switch the scroll fade-in on early (before the page paints) so content
