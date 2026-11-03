@@ -2252,11 +2252,35 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     .pm-menu {
       position: fixed; inset: 0; z-index: 1000000;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: rgba(16,12,8,0.5);
+      /* The same glass as the about page boxes: a faint sheen, fine grain
+         and a warm dark wash, over the blur. */
+      background-image:
+        linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 15%, transparent 85%, rgba(255,255,255,0.04) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        linear-gradient(160deg, rgba(30,27,20,0.55), rgba(12,11,8,0.7));
+      background-repeat: no-repeat, repeat, no-repeat;
+      background-size: cover, 160px 160px, cover;
+      background-blend-mode: normal, overlay, normal;
       -webkit-backdrop-filter: blur(18px) saturate(115%); backdrop-filter: blur(18px) saturate(115%);
-      opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.55s;
     }
-    .pm-menu.open { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+    .pm-menu.open { opacity: 1; visibility: visible; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    /* The contents drift up gently and fade in one after another once the
+       glass has started to appear, and fade together as it closes. */
+    .pm-menu .pm-logo, .pm-menu .pm-close, .pm-menu .pm-item, .pm-menu .pm-div {
+      opacity: 0; transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .pm-menu .pm-item, .pm-menu .pm-div { transform: translateY(8px); }
+    .pm-menu.open .pm-logo, .pm-menu.open .pm-close, .pm-menu.open .pm-item, .pm-menu.open .pm-div {
+      opacity: 1;
+      transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    .pm-menu.open .pm-item, .pm-menu.open .pm-div { transform: none; }
+    .pm-menu.open .pm-logo, .pm-menu.open .pm-close { transition-delay: 0.15s; }
+    .pm-menu.open .pm-item:first-of-type { transition-delay: 0.22s; }
+    .pm-menu.open .pm-div { transition-delay: 0.32s; }
+    .pm-menu.open .pm-item:last-of-type { transition-delay: 0.42s; }
     .pm-logo { position: absolute; left: 50%; transform: translateX(-50%); width: auto; }
     .pm-close { position: absolute; right: 14px; width: 40px; height: 40px; padding: 0; border: 0; background: none; cursor: pointer; }
     .pm-close i { position: absolute; left: 9px; top: 19px; width: 22px; height: 2px; background: #FBCEA0; transform: rotate(45deg); }
@@ -2272,7 +2296,7 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     .pm-div { display: flex; align-items: center; gap: 10px; width: 160px; margin: 10px 0; }
     .pm-div::before, .pm-div::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(251,206,160,0.7)); }
     .pm-div::after { background: linear-gradient(to left, transparent, rgba(251,206,160,0.7)); }
-    .pm-div span { width: 5px; height: 5px; border: 1px solid rgba(251,206,160,0.9); transform: rotate(45deg); }
+    .pm-div span { width: 15px; height: 14px; background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat; }   /* the frog foot, as on the project pages */
     html.pm-lock, html.pm-lock body { overflow: hidden; }
   }
 
@@ -2283,6 +2307,13 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     border: 0 !important; transform: none !important;
     background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
   }
+
+  /* Phones: never show the phone's own big play button over videos that
+     play by themselves (it appears if a loop is waiting to start). */
+  video.hero-media::-webkit-media-controls-start-playback-button,
+  video[data-autoplay]::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none; }
+  video.hero-media::-webkit-media-controls,
+  video[data-autoplay]::-webkit-media-controls { display: none !important; }
 </style>
 <button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
@@ -2328,6 +2359,39 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
   });
   // Back button: make sure the menu and any fade are cleared.
   window.addEventListener('pageshow', function(e){ if(e.persisted){ shut(); document.querySelectorAll('body > div[style*="z-index:1000001"]').forEach(function(d){ d.remove(); }); } });
+})();
+</script>
+<script>
+// ── PHONE ROUND 6: get looping clips ready before they're on screen ──
+(function(){
+  if(!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+  function ready(v){ if(v.preload !== 'auto'){ v.preload = 'auto'; v.load(); } }
+  function playMuted(v){ if(!v.paused) return; v.muted = true; var p = v.play(); if(p && p.catch) p.catch(function(){}); }
+  // Carousels slide sideways, so a clip can arrive on screen faster than it
+  // can load. When a carousel is within a screen and a half, load every clip
+  // in it, so each one is ready by the time it slides into view.
+  if('IntersectionObserver' in window){
+    document.querySelectorAll('[id$="CarouselTrack"]').forEach(function(track){
+      var io = new IntersectionObserver(function(es){
+        if(!es[0].isIntersecting) return;
+        io.disconnect();
+        track.querySelectorAll('video').forEach(ready);
+      }, { rootMargin: '150% 0px' });
+      io.observe(track);
+    });
+    // Other looping clips: start loading a screen and a half before they're needed.
+    var io2 = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ io2.unobserve(e.target); ready(e.target); } });
+    }, { rootMargin: '150% 0px' });
+    document.querySelectorAll('video[data-autoplay]').forEach(function(v){ if(!v.closest('[id$="CarouselTrack"]')) io2.observe(v); });
+  }
+  // Any touch: play the looping clips that are on screen but still waiting.
+  document.addEventListener('touchend', function(){
+    document.querySelectorAll('video[data-autoplay]').forEach(function(v){
+      var r = v.getBoundingClientRect();
+      if(r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth) playMuted(v);
+    });
+  }, { passive: true });
 })();
 </script>
 </body>
