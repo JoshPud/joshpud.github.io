@@ -622,6 +622,9 @@ var RETURN_PORTAL = null;
   sprites["groundTile"] = new Image();
   sprites["groundTile"].onload = function(){ spritesLoaded++; };
   sprites["groundTile"].src = "soil-repeat-tile.png";
+  // "BEWARE SHELLTON" sign near the start, hinting at the turtle further on
+  sprites["shelltonSign"] = new Image();
+  sprites["shelltonSign"].src = "beware-shellton.png";
   sprites["tortoise-ghost"] = new Image();
   sprites["tortoise-ghost"].onload = function(){ spritesLoaded++; };
   sprites["tortoise-ghost"].src = "tortoise-ghost.png";
@@ -1270,6 +1273,17 @@ var RETURN_PORTAL = null;
         ctx.fillStyle = '#4aaa0a';
         ctx.fillRect(px + 4, p.y - 4, 4, 6);
         ctx.fillRect(px + 14, p.y - 6, 4, 8);
+      }
+    }
+
+    // "BEWARE SHELLTON" sign, planted in the grass between the frog's
+    // starting spot and the first portal (world space, behind the frog).
+    var signImg = sprites['shelltonSign'];
+    if(signImg && signImg.complete && signImg.naturalWidth > 0){
+      var SIGN_H = 230, SIGN_X = 330;
+      var signW = SIGN_H * signImg.naturalWidth / signImg.naturalHeight;
+      if(SIGN_X + signW > cam.x - 50 && SIGN_X < cam.x + canvas.width + 50){
+        ctx.drawImage(signImg, SIGN_X, GROUND_Y - SIGN_H + 14, signW, SIGN_H);
       }
     }
 
