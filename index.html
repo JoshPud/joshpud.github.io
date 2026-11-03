@@ -295,6 +295,16 @@
        This recentres the crop on the wordmark itself. */
     object-position: 54% 50%;
   }
+  /* ── PHONES: fit the intro to the visible screen ──
+     100vh on iPhone includes the area behind Safari's toolbars, which
+     pushed everything down and hid the bottom of the videos. Size the stage
+     to the visible window instead (100svh, with a script fallback below),
+     and anchor the frog scene to its bottom edge so the fire is never the
+     part that gets cropped. Desktop is untouched. */
+  .is-mobile-device #stage { height: 100vh; height: 100svh; }
+  .is-mobile-device #bgVideo { object-position: 50% 100%; }
+  /* The old "Sequence starting..." development message, hidden everywhere. */
+  #status { display: none !important; }
 </style>
 </head>
 <body>
@@ -648,5 +658,17 @@ async function playLogoHoverBob(){
 document.querySelector('.logo-stack').addEventListener('mouseenter', playLogoHoverBob);
 </script>
 
+<script>
+// Phones: size the intro to the window as it first appears, with Safari's
+// toolbars showing (backs up the 100svh rule). Re-measured on rotation only.
+(function(){
+  if(!document.documentElement.classList.contains('is-mobile-device')) return;
+  var stage = document.getElementById('stage');
+  if(!stage) return;
+  function fit(){ stage.style.height = window.innerHeight + 'px'; }
+  fit();
+  window.addEventListener('orientationchange', function(){ setTimeout(fit, 350); });
+})();
+</script>
 </body>
 </html>
