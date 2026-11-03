@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@300;400&family=Spectral:wght@600&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1027,8 +1027,9 @@
      side-by-side social videos on a phone. Set by the script at the end. */
   .video-play-btn{ transform: translate(-50%, -50%) scale(var(--vpb-scale, 1)); }
 
-  /* ═══════════ PHONE LAYOUT TIDY-UP ═══════════ */
-  @media (max-width: 640px) {
+  /* ═══════════ PHONE LAYOUT TIDY-UP ═══════════
+     Touch screens only, so a narrow desktop window is never affected. */
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
     /* Top logo: a little smaller, with a soft dark fade behind it so it
        stays readable as the page's text scrolls up underneath. */
     .top-bar {
@@ -1044,6 +1045,14 @@
       padding-right: 1.5rem !important;
     }
     .context-description { max-width: 100%; }
+    /* Body text set like a book page on phones: left-aligned, normal letter
+       spacing and a slightly tighter line height, so it fills the width
+       comfortably instead of sitting in a narrow centred column. */
+    .context-description .context-text {
+      text-align: left;
+      letter-spacing: 0.1px;
+      line-height: 1.55;
+    }
 
     /* Bottom nav: the two links stacked and centred instead of squeezed
        side by side, with room underneath for the frog to sit on the soil. */
@@ -1071,15 +1080,121 @@
   }
 
   /* Phones: size the first screen to the part of the window that's always
-     visible (100svh), so Safari's bottom toolbar can't cover the scroll cue. */
-  @media (max-width: 980px) {
-    .hero, .hero-spacer { height: 100vh; height: 100svh; }
+     visible (100svh), so Safari's bottom toolbar can't cover the scroll cue.
+     Touch screens only; desktop keeps its original header exactly. */
+  @media (max-width: 980px) and (hover: none) and (pointer: coarse) {
+    .hero, .hero-gap { height: 100vh !important; height: 100svh !important; }
   }
 
   /* A little more breathing room between the scroll cue and the bottom of
-     the screen on phones. */
-  @media (max-width: 980px) {
+     the screen on phones (touch screens only). */
+  @media (max-width: 980px) and (hover: none) and (pointer: coarse) {
     .scroll-cue { bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
+  }
+
+  /* ═══════════ PHONE ROUND 2 ═══════════
+     Touch phones only; desktop is untouched. */
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
+    /* Title: less side padding and a size that scales with the screen, so
+       "Back for the Believers" sits on two lines rather than three. */
+    .context { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+    .context-title { font-size: clamp(2.6rem, 13vw, 3.6rem); line-height: 1.05; }
+
+    /* Lighter body text, closer to a book page. */
+    .context-description .context-text {
+      font-weight: 300;
+      color: rgba(236,229,212,0.82);
+    }
+
+    /* Bottom nav: just "Next", bigger and easier to tap. The top logo
+       already takes you back to the portfolio. */
+    .project-nav-item.prev { display: none; }
+    .project-nav-item.next { border-top: none; padding: 2.25rem 1.5rem 1.5rem; }
+    .project-nav-item.next .nav-title { font-size: 2rem; line-height: 1.15; }
+    .project-nav-item.next .nav-direction { font-size: 0.6rem; letter-spacing: 3px; }
+    .project-nav-item.next .nav-arrow { width: 1.2em; height: 1.2em; }
+    .project-nav { padding-bottom: 175px; }
+
+    /* Soil strip a third of its desktop size; the frog stays the same size. */
+    .soil-strip { height: 74px; background-size: auto 74px; }
+    .logo-footer { margin-top: -20px; padding-top: 20px; }
+
+    /* Copyright centred under the logo. */
+    .footer-copyright {
+      left: 0; right: 0;
+      max-width: none;
+      padding: 0 1rem;
+      text-align: center;
+    }
+  }
+
+  /* Project label (e.g. LUCOZADE): set like the reference, in Quadraat
+     Demibold if it's ever added to the site, otherwise Spectral SemiBold,
+     the closest free match. No lines either side. */
+  .context-eyebrow {
+    font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 18.2px;
+    letter-spacing: 3px;
+    color: #FBCEA0;
+    opacity: 1;
+  }
+  .context-eyebrow::before,
+  .context-eyebrow::after { display: none; }
+
+  /* Ornamental dividers between the title, the tagline and the role: a
+     thin gold rule fading in from each side, with a small diamond centre,
+     in the same gold as the project label. */
+  .title-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: min(260px, 70%);
+    margin: 1.6rem auto 1.4rem;
+  }
+  .title-divider::before,
+  .title-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(251,206,160,0.7));
+  }
+  .title-divider::after {
+    background: linear-gradient(to left, transparent, rgba(251,206,160,0.7));
+  }
+  .title-divider span {
+    width: 7px;
+    height: 7px;
+    border: 1px solid rgba(251,206,160,0.9);
+    transform: rotate(45deg);
+  }
+
+  /* ═══════════ PHONE ROUND 3: title card sizing and spacing ═══════════
+     Touch phones only. Sizes closer to desktop, and an even 32px of visible
+     space between each line (measured on the lettering itself). */
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
+    .context-title { font-size: clamp(2.8rem, 17.5vw, 5.5rem) !important; line-height: 1.02; }
+    .context-tagline {
+      font-size: 20px !important;
+      max-width: 86% !important;
+      margin-left: auto; margin-right: auto;
+      text-wrap: balance;           /* both lines about the same length, no lone last word */
+    }
+    .context-role-title { font-size: 20px !important; }
+    .title-divider span { width: 5px; height: 5px; }
+
+    .context-eyebrow { margin-bottom: 30px !important; }
+    .context-tagline { margin-top: 15px !important; margin-bottom: 0 !important; }
+    .title-divider { margin-top: 32px !important; margin-bottom: 0 !important; }
+    .context-role { margin-top: 29px !important; }
+    .context-role-title { margin-top: 6px !important; }
+
+    /* Fade behind the top logo in the page's deep brown rather than black. */
+    .top-bar {
+      background: linear-gradient(to bottom, rgba(28,21,14,0.92) 0%, rgba(28,21,14,0.6) 55%, rgba(28,21,14,0) 100%) !important;
+    }
   }
 </style>
 <script>
@@ -1120,7 +1235,7 @@
   </div>
 
 </section>
-<div class="hero-spacer" style="width:100%;display:block;"></div>
+<div class="hero-gap" style="height:100vh;width:100%;display:block;"></div>
 <div class="smoke-zone">
 <div class="smoke-bg" aria-hidden="true"></div>
 <div class="content-wrap">
@@ -1130,6 +1245,7 @@
     <div class="context-eyebrow">Crunchy Nut</div>
     <h1 class="context-title">The Honey<br/><em>Drip Puffer</em></h1>
     <p class="context-tagline">Streetwear? It’s sweet-wear now 💅. We turned Crunchy Nut’s iconic Honey Dripper into the drippiest puffer of the season.</p>
+    <div class="title-divider" aria-hidden="true"><span></span></div>
     <p class="context-role">ROLE</p>
     <p class="context-role-title">Lead Creative</p>
   </div>
@@ -1256,6 +1372,9 @@ if(zzzCanvas && soilFrog){
   }
 
   document.addEventListener('mousemove', function(e){
+    // Touch screens: no hover state (it makes iPhones wait for a second tap);
+    // the frog casts on the tap itself instead (see the nav click handler).
+    if(window.matchMedia('(hover: none)').matches) return;
     var x = e.clientX, y = e.clientY;
     if(isOver(nextBtn, x, y)){
       if(frogState !== 'cast-right'){
@@ -1370,6 +1489,14 @@ document.querySelectorAll('.project-nav-item').forEach(function(item){
   item.addEventListener('click', function(e){
     e.preventDefault();
     var href = item.getAttribute('href');
+    // On a tap (no hover), get the frog casting first, facing the right way
+    var castDir = item.id === 'returnBtn' ? 'left' : 'right';
+    var frogEl = document.getElementById('soilFrog');
+    if(frogEl && window.matchMedia('(hover: none)').matches){
+      frogEl.src = 'frog-cast.png';
+      frogEl.style.transform = castDir === 'left' ? 'translateX(-50%) scaleX(-1)' : 'translateX(-50%)';
+      if(typeof frogState !== 'undefined') frogState = 'cast-' + castDir;
+    }
     // Fireball
     if(window.spawnFireball){
       var dir = item.id === 'returnBtn' ? 'left' : 'right';
@@ -1798,7 +1925,7 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
     }
 
     // Tagline, ROLE and role title are left out on purpose: they show straight away.
-    markAll(document.querySelectorAll('.context-header > :not(.context-tagline):not(.context-role):not(.context-role-title)'), { stagger: true });
+    markAll(document.querySelectorAll('.context-header > :not(.context-tagline):not(.context-role):not(.context-role-title):not(.title-divider)'), { stagger: true });
     markAll(document.querySelectorAll('.context-text'));
     markAll(document.querySelectorAll('.quote-section > *'), { stagger: true });
 
@@ -1904,7 +2031,9 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
 // iPhones can refuse to start videos by themselves (e.g. in Low Power
 // Mode), leaving the header stuck on its first frame. Ask again once the
 // page is ready, and again on the first tap or touch, which phones always allow.
+// Touch devices only: desktop video behaviour is left exactly as it was.
 (function(){
+  if(!window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
   function tryPlay(v){
     if(!v || !v.paused) return;
     v.muted = true;
@@ -1933,19 +2062,92 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
 // in the CSS for any browser that doesn't support it. Re-measured if the
 // phone is rotated, but not while scrolling, so nothing jumps.
 (function(){
-  var mq = window.matchMedia('(max-width: 980px)');
+  var mq = window.matchMedia('(max-width: 980px) and (hover: none) and (pointer: coarse)');
   var hero = document.querySelector('.hero');
-  var spacer = document.querySelector('.hero-spacer');
+  var spacer = document.querySelector('.hero-gap');
   if(!hero) return;
+  var heroOrig = hero.style.height, spacerOrig = spacer ? spacer.style.height : '';
   function fit(){
-    if(!mq.matches){ hero.style.height = ''; if(spacer) spacer.style.height = ''; return; }
+    if(!mq.matches){ hero.style.removeProperty('height'); if(heroOrig) hero.style.height = heroOrig; if(spacer){ spacer.style.removeProperty('height'); spacer.style.height = spacerOrig; } return; }
     var h = window.innerHeight + 'px';
-    hero.style.height = h;
-    if(spacer) spacer.style.height = h;
+    hero.style.setProperty('height', h, 'important');
+    if(spacer) spacer.style.setProperty('height', h, 'important');
   }
   fit();
   window.addEventListener('orientationchange', function(){ setTimeout(fit, 350); });
   mq.addEventListener ? mq.addEventListener('change', fit) : mq.addListener(fit);
+})();
+</script>
+
+<script>
+// ── PHONE ROUND 2 ──
+(function(){
+  var touch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+  // 1. Video thumbnails on phones: iPhones show a black box for a video
+  //    that hasn't played yet. Asking for the frame at 0.1s makes them load
+  //    and show that frame as the thumbnail. (Header video left alone.)
+  if(touch){
+    document.querySelectorAll('video:not(.hero-media)').forEach(function(v){
+      var changed = false;
+      v.querySelectorAll('source').forEach(function(s){
+        var src = s.getAttribute('src');
+        if(src && src.indexOf('#t=') === -1){ s.setAttribute('src', src + '#t=0.1'); changed = true; }
+      });
+      if(changed){ v.preload = 'metadata'; v.load(); }
+    });
+  }
+
+  // 2. Coming back with the browser's Back button: browsers restore this
+  //    page exactly as it was left, i.e. faded to black mid-transition.
+  //    Undo that, so the page is visible again (desktop and phone).
+  // Always start project pages at the top, including when arriving with the
+  // Back button (browsers would otherwise jump back to where you left off,
+  // usually the very bottom).
+  if('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  function toTop(){
+    if(window.lenis) window.lenis.scrollTo(0, { immediate: true, force: true });
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('pageshow', function(e){
+    toTop();
+    if(!e.persisted) return;
+    var flash = document.getElementById('portalFlash');
+    if(flash) flash.style.opacity = '0';
+    document.querySelectorAll('.nav-ripple').forEach(function(r){ r.remove(); });
+    var frog = document.getElementById('soilFrog');
+    if(frog){ frog.src = 'frog-sleep.png'; frog.style.transform = 'translateX(-50%)'; }
+    if(typeof frogState !== 'undefined') frogState = 'sleep';
+  });
+})();
+</script>
+
+<script>
+// ── PHONE TITLE FIT ──
+// Each project title is written as two lines (split where the page breaks
+// it). On phones, keep the title as big as possible while making sure each
+// of those lines still fits on one line, so longer titles shrink a little
+// instead of breaking into three or four lines.
+(function(){
+  var mq = window.matchMedia('(max-width: 640px) and (hover: none) and (pointer: coarse)');
+  var t = document.querySelector('.context-title');
+  if(!t) return;
+  function fit(){
+    t.style.removeProperty('font-size');
+    if(!mq.matches) return;
+    var want = t.querySelectorAll('br').length + 1;       // lines as written
+    var size = parseFloat(getComputedStyle(t).fontSize); // phone maximum from the CSS
+    var lh = parseFloat(getComputedStyle(t).lineHeight) / size;
+    var guard = 0;
+    while(t.getBoundingClientRect().height > (want + 0.5) * size * lh && size > 30 && guard++ < 60){
+      size -= 1;
+      t.style.setProperty('font-size', size + 'px', 'important');
+    }
+  }
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  window.addEventListener('load', fit);
+  window.addEventListener('orientationchange', function(){ setTimeout(fit, 350); });
+  fit();
 })();
 </script>
 

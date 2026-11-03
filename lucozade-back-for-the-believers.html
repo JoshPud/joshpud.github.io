@@ -1212,6 +1212,60 @@
   }
   .context-eyebrow::before,
   .context-eyebrow::after { display: none; }
+
+  /* Ornamental dividers between the title, the tagline and the role: a
+     thin gold rule fading in from each side, with a small diamond centre,
+     in the same gold as the project label. */
+  .title-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: min(260px, 70%);
+    margin: 1.6rem auto 1.4rem;
+  }
+  .title-divider::before,
+  .title-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(251,206,160,0.7));
+  }
+  .title-divider::after {
+    background: linear-gradient(to left, transparent, rgba(251,206,160,0.7));
+  }
+  .title-divider span {
+    width: 7px;
+    height: 7px;
+    border: 1px solid rgba(251,206,160,0.9);
+    transform: rotate(45deg);
+  }
+
+  /* ═══════════ PHONE ROUND 3: title card sizing and spacing ═══════════
+     Touch phones only. Sizes closer to desktop, and an even 32px of visible
+     space between each line (measured on the lettering itself). */
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
+    .context-title { font-size: clamp(2.8rem, 17.5vw, 5.5rem) !important; line-height: 1.02; }
+    .context-tagline {
+      font-size: 20px !important;
+      max-width: 86% !important;
+      margin-left: auto; margin-right: auto;
+      text-wrap: balance;           /* both lines about the same length, no lone last word */
+    }
+    .context-role-title { font-size: 20px !important; }
+    .title-divider span { width: 5px; height: 5px; }
+
+    .context-eyebrow { margin-bottom: 30px !important; }
+    .context-tagline { margin-top: 15px !important; margin-bottom: 0 !important; }
+    .title-divider { margin-top: 32px !important; margin-bottom: 0 !important; }
+    .context-role { margin-top: 29px !important; }
+    .context-role-title { margin-top: 6px !important; }
+
+    /* Fade behind the top logo in the page's deep brown rather than black. */
+    .top-bar {
+      background: linear-gradient(to bottom, rgba(28,21,14,0.92) 0%, rgba(28,21,14,0.6) 55%, rgba(28,21,14,0) 100%) !important;
+    }
+  }
 </style>
 <script>
   // Switch the scroll fade-in on early (before the page paints) so content
@@ -1261,6 +1315,7 @@
     <div class="context-eyebrow">Lucozade</div>
     <h1 class="context-title">Back for<br/><em>the Believers</em></h1>
     <p class="context-tagline">Turning Grafruitti from cult classic to cultural phenomenon.</p>
+    <div class="title-divider" aria-hidden="true"><span></span></div>
     <p class="context-role">ROLE</p>
     <p class="context-role-title">Lead Creative | Director</p>
   </div>
@@ -2103,7 +2158,7 @@ if(gfBottleWrap){
       }
     }
     // Tagline, ROLE and role title are left out on purpose: they show straight away.
-    mark('.context-header > :not(.context-tagline):not(.context-role):not(.context-role-title)', { stagger: true });
+    mark('.context-header > :not(.context-tagline):not(.context-role):not(.context-role-title):not(.title-divider)', { stagger: true });
     mark('.context-description .context-text');
     mark('.work > .gf-main-video');
     mark('.work > div:not(.work-item) > .video-wrap', { stagger: true });
@@ -2288,7 +2343,16 @@ if(gfBottleWrap){
   // 2. Coming back with the browser's Back button: browsers restore this
   //    page exactly as it was left, i.e. faded to black mid-transition.
   //    Undo that, so the page is visible again (desktop and phone).
+  // Always start project pages at the top, including when arriving with the
+  // Back button (browsers would otherwise jump back to where you left off,
+  // usually the very bottom).
+  if('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  function toTop(){
+    if(window.lenis) window.lenis.scrollTo(0, { immediate: true, force: true });
+    window.scrollTo(0, 0);
+  }
   window.addEventListener('pageshow', function(e){
+    toTop();
     if(!e.persisted) return;
     var flash = document.getElementById('portalFlash');
     if(flash) flash.style.opacity = '0';
@@ -2297,6 +2361,35 @@ if(gfBottleWrap){
     if(frog){ frog.src = 'frog-sleep.png'; frog.style.transform = 'translateX(-50%)'; }
     if(typeof frogState !== 'undefined') frogState = 'sleep';
   });
+})();
+</script>
+
+<script>
+// ── PHONE TITLE FIT ──
+// Each project title is written as two lines (split where the page breaks
+// it). On phones, keep the title as big as possible while making sure each
+// of those lines still fits on one line, so longer titles shrink a little
+// instead of breaking into three or four lines.
+(function(){
+  var mq = window.matchMedia('(max-width: 640px) and (hover: none) and (pointer: coarse)');
+  var t = document.querySelector('.context-title');
+  if(!t) return;
+  function fit(){
+    t.style.removeProperty('font-size');
+    if(!mq.matches) return;
+    var want = t.querySelectorAll('br').length + 1;       // lines as written
+    var size = parseFloat(getComputedStyle(t).fontSize); // phone maximum from the CSS
+    var lh = parseFloat(getComputedStyle(t).lineHeight) / size;
+    var guard = 0;
+    while(t.getBoundingClientRect().height > (want + 0.5) * size * lh && size > 30 && guard++ < 60){
+      size -= 1;
+      t.style.setProperty('font-size', size + 'px', 'important');
+    }
+  }
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  window.addEventListener('load', fit);
+  window.addEventListener('orientationchange', function(){ setTimeout(fit, 350); });
+  fit();
 })();
 </script>
 
