@@ -36,6 +36,10 @@
     font-size: 13px; line-height: 18.2px; letter-spacing: 3px; color: #FBCEA0; text-transform: uppercase;
   }
   .intro-title { font-style: italic; font-weight: 400; letter-spacing: -0.5px; font-size: 44px; line-height: 1.02; margin: 18px 0 0; color: #ece5d4; }
+  .intro-note {
+    font-style: italic; font-size: 17px; line-height: 1.4; color: rgba(236,229,212,0.62);
+    max-width: 300px; margin: 16px auto 0; text-wrap: balance;
+  }
   .divider { display: flex; align-items: center; gap: 10px; width: min(240px, 66%); margin: 26px auto 6px; }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(251,206,160,0.7)); }
   .divider::after { background: linear-gradient(to left, transparent, rgba(251,206,160,0.7)); }
@@ -64,7 +68,7 @@
   }
   .q-title { font-style: italic; font-size: 21px; line-height: 1.15; color: #ece5d4; }
 
-  .foot { text-align: center; padding: 1.5rem 1.75rem 0; }
+  .foot { text-align: center; padding: 1.25rem 1.75rem 0; }
   .foot-note { font-style: italic; font-size: 15px; line-height: 1.5; color: rgba(236,229,212,0.5); margin: 0 0 14px; }
   .copyright { font-family: 'Press Start 2P', monospace; font-size: 0.42rem; letter-spacing: 1px; color: rgba(213,231,9,0.9); }
 
@@ -93,7 +97,9 @@
   .zzz.on { animation: zz 2.6s steps(6) infinite; }
   @keyframes zz { 0% { opacity: 0; transform: translate(0,0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(14px,-34px); } }
 
-  #fireCanvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 30; }
+  /* Stretched between the top and bottom of the visible screen, so it always
+     lines up with the frog, whether or not Safari's toolbar is showing. */
+  #fireCanvas { position: fixed; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
   #flash { position: fixed; inset: 0; background: #000; opacity: 1; pointer-events: none; z-index: 50; transition: opacity 0.5s ease; }
 </style>
 </head>
@@ -103,7 +109,8 @@
 
 <header class="intro">
   <div class="intro-label">Kingdom of Portfolia</div>
-  <h1 class="intro-title">Choose your quest</h1>
+  <h1 class="intro-title">Choose Your Quest</h1>
+  <p class="intro-note">Open this site on a desktop or laptop to play the full game, frog wizard included.</p>
   <div class="divider" aria-hidden="true"><span></span></div>
 </header>
 
@@ -183,7 +190,6 @@
 </nav>
 
 <footer class="foot">
-  <p class="foot-note">Open this site on a desktop or laptop to play the full game, frog wizard included.</p>
   <div class="copyright">&copy; COPYRIGHT 2026 JOSHUA CROSSLEY CREATIVE</div>
 </footer>
 
@@ -205,12 +211,15 @@
   var canvas = document.getElementById('fireCanvas');
   var ctx = canvas.getContext('2d');
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
-  // Sized to the visible window in px. (100vh on iPhone includes the area
-  // behind Safari's toolbars, which stretched the drawing downwards so the
-  // fireball started low and missed its target.)
+  // The drawing area takes its size and position from the canvas itself, and
+  // every point is measured relative to it, so the fireball lines up with the
+  // frog and the quest even when Safari's toolbar moves things around.
+  var origin = { x: 0, y: 0 };
   function size(){
-    canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px';
-    canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    var r = canvas.getBoundingClientRect();
+    origin.x = r.left; origin.y = r.top;
+    canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
   }
   size(); window.addEventListener('resize', size);
 
@@ -231,13 +240,13 @@
     frog.src = 'frog-cast.png';
     frog.style.transform = 'translateX(-50%)' + (left ? ' scaleX(-1)' : '');
     zzz.classList.remove('on');
-    var sx = left ? r.left + r.width * 0.14 : r.left + r.width * 0.86;
-    var sy = r.top + r.height * 0.78;
-    ball = { sx: sx, sy: sy, tx: tx, ty: ty, t: 0 };
+    var sx = (left ? r.left + r.width * 0.14 : r.left + r.width * 0.86) - origin.x;
+    var sy = r.top + r.height * 0.78 - origin.y;
+    ball = { sx: sx, sy: sy, tx: tx - origin.x, ty: ty - origin.y, t: 0 };
   }
   function draw(){
     requestAnimationFrame(draw);
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
     if(!ball) return;
     ball.t = Math.min(1, ball.t + 0.045);
     var k = ball.t, e = 1 - Math.pow(1 - k, 2);
