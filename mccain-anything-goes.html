@@ -2234,5 +2234,92 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
   });
 })();
 </script>
+
+<!-- ── PHONE MENU ── PROJECTS (the quest list) and ABOUT ME, behind a menu
+     button lined up with the top logo. Phones only. -->
+<style>
+  .pm-btn, .pm-menu { display: none; }
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
+    .pm-btn {
+      display: flex; position: fixed; right: 14px; z-index: 1001;
+      width: 40px; height: 40px; padding: 0; border: 0; background: none;
+      flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+      -webkit-tap-highlight-color: transparent; cursor: pointer;
+    }
+    .pm-btn i { display: block; width: 22px; height: 2px; background: #FBCEA0; }
+    .pm-btn i:nth-child(2) { width: 16px; margin-left: 6px; }
+    .pm-menu {
+      position: fixed; inset: 0; z-index: 1000000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(16,12,8,0.5);
+      -webkit-backdrop-filter: blur(18px) saturate(115%); backdrop-filter: blur(18px) saturate(115%);
+      opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    }
+    .pm-menu.open { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+    .pm-logo { position: absolute; left: 50%; transform: translateX(-50%); width: auto; }
+    .pm-close { position: absolute; right: 14px; width: 40px; height: 40px; padding: 0; border: 0; background: none; cursor: pointer; }
+    .pm-close i { position: absolute; left: 9px; top: 19px; width: 22px; height: 2px; background: #FBCEA0; transform: rotate(45deg); }
+    .pm-close i + i { transform: rotate(-45deg); }
+    .pm-item {
+      font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif; font-weight: 600;
+      font-size: 20px; letter-spacing: 6px; color: #FBCEA0; text-decoration: none;
+      padding: 14px 0; text-align: center;
+    }
+    .pm-item.here { color: #ece5d4; }
+    .pm-sub { display: block; font-family: 'IM Fell English', serif; font-style: italic; font-weight: 400;
+      letter-spacing: 0; font-size: 16px; color: rgba(236,229,212,0.55); margin-top: 6px; }
+    .pm-div { display: flex; align-items: center; gap: 10px; width: 160px; margin: 10px 0; }
+    .pm-div::before, .pm-div::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(251,206,160,0.7)); }
+    .pm-div::after { background: linear-gradient(to left, transparent, rgba(251,206,160,0.7)); }
+    .pm-div span { width: 5px; height: 5px; border: 1px solid rgba(251,206,160,0.9); transform: rotate(45deg); }
+    html.pm-lock, html.pm-lock body { overflow: hidden; }
+  }
+</style>
+<button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
+<div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
+  <img src="JCC_LOGO_CHAMPAGNE_NAV.png" alt="" class="pm-logo" id="pmLogo">
+  <button class="pm-close" id="pmClose" aria-label="Close menu"><i></i><i></i></button>
+  <a class="pm-item" href="mobile.html">PROJECTS<span class="pm-sub">Choose your quest</span></a>
+  <div class="pm-div" aria-hidden="true"><span></span></div>
+  <a class="pm-item" href="about.html">ABOUT ME<span class="pm-sub">Meet the storyteller</span></a>
+</div>
+<script>
+(function(){
+  var btn = document.getElementById('pmBtn'), menu = document.getElementById('pmMenu');
+  var close = document.getElementById('pmClose'), mlogo = document.getElementById('pmLogo');
+  var logo = document.querySelector('.top-bar-logo');
+  // Centre the button (and the menu's logo and X) on the page's own top logo.
+  function place(){
+    if(!logo) return;
+    var r = logo.getBoundingClientRect(), mid = r.top + r.height / 2;
+    btn.style.top = (mid - 20) + 'px';
+    close.style.top = (mid - 20) + 'px';
+    mlogo.style.top = r.top + 'px'; mlogo.style.height = r.height + 'px';
+  }
+  place(); window.addEventListener('load', place); window.addEventListener('resize', place);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+  setTimeout(place, 1500); setTimeout(place, 5000);  // after any intro animation settles
+  function open(){ place(); menu.classList.add('open'); document.documentElement.classList.add('pm-lock'); btn.setAttribute('aria-expanded','true'); }
+  function shut(){ menu.classList.remove('open'); document.documentElement.classList.remove('pm-lock'); btn.setAttribute('aria-expanded','false'); }
+  btn.addEventListener('click', open);
+  close.addEventListener('click', shut);
+  menu.addEventListener('click', function(e){ if(e.target === menu) shut(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') shut(); });
+  // Choosing an option: the site's usual fade to black, then go.
+  menu.querySelectorAll('.pm-item').forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      if(a.classList.contains('here')){ shut(); return; }
+      var f = document.createElement('div');
+      f.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;z-index:1000001;transition:opacity 0.45s ease;pointer-events:none;';
+      document.body.appendChild(f);
+      requestAnimationFrame(function(){ f.style.opacity = '1'; });
+      setTimeout(function(){ window.location.href = a.getAttribute('href'); }, 480);
+    });
+  });
+  // Back button: make sure the menu and any fade are cleared.
+  window.addEventListener('pageshow', function(e){ if(e.persisted){ shut(); document.querySelectorAll('body > div[style*="z-index:1000001"]').forEach(function(d){ d.remove(); }); } });
+})();
+</script>
 </body>
 </html>
