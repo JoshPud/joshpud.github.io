@@ -1078,6 +1078,12 @@
   @media (max-width: 980px) {
     .hero, .hero-spacer { height: 100vh; height: 100svh; }
   }
+
+  /* A little more breathing room between the scroll cue and the bottom of
+     the screen on phones. */
+  @media (max-width: 980px) {
+    .scroll-cue { bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
+  }
 </style>
 <script>
   // Switch the scroll fade-in on early (before the page paints) so content
@@ -2311,6 +2317,30 @@ initMomentumCarousel('sbCarouselStrip', 'sbCarouselTrack', { baseSpeed: 60 });
   ['touchend', 'click'].forEach(function(type){
     document.addEventListener(type, playVisible, { passive: true });
   });
+})();
+</script>
+
+<script>
+// ── FIRST SCREEN FITS ABOVE THE PHONE'S TOOLBARS ──
+// On phones, size the header to the window as it first appears (with
+// Safari's address bar and bottom toolbar showing), so the scroll cue at
+// its bottom is never hidden behind the toolbar. Backs up the 100svh rule
+// in the CSS for any browser that doesn't support it. Re-measured if the
+// phone is rotated, but not while scrolling, so nothing jumps.
+(function(){
+  var mq = window.matchMedia('(max-width: 980px)');
+  var hero = document.querySelector('.hero');
+  var spacer = document.querySelector('.hero-spacer');
+  if(!hero) return;
+  function fit(){
+    if(!mq.matches){ hero.style.height = ''; if(spacer) spacer.style.height = ''; return; }
+    var h = window.innerHeight + 'px';
+    hero.style.height = h;
+    if(spacer) spacer.style.height = h;
+  }
+  fit();
+  window.addEventListener('orientationchange', function(){ setTimeout(fit, 350); });
+  mq.addEventListener ? mq.addEventListener('change', fit) : mq.addListener(fit);
 })();
 </script>
 
