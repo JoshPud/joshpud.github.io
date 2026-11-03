@@ -981,6 +981,55 @@
      shrinking to about 30% of the video's width on small ones, such as the
      side-by-side social videos on a phone. Set by the script at the end. */
   .video-play-btn{ transform: translate(-50%, -50%) scale(var(--vpb-scale, 1)); }
+
+  /* ═══════════ PHONE LAYOUT TIDY-UP ═══════════ */
+  @media (max-width: 640px) {
+    /* Top logo: a little smaller, with a soft dark fade behind it so it
+       stays readable as the page's text scrolls up underneath. */
+    .top-bar {
+      padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem 1.6rem;
+      background: linear-gradient(to bottom, rgba(8,8,6,0.88) 0%, rgba(8,8,6,0.55) 55%, rgba(8,8,6,0) 100%);
+      pointer-events: none;
+    }
+    .top-bar-logo { height: 40px; pointer-events: auto; }
+
+    /* Text boxes: use the width of the phone rather than a narrow column. */
+    .context-description-wrap {
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
+    }
+    .context-description { max-width: 100%; }
+
+    /* Bottom nav: the two links stacked and centred instead of squeezed
+       side by side, with room underneath for the frog to sit on the soil. */
+    .project-nav {
+      grid-template-columns: 1fr;
+      padding-bottom: 150px;
+    }
+    .project-nav-item {
+      padding: 1.75rem 1.5rem;
+      text-align: center !important;
+      align-items: center;
+    }
+    .project-nav-item.next {
+      border-left: none;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-title { font-size: 1.25rem; }
+    .soil-frog { height: 180px; }
+
+    /* Less empty space under the quote. */
+    .quote-section { padding-bottom: 6rem; }
+
+    /* Copyright: small but still readable. */
+    .footer-copyright { font-size: 0.42rem; letter-spacing: 0.5px; }
+  }
+
+  /* Phones: size the first screen to the part of the window that's always
+     visible (100svh), so Safari's bottom toolbar can't cover the scroll cue. */
+  @media (max-width: 980px) {
+    .hero, .hero-spacer { height: 100vh; height: 100svh; }
+  }
 </style>
 <script>
   // Switch the scroll fade-in on early (before the page paints) so content
@@ -1020,7 +1069,7 @@
   </div>
 
 </section>
-<div style="height:100vh;width:100%;display:block;"></div>
+<div class="hero-spacer" style="width:100%;display:block;"></div>
 <div class="smoke-zone">
 <div class="smoke-bg" aria-hidden="true"></div>
 <div class="content-wrap">
@@ -1820,6 +1869,32 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     var all = function(){ wraps.forEach(fit); };
     window.addEventListener('resize', all); window.addEventListener('load', all); all();
   }
+})();
+</script>
+
+<script>
+// ── VIDEO PLAYBACK SAFETY NET ──
+// iPhones can refuse to start videos by themselves (e.g. in Low Power
+// Mode), leaving the header stuck on its first frame. Ask again once the
+// page is ready, and again on the first tap or touch, which phones always allow.
+(function(){
+  function tryPlay(v){
+    if(!v || !v.paused) return;
+    v.muted = true;
+    var p = v.play(); if(p && p.catch) p.catch(function(){});
+  }
+  function playVisible(){
+    tryPlay(document.querySelector('.hero-media'));
+    document.querySelectorAll('video[data-autoplay], video[autoplay]').forEach(function(v){
+      var r = v.getBoundingClientRect();
+      if(r.bottom > 0 && r.top < window.innerHeight) tryPlay(v);
+    });
+  }
+  window.addEventListener('load', playVisible);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) playVisible(); });
+  ['touchend', 'click'].forEach(function(type){
+    document.addEventListener(type, playVisible, { passive: true });
+  });
 })();
 </script>
 
