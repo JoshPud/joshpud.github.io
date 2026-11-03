@@ -1223,6 +1223,13 @@
   /* Header is three clips side by side: crop in so only the centre clip
      shows on a phone, rather than slivers of the side clips. */
   @media (max-width: 640px) and (hover: none) and (pointer: coarse) { .hero-media { transform: scale(1.12); transform-origin: 50% 50%; } }
+
+  /* ═══════════ DESKTOP: lighter body text + even space around the tagline ═══════════ */
+  /* Body copy in the same lighter weight as on phones. */
+  .context-description .context-text { font-weight: 300; }
+  /* The gap under the tagline (to the divider) now matches the gap above
+     it (from the title). Phones have their own even 32px spacing. */
+  .title-divider { margin-top: calc(1.6rem + 42px); }
 </style>
 <script>
   // Switch the scroll fade-in on early (before the page paints) so content
@@ -2536,8 +2543,13 @@ initMomentumCarousel('sbCarouselStrip', 'sbCarouselTrack', { baseSpeed: 60 });
     window.scrollTo(0, 0);
   }
   window.addEventListener('pageshow', function(e){
-    toTop();
+    // Only when the browser restores the page from its Back/Forward memory.
+    // (On a normal load, 'pageshow' fires after everything has loaded, which
+    // can be a few seconds in; jumping to the top then would yank anyone who
+    // had already started scrolling back up. scrollRestoration above already
+    // stops a normal reload from jumping to the old position.)
     if(!e.persisted) return;
+    toTop();
     var flash = document.getElementById('portalFlash');
     if(flash) flash.style.opacity = '0';
     document.querySelectorAll('.nav-ripple').forEach(function(r){ r.remove(); });
