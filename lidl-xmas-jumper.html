@@ -1243,12 +1243,20 @@
   /* Tweets on phones: bigger, in a shorter band (less empty space around
      the snow), and panned by scrolling rather than a mouse wheel. */
   @media (max-width: 640px) and (hover: none) and (pointer: coarse) {
-    .tweet-slide { width: 100vw; filter: drop-shadow(0 0 18px rgba(255,255,255,0.6)); }
-    .tweet-scroll-sticky {
-      height: calc(57.5vw + 4rem);
-      top: calc(50svh - (57.5vw + 4rem) / 2);
+    /* The tweet images have a lot of empty space around each tweet, so on
+       phones they're zoomed in until the tweet itself spans almost the full
+       width, in a band only as tall as the tweet. */
+    .tweet-slide {
+      width: 100vw; aspect-ratio: auto; height: 48vw;
+      background-size: 181% auto; background-position: 47% 50%;
+      filter: drop-shadow(0 0 16px rgba(255,255,255,0.55));
     }
-    .tweet-pin-wrap { height: calc(57.5vw + 4rem + 160svh); }
+    .tweet-scroll-sticky {
+      height: calc(48vw + 3rem);
+      top: calc(50svh - (48vw + 3rem) / 2);
+    }
+    /* Shorter pinned stretch: about half a screen of scrolling per tweet. */
+    .tweet-pin-wrap { height: calc(48vw + 3rem + 100svh); }
   }
 
   /* ═══════════ DESKTOP: lighter body text + even space around the tagline ═══════════ */
