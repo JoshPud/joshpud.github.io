@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@300;400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Press+Start+2P&family=Inknut+Antiqua:wght@300;400&family=Inter:wght@300;400&family=Spectral:wght@600&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1197,6 +1197,21 @@
       text-align: center;
     }
   }
+
+  /* Project label (e.g. LUCOZADE): set like the reference, in Quadraat
+     Demibold if it's ever added to the site, otherwise Spectral SemiBold,
+     the closest free match. No lines either side. */
+  .context-eyebrow {
+    font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 18.2px;
+    letter-spacing: 3px;
+    color: #FBCEA0;
+    opacity: 1;
+  }
+  .context-eyebrow::before,
+  .context-eyebrow::after { display: none; }
 </style>
 <script>
   // Switch the scroll fade-in on early (before the page paints) so content
