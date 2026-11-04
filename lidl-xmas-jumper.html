@@ -1247,16 +1247,18 @@
        phones they're zoomed in until the tweet itself spans almost the full
        width, in a band only as tall as the tweet. */
     .tweet-slide {
-      width: 100vw; aspect-ratio: auto; height: 48vw;
-      background-size: 181% auto; background-position: 47% 50%;
+      width: 100vw; aspect-ratio: auto; height: 44vw;
+      background-size: 162% auto; background-position: 48.7% 50%;
       filter: drop-shadow(0 0 16px rgba(255,255,255,0.55));
     }
+    /* Pinned by script on phones (more reliable on iPhone than sticky). */
     .tweet-scroll-sticky {
-      height: calc(48vw + 3rem);
-      top: calc(50svh - (48vw + 3rem) / 2);
+      position: absolute !important; top: 0; left: 0; right: 0;
+      height: calc(44vw + 3rem);
     }
+    .tweet-scroll-sticky.pinned { position: fixed !important; }
     /* Shorter pinned stretch: about half a screen of scrolling per tweet. */
-    .tweet-pin-wrap { height: calc(48vw + 3rem + 100svh); }
+    .tweet-pin-wrap { height: calc(44vw + 3rem + 100svh); }
   }
 
   /* ═══════════ DESKTOP: lighter body text + even space around the tagline ═══════════ */
@@ -2393,17 +2395,30 @@ if(snowCanvas){
 // The band pins in place as soon as the first tweet is centred; scrolling
 // then slides the tweets sideways instead of moving the page, until the
 // third is centred, and then the page carries on scrolling down.
+// Desktop pins with CSS (sticky); phones pin with this script (fixed), which
+// iPhones handle more reliably, so the band never drifts while panning.
 (function(){
   window.__tweetScrollPan = true;
   var wrap = document.querySelector('.tweet-pin-wrap');
   var pin = document.getElementById('tweetPin');
   if(!wrap || !pin) return;
+  var phone = window.matchMedia('(max-width: 640px) and (hover: none) and (pointer: coarse)');
   var slides = pin.querySelectorAll('.tweet-slide');
   var max = slides.length - 1;
   function update(){
     var w = wrap.getBoundingClientRect();
-    var stickTop = parseFloat(getComputedStyle(pin).top) || 0;
-    var travel = w.height - pin.offsetHeight;
+    var bandH = pin.offsetHeight;
+    var travel = w.height - bandH;
+    var stickTop;
+    if(phone.matches){
+      stickTop = Math.round((window.innerHeight - bandH) / 2);   // band centred on screen
+      if(w.top > stickTop){ pin.classList.remove('pinned'); pin.style.top = '0px'; }
+      else if(w.bottom - bandH < stickTop){ pin.classList.remove('pinned'); pin.style.top = travel + 'px'; }
+      else { pin.classList.add('pinned'); pin.style.top = stickTop + 'px'; }
+    } else {
+      pin.classList.remove('pinned'); pin.style.top = '';
+      stickTop = parseFloat(getComputedStyle(pin).top) || 0;
+    }
     var p = travel > 0 ? Math.min(1, Math.max(0, (stickTop - w.top) / travel)) : 0;
     var prog = p * max;
     slides.forEach(function(s, i){
