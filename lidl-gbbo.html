@@ -1207,7 +1207,7 @@
   }
 
   /* Header crop nudged so the gold card sits in the centre on phones. */
-  @media (max-width: 640px) and (hover: none) and (pointer: coarse) { .hero-media { object-position: 42% 50%; } }
+  @media (max-width: 640px) and (hover: none) and (pointer: coarse) { .hero-media { object-position: 47% 50%; } }
 
   /* ═══════════ DESKTOP: lighter body text + even space around the tagline ═══════════ */
   /* Body copy in the same lighter weight as on phones. */
@@ -2109,7 +2109,7 @@ if(goldCardWrap){
   //    that hasn't played yet. Asking for the frame at 0.1s makes them load
   //    and show that frame as the thumbnail. (Header video left alone.)
   if(touch){
-    document.querySelectorAll('video:not(.hero-media):not([data-autoplay]):not(.video-backdrop)').forEach(function(v){
+    document.querySelectorAll('video:not(.hero-media):not([data-autoplay]):not(.video-backdrop):not([poster])').forEach(function(v){
       var changed = false;
       v.querySelectorAll('source').forEach(function(s){
         var src = s.getAttribute('src');
