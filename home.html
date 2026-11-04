@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Joshua Crossley Creative</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IM+Fell+English:ital@1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IM+Fell+English:ital@1&family=Spectral:wght@600&display=swap" rel="stylesheet"/>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -244,6 +244,47 @@
     display: none;
     cursor: pointer;
   }
+  /* ═══════════ TOP-RIGHT WORD MENU (same as the landing page) ═══════════
+     The three buttons become gold words in the top right (lettered like the
+     project labels), with small frog-foot dividers. On hover, a bright copy
+     of each word fills in from left to right (as on the Shadow of War site). */
+  #gameNav {
+    top: 22px; right: 28px; bottom: auto;
+    gap: 14px; align-items: center;
+  }
+  #gameNav button {
+    height: auto; padding: 4px 0;
+    font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 3px; color: #FBCEA0; text-shadow: none;
+  }
+  #gameNav button::before, #gameNav button::after { content: none; display: none; }
+  #gameNav .gx-t { display: inline-block; position: relative; }
+  #gameNav .gx-t::before {
+    content: attr(data-t); position: absolute; left: 0; top: 0;
+    color: transparent; text-shadow: 0 2px 5px rgba(0,0,0,0.55);
+  }
+  #gameNav .gx-t span {
+    display: block; position: relative;
+    background: linear-gradient(180deg, #FFE9C4 0%, #FBCEA0 45%, #B88A4E 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #gameNav .gx-t::after {
+    content: attr(data-t); position: absolute; top: 0; left: 0; z-index: 2;
+    width: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+    color: #FFF6E2; text-shadow: 0 0 8px rgba(255,214,150,0.55);
+    transition: opacity 0.4s 0.2s, width 0.6s;
+  }
+  #gameNav button:hover .gx-t::after,
+  #gameNav button:focus-visible .gx-t::after { opacity: 1; width: 100%; transition: opacity 0.4s, width 0.6s; }
+  #gameNav .gx-foot {
+    width: 8px; height: 7px; flex-shrink: 0;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
+    opacity: 0.75; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  }
+  #gameNav { position: fixed; z-index: 9999; display: flex; visibility: hidden; }
+  #gameNav button { background: transparent; border: none; cursor: pointer; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+  /* the old pixel SOUND box styling no longer applies */
+  #gameNav #muteBtn { position: static; visibility: inherit; border: none; background: transparent; image-rendering: auto; }
 </style>
 <script>
   // iPhones mute web page sound effects and music when the phone's silent
@@ -264,7 +305,13 @@
 <audio id="tortoiseDead" src="TORTOISE_DEAD_2.mp3" preload="auto"></audio>
 <audio id="bgMusic" src="scizzie_-_aquatic_ambience.mp3" preload="auto"></audio>
 <audio id="logoCroak" src="FROG_CROAK.mp3" preload="auto"></audio>
-<button id="muteBtn">🔊 SOUND</button>
+<nav id="gameNav" aria-label="Site">
+  <button id="muteBtn"><span class="gx-t" data-t="Music"><span>Music</span></span></button>
+  <i class="gx-foot" aria-hidden="true"></i>
+  <button id="hopBtn"><span class="gx-t" data-t="Hop to the work"><span>Hop to the work</span></span></button>
+  <i class="gx-foot" aria-hidden="true"></i>
+  <button id="aboutBtn"><span class="gx-t" data-t="About me"><span>About me</span></span></button>
+</nav>
 <img src="JCC_LOGO_LIME_NAV.png" id="gameplayLogo" alt="Joshua Crossley Creative" decoding="async" loading="eager"/>
 <script>window.JCC_METAL = 'lime';</script>
 <script src="chrome-logo.js?v=4"></script>
@@ -552,7 +599,9 @@ var RETURN_PORTAL = null;
   var muted = false;
   document.getElementById('muteBtn').addEventListener('click', function(){
     muted = !muted;
-    this.textContent = muted ? '🔇 SOUND' : '🔊 SOUND';
+    var t = this.querySelector('.gx-t'), inner = t.querySelector('span');
+    t.setAttribute('data-t', muted ? '(Muted)' : 'Music'); inner.textContent = muted ? '(Muted)' : 'Music';
+    this.blur();   // so Space (fireball) and Enter (portals) don't press it again
     if(audioCtx) audioCtx.suspend && (muted ? audioCtx.suspend() : audioCtx.resume());
     if(muted){
       stopTitleMusic();
@@ -1555,8 +1604,8 @@ var RETURN_PORTAL = null;
 
     // Safe to reveal the sound button now - it's hidden underneath the
     // opaque flash above until that fades away below
-    var muteBtnEl = document.getElementById('muteBtn');
-    if(muteBtnEl) muteBtnEl.style.setProperty('visibility', 'visible', 'important');
+    var navEl = document.getElementById('gameNav');
+    if(navEl) navEl.style.setProperty('visibility', 'visible', 'important');
 
     var hudEl = document.getElementById('hud');
     if(hudEl) hudEl.style.display = 'block';
@@ -1664,5 +1713,20 @@ var RETURN_PORTAL = null;
 // Back button: the game was left mid-fade, so start it fresh instead of
 // showing the black screen it was left on.
 window.addEventListener('pageshow', function(e){ if(e.persisted) location.reload(); });
+</script>
+<script>
+// Word menu: HOP TO THE WORK and ABOUT ME, with the site's fade to black.
+(function(){
+  function go(url){
+    var f = document.createElement('div');
+    f.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;z-index:999999;transition:opacity 0.5s ease;pointer-events:none;';
+    document.body.appendChild(f);
+    requestAnimationFrame(function(){ f.style.opacity = '1'; });
+    setTimeout(function(){ window.location.href = url; }, 550);
+  }
+  var hop = document.getElementById('hopBtn'), about = document.getElementById('aboutBtn');
+  if(hop) hop.addEventListener('click', function(){ this.blur(); go('lucozade-back-for-the-believers.html?from=0'); });
+  if(about) about.addEventListener('click', function(){ this.blur(); go('about.html'); });
+})();
 </script>
 </body>
