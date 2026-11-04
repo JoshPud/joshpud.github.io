@@ -24,7 +24,7 @@
 <title>JCC Intro Sequence Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IM+Fell+English:ital@1&family=Cinzel:wght@500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IM+Fell+English:ital@1&family=Cinzel:wght@500&family=Spectral:wght@600&display=swap" rel="stylesheet"/>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
@@ -332,6 +332,44 @@
   /* DESKTOP: softer intro text shadow, matching phones (a tight light shadow
      under the letters plus a faint wide glow, instead of a heavy dark halo). */
   #crawl p { text-shadow: 0 1px 2px rgba(0,0,0,0.55), 0 0 14px rgba(0,0,0,0.3); }
+
+  /* ═══════════ EXPERIMENT: top-right word menu ═══════════
+     The three buttons become gold words in the top right (lettered like the
+     project labels), with small frog-foot dividers. On hover, a bright copy
+     of each word fills in from left to right (as on the Shadow of War site). */
+  #btnRow {
+    top: 22px; right: 28px; bottom: auto;
+    gap: 14px; align-items: center;
+  }
+  #btnRow button {
+    height: auto; padding: 4px 0;
+    font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 3px; color: #FBCEA0; text-shadow: none;
+  }
+  #btnRow button::before, #btnRow button::after { content: none; display: none; }
+  #btnRow .gx-t { display: inline-block; position: relative; }
+  #btnRow .gx-t::before {
+    content: attr(data-t); position: absolute; left: 0; top: 0;
+    color: transparent; text-shadow: 0 2px 5px rgba(0,0,0,0.55);
+  }
+  #btnRow .gx-t span {
+    display: block; position: relative;
+    background: linear-gradient(180deg, #FFE9C4 0%, #FBCEA0 45%, #B88A4E 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #btnRow .gx-t::after {
+    content: attr(data-t); position: absolute; top: 0; left: 0; z-index: 2;
+    width: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+    color: #FFF6E2; text-shadow: 0 0 8px rgba(255,214,150,0.55);
+    transition: opacity 0.4s 0.2s, width 0.6s;
+  }
+  #btnRow button:hover .gx-t::after,
+  #btnRow button:focus-visible .gx-t::after { opacity: 1; width: 100%; transition: opacity 0.4s, width 0.6s; }
+  #btnRow .gx-foot {
+    width: 8px; height: 7px; flex-shrink: 0;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
+    opacity: 0.75; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  }
 </style>
 <script>
   // iPhones mute web page sound effects and music when the phone's silent
@@ -364,9 +402,11 @@
 
 <div id="status">Sequence starting...</div>
 <div id="btnRow">
-  <button id="muteBtn">MUSIC</button>
-  <button id="hopBtn">HOP TO THE WORK</button>
-  <button id="aboutBtn">ABOUT ME</button>
+  <button id="muteBtn"><span class="gx-t" data-t="Music"><span>Music</span></span></button>
+  <i class="gx-foot" aria-hidden="true"></i>
+  <button id="hopBtn"><span class="gx-t" data-t="Hop to the work"><span>Hop to the work</span></span></button>
+  <i class="gx-foot" aria-hidden="true"></i>
+  <button id="aboutBtn"><span class="gx-t" data-t="About me"><span>About me</span></span></button>
 </div>
 
 <script>
@@ -623,12 +663,14 @@ document.getElementById('aboutBtn').addEventListener('click', async function(){
 });
 
 document.getElementById('muteBtn').addEventListener('click', function(){
+  // Update the word (and its hover copy) without losing the lettering effect
+  var t = this.querySelector('.gx-t'), inner = t.querySelector('span');
   if(musicPlaying){
     stopIntroMusic();
-    this.textContent = '(MUTED)';
+    t.setAttribute('data-t', '(Muted)'); inner.textContent = '(Muted)';
   } else {
     playIntroMusic();
-    this.textContent = 'MUSIC';
+    t.setAttribute('data-t', 'Music'); inner.textContent = 'Music';
   }
 });
 
