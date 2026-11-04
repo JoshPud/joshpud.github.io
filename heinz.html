@@ -1217,6 +1217,7 @@
 <div id="portalFlash"></div>
 
 <!-- Top Bar -->
+<nav id="pageNav" aria-label="Site"><button id="pageAbout"><span class="gx-t" data-t="About me"><span>About me</span></span></button></nav>
 <header class="top-bar">
   <img src="JCC_LOGO_CHAMPAGNE_NAV.png" alt="Joshua Crossley Creative" class="top-bar-logo"/>
 </header>
@@ -2270,6 +2271,36 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
   video[data-autoplay]::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none; }
   video.hero-media::-webkit-media-controls,
   video[data-autoplay]::-webkit-media-controls { display: none !important; }
+
+  /* ═══════════ ABOUT ME, top right (desktop) ═══════════
+     Gold word lettered like the project labels; lights up left to right on
+     hover, as on the landing page. Phones use the menu button instead. */
+  #pageNav { position: fixed; right: 28px; z-index: 1001; opacity: 0; transition: opacity 0.8s ease; }
+  #pageNav.on { opacity: 1; }
+  #pageNav button {
+    background: transparent; border: none; cursor: pointer; padding: 4px 0;
+    font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 3px; text-transform: uppercase; line-height: 1; white-space: nowrap;
+  }
+  #pageNav .gx-t { display: inline-block; position: relative; }
+  #pageNav .gx-t::before {
+    content: attr(data-t); position: absolute; left: 0; top: 0;
+    color: transparent; text-shadow: 0 2px 5px rgba(0,0,0,0.55);
+  }
+  #pageNav .gx-t span {
+    display: block; position: relative;
+    background: linear-gradient(180deg, #FFE9C4 0%, #FBCEA0 45%, #B88A4E 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #pageNav .gx-t::after {
+    content: attr(data-t); position: absolute; top: 0; left: 0; z-index: 2;
+    width: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+    color: #FFF6E2; text-shadow: 0 0 8px rgba(255,214,150,0.55);
+    transition: opacity 0.4s 0.2s, width 0.6s;
+  }
+  #pageNav button:hover .gx-t::after,
+  #pageNav button:focus-visible .gx-t::after { opacity: 1; width: 100%; transition: opacity 0.4s, width 0.6s; }
+  @media (hover: none) and (pointer: coarse) { #pageNav { display: none; } }
 </style>
 <button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
@@ -2350,5 +2381,30 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
   }, { passive: true });
 })();
 </script>
+<script>
+// ABOUT ME (top right): centred on the top logo's height; fades in with the page; fades to black on click.
+(function(){
+  var nav = document.getElementById('pageNav'), btn = document.getElementById('pageAbout');
+  var logo = document.querySelector('.top-bar-logo');
+  if(!nav || !btn) return;
+  function place(){
+    if(!logo) { nav.style.top = '22px'; return; }
+    var r = logo.getBoundingClientRect();
+    nav.style.top = Math.round(r.top + r.height / 2 - nav.offsetHeight / 2) + 'px';
+  }
+  place(); window.addEventListener('load', place); window.addEventListener('resize', place);
+  setTimeout(function(){ place(); nav.classList.add('on'); }, 400);
+  btn.addEventListener('click', function(){
+    this.blur();
+    var f = document.createElement('div');
+    f.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;z-index:1000002;transition:opacity 0.5s ease;pointer-events:none;';
+    document.body.appendChild(f);
+    requestAnimationFrame(function(){ f.style.opacity = '1'; });
+    setTimeout(function(){ window.location.href = 'about.html'; }, 550);
+  });
+  window.addEventListener('pageshow', function(e){ if(e.persisted) document.querySelectorAll('body > div[style*="z-index:1000002"]').forEach(function(d){ d.remove(); }); });
+})();
+</script>
+<script src="fairy-cursor.js?v=1" defer></script>
 </body>
 </html>
