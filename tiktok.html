@@ -2177,7 +2177,7 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
   //    that hasn't played yet. Asking for the frame at 0.1s makes them load
   //    and show that frame as the thumbnail. (Header video left alone.)
   if(touch){
-    document.querySelectorAll('video:not(.hero-media):not([data-autoplay]):not(.video-backdrop)').forEach(function(v){
+    document.querySelectorAll('video:not(.hero-media):not([data-autoplay]):not(.video-backdrop):not([poster])').forEach(function(v){
       var changed = false;
       v.querySelectorAll('source').forEach(function(s){
         var src = s.getAttribute('src');
@@ -2397,6 +2397,34 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
   video[data-autoplay]::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none; }
   video.hero-media::-webkit-media-controls,
   video[data-autoplay]::-webkit-media-controls { display: none !important; }
+
+  /* ═══════════ PLAY BUTTON: gold thorned ring ═══════════
+     Same size and behaviour as before (it still scales with the video and
+     hides while playing); only the look changes: a darker smoky disc, a
+     thin gold double ring with a crown of thorns that slowly turns on
+     hover, and a gold play arrow. */
+  .video-play-btn { border: none !important; overflow: visible !important; }
+  .video-play-btn .vpb-glass {
+    border-radius: 50%;
+    background-color: rgba(10,10,10,0.5) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(110%) !important;
+    backdrop-filter: blur(8px) saturate(110%) !important;
+  }
+  .video-play-btn .vpb-green-triangle,
+  .video-play-btn .vpb-green-ring,
+  .video-play-btn > svg:not(.vpb-thorn) { display: none !important; }
+  .video-play-btn svg.vpb-thorn {
+    display: block !important; margin: 0 !important; z-index: 3;
+    position: absolute; left: 50%; top: 50%;
+    width: 129% !important; height: 129% !important;   /* the disc fills the old button's circle; thorns sit outside it */
+    transform: translate(-50%, -50%);
+    overflow: visible; pointer-events: none;
+    filter: drop-shadow(0 0 6px rgba(0,0,0,0.45));
+  }
+  .vpb-thorn .pb-ring { transform-origin: 75px 75px; transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .vpb-thorn .pb-tri { transform-origin: 75px 75px; transition: transform 0.4s ease; }
+  .pb-hot .vpb-thorn .pb-ring { transform: rotate(30deg); }
+  .pb-hot .vpb-thorn .pb-tri { transform: scale(1.08); }
 </style>
 <button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
@@ -2475,6 +2503,39 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
       if(r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth) playMuted(v);
     });
   }, { passive: true });
+})();
+</script>
+<script>
+// ── PLAY BUTTON: gold thorned ring (drawn once into every play button) ──
+(function(){
+  var NS = 'http://www.w3.org/2000/svg', GOLD = '#FBCEA0';
+  function el(t, a, p){ var e = document.createElementNS(NS, t); for(var k in a) e.setAttribute(k, a[k]); if(p) p.appendChild(e); return e; }
+  function build(){
+    var s = el('svg', { viewBox: '0 0 150 150', class: 'vpb-thorn', 'aria-hidden': 'true' });
+    el('circle', { cx: 75, cy: 75, r: 58, fill: 'none', stroke: GOLD, 'stroke-width': 1.6 }, s);
+    el('circle', { cx: 75, cy: 75, r: 53, fill: 'none', stroke: GOLD, 'stroke-opacity': 0.45, 'stroke-width': 0.8 }, s);
+    var g = el('g', { class: 'pb-ring' }, s);
+    for(var i = 0; i < 28; i++){
+      var a = i / 28 * Math.PI * 2, long = i % 2 === 0, L = long ? 13 : 7, w = long ? 2.6 : 1.8;
+      var c = Math.cos(a), sn = Math.sin(a);
+      var x1 = 75 + c * 58, y1 = 75 + sn * 58, x2 = 75 + c * (58 + L), y2 = 75 + sn * (58 + L);
+      var px = -sn * w / 2, py = c * w / 2;
+      el('path', { d: 'M' + (x1 + px) + ' ' + (y1 + py) + ' L' + x2 + ' ' + y2 + ' L' + (x1 - px) + ' ' + (y1 - py) + ' Z', fill: GOLD }, g);
+      if(long){
+        var xm = 75 + c * 62, ym = 75 + sn * 62;
+        el('path', { d: 'M' + (xm + px * 1.8) + ' ' + (ym + py * 1.8) + ' L' + (xm - px * 1.8) + ' ' + (ym - py * 1.8), stroke: GOLD, 'stroke-width': 1 }, g);
+      }
+    }
+    el('path', { d: 'M65 54 L96 75 L65 96 Z', fill: GOLD, class: 'pb-tri' }, s);
+    return s;
+  }
+  document.querySelectorAll('.video-play-btn').forEach(function(btn){
+    if(btn.querySelector('.vpb-thorn')) return;
+    btn.appendChild(build());
+    var host = btn.parentElement;
+    host.addEventListener('mouseenter', function(){ btn.classList.add('pb-hot'); });
+    host.addEventListener('mouseleave', function(){ btn.classList.remove('pb-hot'); });
+  });
 })();
 </script>
 </body>
