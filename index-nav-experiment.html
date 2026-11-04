@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+  // Touch-primary devices (phones, most tablets) still get the cinematic
+  // intro below, just with a 9:16 background video instead of the desktop
+  // 16:9 one, and it ends on the simple mobile project list instead of the
+  // unplayable (keyboard-only) game. Anything with a mouse or trackpad,
+  // including touch-capable laptops, is untouched and behaves exactly as
+  // before: 16:9 video, ends on the game.
+  var isMobileDevice = false;
+  try {
+    var isTouchPrimary = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    var isPhoneWidth = Math.min(window.innerWidth, window.innerHeight) <= 500;
+    isMobileDevice = isTouchPrimary && isPhoneWidth;
+    // A class on <html> (available immediately, before <body> exists) so
+    // the CSS below can scope every mobile-only tweak off the exact same
+    // check used for the redirect logic, rather than a separate breakpoint.
+    if (isMobileDevice) document.documentElement.classList.add('is-mobile-device');
+  } catch (e) {}
+</script>
+<title>[EXPERIMENT nav] JCC Intro Sequence Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IM+Fell+English:ital@1&family=Cinzel:wght@500&family=Spectral:wght@600&display=swap" rel="stylesheet"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #000;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Press Start 2P', monospace;
+  }
+  #stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    overflow: hidden;
+  }
+  #scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.15) 3px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 200;
+  }
+  #vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+    z-index: 201;
+  }
+  #bgVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+  }
+  #logoBumper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 60;
+    background: #000;
+  }
+  #blackCover {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 1;
+    z-index: 50;
+    pointer-events: none;
+  }
+  #crawl {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 46%;
+    text-align: center;
+    z-index: 30;
+    padding: 0 8%;
+  }
+  #crawl p {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: #fff;
+    text-shadow: 0 0 8px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9);
+    line-height: 1.7;
+    opacity: 0;
+  }
+  #logoWrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+    pointer-events: none;
+  }
+  .logo-stack {
+    position: relative;
+    width: min(60vw, 620px);
+    cursor: pointer;
+  }
+  .logo-stack.logo-active {
+    pointer-events: auto;
+  }
+  #logoText {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 0 20px rgba(213,231,9,0.5));
+    opacity: 0;
+  }
+  #pressEnter {
+    margin-top: 32px;
+    font-size: 0.85rem;
+    color: #d5e709;
+    letter-spacing: 2px;
+    opacity: 0;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  #pressEnter.pulse {
+    animation: pulse 1.2s steps(2) infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  #copyrightTag {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.5rem, 1.1vw, 0.7rem);
+    color: rgba(213,231,9,0.9);
+    letter-spacing: 2px;
+    white-space: nowrap;
+    opacity: 0;
+    z-index: 40;
+    pointer-events: none;
+  }
+  #status {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    color: #666;
+    font-size: 0.6rem;
+    z-index: 100;
+  }
+  #btnRow {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    z-index: 210;
+    display: flex;
+    gap: 10px;
+    /* Hidden during the JOSHUA logo intro; the script fades the buttons in
+       alongside the frog scene (see showButtons in runSequence). */
+    opacity: 0;
+    visibility: hidden;
+  }
+  #btnRow button {
+    position: relative;
+    background: transparent;
+    border: none;
+    /* Same gold Cinzel lettering as the Send a Raven button on the about
+       page (the house style for these buttons everywhere). */
+    color: #d8b559;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.85);
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1;
+    text-align: center;
+    /* 0.18em less on the right cancels the letter-spacing after the last
+       letter, so each word sits truly centred. */
+    padding: 0 calc(1.1rem - 0.18em) 0 1.1rem;
+    height: 44px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  /* Each button is built from three pieces rather than one stretched
+     image: a centre tile that repeats along the button's length, with the
+     left and right end caps sitting on top of it at each end. So the
+     button grows or shrinks with its word and nothing gets stretched.
+     Two stacked layers (base, then hover on top) so hovering can
+     cross-fade between them rather than snapping. */
+  #btnRow button::before,
+  #btnRow button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-position: left center, right center, left center;
+    background-size: auto 100%, auto 100%, auto 100%;
+    background-repeat: no-repeat, no-repeat, repeat-x;
+    z-index: -1;
+    pointer-events: none;
+  }
+  #btnRow button::before {
+    background-image:
+      url('d4-button-secondary-left-base_2x_GREEN.png'),
+      url('d4-button-secondary-right-base_2x_GREEN.png'),
+      url('d4-button-secondary-tile-base_2x_GREEN.png');
+  }
+  #btnRow button::after {
+    background-image:
+      url('d4-button-secondary-left-hover_2x_GREEN.png'),
+      url('d4-button-secondary-right-hover_2x_GREEN.png'),
+      url('d4-button-secondary-tile-hover_2x_GREEN.png');
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  #btnRow button:hover::after,
+  #btnRow button:focus-visible::after {
+    opacity: 1;
+  }
+  /* Like Send a Raven, the lettering stays gold on hover; only the button art lights up. */
+  #clickGate {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #clickGate span {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.9rem;
+    color: #d5e709;
+    animation: pulse 1.2s steps(2) infinite;
+  }
+
+  /* ── MOBILE ONLY ── scoped to html.is-mobile-device, set by the script
+     above using the same touch+width check as the redirect logic, so
+     this never fires for a desktop browser regardless of window size. */
+  .is-mobile-device #muteBtn,
+  .is-mobile-device #hopBtn,
+  .is-mobile-device #aboutBtn {
+    display: none !important;
+  }
+  /* Crawl and logo share one anchor point (top + translateY(-50%)) so both
+     are centred on the exact same line, and both use their own true centre
+     rather than the crawl's box top, which used to drift downward as more
+     lines faded in. Moved higher up the screen than the old default too. */
+  .is-mobile-device #crawl {
+    top: 38%;
+    transform: translateY(-50%);
+  }
+  .is-mobile-device #logoWrap {
+    inset: auto;
+    top: 41.5%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    justify-content: flex-start;
+  }
+  .is-mobile-device .logo-stack {
+    width: min(80vw, 620px);
+  }
+  .is-mobile-device #pressEnter {
+    font-size: 0.72rem;
+  }
+  .is-mobile-device #logoBumper {
+    /* The 16:9 bumper video gets cropped hard to fill a phone's tall,
+       narrow frame. The JOSHUA wordmark itself sits a little left of the
+       video's true centre, so a plain 50% crop cuts off far more of its
+       left side than its right and the remainder reads as right-shifted.
+       This recentres the crop on the wordmark itself. */
+    object-position: 54% 50%;
+  }
+  /* ── PHONES: fit the intro to the visible screen ──
+     100vh on iPhone includes the area behind Safari's toolbars, which
+     pushed everything down and hid the bottom of the videos. Size the stage
+     to the visible window instead (100svh, with a script fallback below),
+     and anchor the frog scene to its bottom edge so the fire is never the
+     part that gets cropped. Desktop is untouched. */
+  .is-mobile-device #stage { height: 100vh; height: 100svh; }
+  .is-mobile-device #bgVideo { object-position: 50% 100%; }
+  /* The old "Sequence starting..." development message, hidden everywhere. */
+  #status { display: none !important; }
+  /* Phones: the copyright line was wider than the screen; smaller so it fits. */
+  .is-mobile-device #copyrightTag {
+    font-size: 0.42rem;
+    letter-spacing: 1px;
+    max-width: calc(100vw - 2rem);
+  }
+
+  /* ── PHONES: intro text and logo, round 2 ──
+     Text and logo a little higher (between the old position and the open
+     sky), slightly smaller type that fits short lines on one line, tighter
+     leading and balanced lines when it does wrap, a softer shadow, and a
+     much lighter vignette. Desktop is untouched. */
+  .is-mobile-device #crawl { top: 30.5%; padding: 0 7%; }
+  .is-mobile-device #crawl p {
+    font-size: 1.35rem;
+    line-height: 1.3;
+    text-wrap: balance;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.55), 0 0 14px rgba(0,0,0,0.3);
+  }
+  .is-mobile-device #logoWrap { top: 33%; }
+  .is-mobile-device #vignette {
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.28) 100%);
+  }
+
+  /* DESKTOP: softer intro text shadow, matching phones (a tight light shadow
+     under the letters plus a faint wide glow, instead of a heavy dark halo). */
+  #crawl p { text-shadow: 0 1px 2px rgba(0,0,0,0.55), 0 0 14px rgba(0,0,0,0.3); }
+
+  /* ═══════════ EXPERIMENT: top-right word menu ═══════════
+     The three buttons become gold words in the top right (lettered like the
+     project labels), with small frog-foot dividers. On hover, a bright copy
+     of each word fills in from left to right (as on the Shadow of War site). */
+  #btnRow {
+    top: 22px; right: 28px; bottom: auto;
+    gap: 14px; align-items: center;
+  }
+  #btnRow button {
+    height: auto; padding: 4px 0;
+    font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 3px; color: #FBCEA0; text-shadow: none;
+  }
+  #btnRow button::before, #btnRow button::after { content: none; display: none; }
+  #btnRow .gx-t { display: inline-block; position: relative; }
+  #btnRow .gx-t::before {
+    content: attr(data-t); position: absolute; left: 0; top: 0;
+    color: transparent; text-shadow: 0 2px 5px rgba(0,0,0,0.55);
+  }
+  #btnRow .gx-t span {
+    display: block; position: relative;
+    background: linear-gradient(180deg, #FFE9C4 0%, #FBCEA0 45%, #B88A4E 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #btnRow .gx-t::after {
+    content: attr(data-t); position: absolute; top: 0; left: 0; z-index: 2;
+    width: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+    color: #FFF6E2; text-shadow: 0 0 8px rgba(255,214,150,0.55);
+    transition: opacity 0.4s 0.2s, width 0.6s;
+  }
+  #btnRow button:hover .gx-t::after,
+  #btnRow button:focus-visible .gx-t::after { opacity: 1; width: 100%; transition: opacity 0.4s, width 0.6s; }
+  #btnRow .gx-foot {
+    width: 8px; height: 7px; flex-shrink: 0;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
+    opacity: 0.75; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  }
+</style>
+<script>
+  // iPhones mute web page sound effects and music when the phone's silent
+  // switch is on (sound made by the page itself, as opposed to video).
+  // Tell Safari this site's sounds are part of the experience, like a game,
+  // so they play like other media do. Ignored by browsers that don't support it.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+</script>
+</head>
+<body>
+
+<div id="clickGate"><span>DARE YOU ENTER?</span></div>
+<div id="stage">
+  <video id="logoBumper" muted playsinline></video>
+  <audio id="logoBobSound" src="FROG_CROAK.mp3"></audio>
+  <video id="bgVideo" muted playsinline loop></video>
+  
+  <div id="scanlines"></div>
+  <div id="vignette"></div>
+  <div id="crawl"><p id="crawlText"></p></div>
+  <div id="logoWrap">
+    <div class="logo-stack">
+    <img id="logoText" src="JOSHUA_LOGO.png" alt="Joshua Crossley"/>
+    </div>
+    <div id="pressEnter">PRESS ENTER TO START</div>
+  </div>
+  <div id="copyrightTag">&copy; COPYRIGHT 2026 JOSHUA CROSSLEY CREATIVE</div>
+  <div id="blackCover"></div>
+</div>
+
+<div id="status">Sequence starting...</div>
+<div id="btnRow">
+  <button id="muteBtn"><span class="gx-t" data-t="Music"><span>Music</span></span></button>
+  <i class="gx-foot" aria-hidden="true"></i>
+  <button id="hopBtn"><span class="gx-t" data-t="Hop to the work"><span>Hop to the work</span></span></button>
+  <i class="gx-foot" aria-hidden="true"></i>
+  <button id="aboutBtn"><span class="gx-t" data-t="About me"><span>About me</span></span></button>
+</div>
+
+<script>
+var video = document.getElementById('bgVideo');
+
+// ── ORIGINAL BACKGROUND MUSIC (synthesized, not from any reference track) ──
+var musicCtx = null;
+function getMusicAudio(){
+  if(!musicCtx) musicCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(musicCtx.state === 'suspended') musicCtx.resume();
+  return musicCtx;
+}
+function playLogoFlashSFX(){
+  var ctx = getMusicAudio();
+  var now = ctx.currentTime;
+  // Bright ascending three-note sparkle (square wave, fast attack/decay)
+  var notes = [880.00, 1108.73, 1396.91]; // A5, C#6, F6
+  notes.forEach(function(freq, i){
+    var t = now + i * 0.045;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.07, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.25);
+  });
+  // Underlying pitch-sweep shimmer layer
+  var sweep = ctx.createOscillator();
+  var sweepGain = ctx.createGain();
+  sweep.type = 'triangle';
+  sweep.frequency.setValueAtTime(600, now);
+  sweep.frequency.exponentialRampToValueAtTime(1800, now + 0.18);
+  sweepGain.gain.setValueAtTime(0.0001, now);
+  sweepGain.gain.exponentialRampToValueAtTime(0.05, now + 0.03);
+  sweepGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+  sweep.connect(sweepGain);
+  sweepGain.connect(ctx.destination);
+  sweep.start(now);
+  sweep.stop(now + 0.32);
+}
+var activeMusicNodes = [];
+function musicTone(freq, type, start, duration, peakVol){
+  var ctx = getMusicAudio();
+  var osc = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = type;
+  var t = ctx.currentTime + start;
+  osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(peakVol, t + 0.15);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+  osc.start(t);
+  osc.stop(t + duration + 0.05);
+  activeMusicNodes.push({osc: osc, gain: gain});
+  osc.onended = function(){
+    var idx = activeMusicNodes.findIndex(function(n){ return n.osc === osc; });
+    if(idx !== -1) activeMusicNodes.splice(idx, 1);
+  };
+}
+var musicPlaying = false;
+var musicLoopTimeout = null;
+// Slow, moody minor-key progression: Am - F - C - G, arpeggiated bass
+// with a sparse melody note per bar
+var CHORDS = [
+  { bass: 110.00, notes: [220.00, 261.63, 329.63] },
+  { bass: 87.31,  notes: [174.61, 220.00, 261.63] },
+  { bass: 130.81, notes: [261.63, 329.63, 392.00] },
+  { bass: 98.00,  notes: [196.00, 246.94, 293.66] }
+];
+var melodyStep = 0;
+function scheduleMusicLoop(){
+  if(!musicPlaying) return;
+  var barDur = 2.6;
+  CHORDS.forEach(function(chord, i){
+    var barStart = i * barDur;
+    musicTone(chord.bass, 'triangle', barStart, 1.2, 0.05);
+    musicTone(chord.bass, 'triangle', barStart + 1.3, 1.2, 0.05);
+    var note = chord.notes[melodyStep % chord.notes.length];
+    musicTone(note, 'square', barStart + 0.5, 1.7, 0.02);
+    melodyStep++;
+  });
+  var totalDur = CHORDS.length * barDur;
+  musicLoopTimeout = setTimeout(scheduleMusicLoop, totalDur * 1000);
+}
+function playIntroMusic(){
+  if(musicPlaying) return;
+  musicPlaying = true;
+  scheduleMusicLoop();
+}
+function stopIntroMusic(){
+  musicPlaying = false;
+  clearTimeout(musicLoopTimeout);
+  var ctx = getMusicAudio();
+  var now = ctx.currentTime;
+  activeMusicNodes.forEach(function(n){
+    try {
+      n.gain.gain.cancelScheduledValues(now);
+      n.gain.gain.setValueAtTime(n.gain.gain.value, now);
+      n.gain.gain.linearRampToValueAtTime(0.0001, now + 0.05);
+      n.osc.stop(now + 0.06);
+    } catch(e){}
+  });
+  activeMusicNodes = [];
+}
+video.src = isMobileDevice ? "JCC_LANDING_MOBILE.mp4" : "LANDING_PAGE.mp4";
+var logoBumper = document.getElementById('logoBumper');
+logoBumper.src = "JOSHUA_LOGO.mp4";
+
+var blackCover = document.getElementById('blackCover');
+var crawlEl = document.getElementById('crawl');
+var crawlText = document.getElementById('crawlText');
+var logoText = document.getElementById('logoText');
+var pressEnter = document.getElementById('pressEnter');
+if(isMobileDevice) pressEnter.textContent = 'TAP TO START';
+var status = document.getElementById('status');
+
+var COPY_LINES = [
+  { text: "Darkness sweeps the troubled land,", hold: 2100 },
+  { text: "as the masses drown in mundane tides.", hold: 3200 },
+  { text: "One storyteller stands against this blight of blandness.", hold: 2100 },
+  { text: "This is the story of...", hold: 2100 }
+];
+
+function wait(ms){
+  return new Promise(function(resolve){ setTimeout(resolve, ms); });
+}
+
+// Choppy/juddery opacity step - mimics low framerate fade, not a smooth CSS transition
+async function juddyFadeIn(el, steps, stepDelay, propGetter, propSetter){
+  for(var i = 1; i <= steps; i++){
+    propSetter(el, i / steps);
+    await wait(stepDelay);
+  }
+}
+
+// Each crawl line steps upward a short distance into its resting position
+// while fading in, in visible jumps rather than a smooth slide
+async function juddyLineIn(el, steps, stepDelay, fromPx){
+  for(var i = 1; i <= steps; i++){
+    var t = i / steps;
+    el.style.opacity = t;
+    el.style.transform = 'translateY(' + (fromPx * (1 - t)) + 'px)';
+    await wait(stepDelay);
+  }
+}
+
+function setOpacity(el, v){ el.style.opacity = v; }
+
+// The MUSIC / HOP TO THE WORK / ABOUT ME buttons stay hidden during the JOSHUA
+// logo intro and fade in with the frog scene, in the same stepped fade.
+var btnRow = document.getElementById('btnRow');
+function hideButtons(){
+  btnRow.style.opacity = 0;
+  btnRow.style.visibility = 'hidden';
+}
+function showButtons(){
+  btnRow.style.visibility = 'visible';
+  return juddyFadeIn(btnRow, 10, 180, null, setOpacity);
+}
+
+async function runSequence(){
+  video.play().catch(function(){});
+  playIntroMusic();
+  await wait(300);
+
+  status.textContent = 'Fading in scene...';
+  // Video is fully visible underneath the whole time - the black cover on
+  // top is what actually steps away, revealing the scene in visible jumps
+  video.style.opacity = 1;
+  showButtons(); // runs alongside the scene fade below, same steps and timing
+  await juddyFadeIn(blackCover, 10, 180, null, function(el, v){ el.style.opacity = 1 - v; });
+  blackCover.style.opacity = 0;
+  await wait(600);
+
+  status.textContent = 'Crawl text...';
+  // Each line steps upward into its resting position as it fades in
+  // (like the SoR crawl motion), then fades out in place before the
+  // next line appears (like the Secret of Mana credits) - one line at
+  // a time, not a scrolling block
+  for(var i = 0; i < COPY_LINES.length; i++){
+    crawlText.innerHTML = COPY_LINES[i].text;
+    await juddyLineIn(crawlText, 4, 150, 16);
+    await wait(COPY_LINES[i].hold);
+    await juddyFadeIn(crawlText, 3, 150, null, function(el, v){ el.style.opacity = 1 - v; });
+  }
+
+  status.textContent = 'Logo reveal...';
+  await wait(200);
+  // Choppy fade-in for the logo
+  await juddyFadeIn(logoText, 4, 190, null, setOpacity);
+  document.querySelector('.logo-stack').classList.add('logo-active');
+  await wait(500);
+
+  status.textContent = 'Press enter...';
+  // Allow Enter/click to work as soon as this starts appearing, rather
+  // than waiting for the fade-in (and everything after it) to finish.
+  introFinished = true;
+  await juddyFadeIn(pressEnter, 4, 190, null, setOpacity);
+  pressEnter.classList.add('pulse');
+
+  await wait(300);
+  var copyrightTag = document.getElementById('copyrightTag');
+  await juddyFadeIn(copyrightTag, 4, 190, null, setOpacity);
+
+  status.textContent = 'Done';
+}
+
+var introFinished = false;
+var launching = false;
+
+// Lets an impatient visitor skip the whole intro at any point, not just
+// once it's finished - reuses the same fade rather than a hard jump cut.
+async function hopToWork(){
+  if(launching) return;
+  launching = true;
+  stopIntroMusic();
+  await juddyFadeIn(blackCover, 6, 50, null, setOpacity);
+  // Straight to the first project, passing the same ?from= the home page
+  // portals pass (portal 0 is this one)
+  window.location.href = 'lucozade-back-for-the-believers.html?from=0';
+}
+document.getElementById('hopBtn').addEventListener('click', hopToWork);
+
+async function launchGame(){
+  if(!introFinished || launching) return;
+  launching = true;
+  stopIntroMusic();
+  pressEnter.classList.remove('pulse');
+  // Fade everything to black, in the same stepped style as the rest
+  // of the intro, before handing off to the actual site.
+  await juddyFadeIn(blackCover, 8, 60, null, setOpacity);
+  window.location.href = isMobileDevice ? 'mobile.html' : 'home.html';
+}
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Enter') launchGame();
+});
+pressEnter.addEventListener('click', launchGame);
+pressEnter.style.cursor = 'pointer';
+
+// ABOUT ME: same stepped fade to black as HOP TO THE WORK, then the about page
+document.getElementById('aboutBtn').addEventListener('click', async function(){
+  if(launching) return;
+  launching = true;
+  stopIntroMusic();
+  await juddyFadeIn(blackCover, 6, 50, null, setOpacity);
+  window.location.href = 'about.html';
+});
+
+document.getElementById('muteBtn').addEventListener('click', function(){
+  // Update the word (and its hover copy) without losing the lettering effect
+  var t = this.querySelector('.gx-t'), inner = t.querySelector('span');
+  if(musicPlaying){
+    stopIntroMusic();
+    t.setAttribute('data-t', '(Muted)'); inner.textContent = '(Muted)';
+  } else {
+    playIntroMusic();
+    t.setAttribute('data-t', 'Music'); inner.textContent = 'Music';
+  }
+});
+
+function playLogoBumper(){
+  return new Promise(function(resolve){
+    logoBumper.currentTime = 0;
+    logoBumper.style.display = 'block';
+    logoBumper.style.opacity = 1;
+    var finished = false;
+    function done(){
+      if(finished) return;
+      finished = true;
+      logoBumper.style.display = 'none';
+      resolve();
+    }
+    logoBumper.addEventListener('ended', done, { once: true });
+    // Fallback in case 'ended' doesn't fire (e.g. autoplay hiccup)
+    setTimeout(done, 4500);
+    // Flash SFX timed to the gradient sweep's brightness peak (~1.21s in)
+    setTimeout(function(){ playLogoFlashSFX(); }, 1210);
+    logoBumper.play().catch(function(){ done(); });
+  });
+}
+
+// Browsers block audio autoplay until the visitor has interacted with
+// the page - this click is that interaction, and unlocks audio (both
+// the AudioContext and any <audio> elements) for the rest of the session.
+document.getElementById('clickGate').addEventListener('click', function(){
+  var gate = document.getElementById('clickGate');
+  getMusicAudio(); // creates/resumes the AudioContext on this user gesture
+  gate.style.display = 'none';
+  playLogoBumper().then(runSequence);
+}, { once: true });
+
+// Neon-sign flicker on hover: irregular on/off stutters before settling
+// back to fully lit, like a tube light catching. Quiet buzz-crackle SFX
+// layered underneath. Only active once the logo has actually revealed -
+// logoWrap sits over the whole stage the entire time (just invisible),
+// so pointer-events stays off until the reveal completes.
+var logoBobSound = document.getElementById('logoBobSound');
+function playLogoBobSFX(){
+  logoBobSound.volume = 0.5;
+  logoBobSound.currentTime = 0;
+  logoBobSound.play().catch(function(){});
+}
+
+var logoBobPlaying = false;
+async function playLogoHoverBob(){
+  if(logoBobPlaying) return;
+  logoBobPlaying = true;
+  playLogoBobSFX();
+  // Stepped vertical jitter - low-framerate sprite idle bounce
+  var offsets = [0, -4, -6, -4, 0, 2, 0];
+  for(var i = 0; i < offsets.length; i++){
+    logoText.style.transform = 'translateY(' + offsets[i] + 'px)';
+    await wait(70);
+  }
+  logoText.style.transform = 'translateY(0)';
+  logoBobPlaying = false;
+}
+document.querySelector('.logo-stack').addEventListener('mouseenter', playLogoHoverBob);
+</script>
+
+<script>
+// Phones: size the intro to the window as it first appears, with Safari's
+// toolbars showing (backs up the 100svh rule). Re-measured on rotation only.
+(function(){
+  if(!document.documentElement.classList.contains('is-mobile-device')) return;
+  var stage = document.getElementById('stage');
+  if(!stage) return;
+  function fit(){ stage.style.height = window.innerHeight + 'px'; }
+  fit();
+  window.addEventListener('orientationchange', function(){ setTimeout(fit, 350); });
+})();
+</script>
+<script>
+// Back button: browsers restore this page exactly as it was left, which is
+// faded to black on the way out. Clear the fade and let the buttons work
+// again, so you come back to the frog scene rather than a black screen.
+window.addEventListener('pageshow', function(e){
+  if(!e.persisted) return;
+  var cover = document.getElementById('blackCover');
+  if(cover) cover.style.opacity = '0';
+  if(typeof launching !== 'undefined') launching = false;
+  var pe = document.getElementById('pressEnter');
+  if(pe && typeof introFinished !== 'undefined' && introFinished) pe.classList.add('pulse');
+});
+</script>
+<script>
+(function(){
+
+  // Silent-mode sound: iPhones mute sounds a page makes itself (music,
+  // chimes, effects) when the phone is on silent. Playing a tiny silent
+  // audio loop, started by your tap, moves the page into "media" mode, where
+  // those sounds are allowed through, like a video's sound.
+  var keepAlive = new Audio('data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAABTQALCwsLDc3Nzc3QUFBQUtLS0tLVVVVVV9fX19faWlpaXNzc3NzfX19fYeHh4eHkZGRkZubm5ubpaWlpaWvr6+vubm5ubnDw8PDzc3Nzc3X19fX4eHh4eHr6+vr9fX19fX/////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQELwAAAAAAAAU0bbRwgwAAAAAAAAAAAAAAAAD/8yDEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MixCcAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDETwAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxHYAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIMSdAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVX/8yLExAAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIsTXAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MixNcAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/8yLE1wAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zIsTXAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+  keepAlive.loop = true; keepAlive.volume = 0.01;
+  function startKeepAlive(){ var p = keepAlive.play(); if(p && p.catch) p.catch(function(){}); }
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) keepAlive.pause(); });
+  var gate = document.getElementById('clickGate');
+  if(gate) gate.addEventListener('click', startKeepAlive, { once: true });
+  window.addEventListener('pageshow', function(e){ if(e.persisted) startKeepAlive(); });
+})();
+</script>
+</body>
+</html>
