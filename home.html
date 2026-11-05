@@ -307,6 +307,7 @@
 <audio id="logoCroak" src="FROG_CROAK.mp3" preload="auto"></audio>
 <audio id="tongueSound" src="frog_tongue.mp3" preload="auto"></audio>
 <audio id="helpScream" src="frog_help_scream.mp3" preload="auto"></audio>
+<audio id="ohNo" src="frog_ohno.mp3" preload="auto"></audio>
 <nav id="gameNav" aria-label="Site">
   <button id="muteBtn"><span class="gx-t" data-t="Music"><span>Music</span></span></button>
   <i class="gx-foot" aria-hidden="true"></i>
@@ -1890,8 +1891,13 @@ var RETURN_PORTAL = null;
       var destPage = PROJECT_PAGES[pi] + '?from=' + pi;
       var tSound = document.getElementById('teleportSound');
       if(tSound && !muted){ tSound.currentTime = 0; tSound.play(); }
-      var help = document.getElementById('helpScream');
-      if(help && !muted){ help.volume = 0.85; help.currentTime = 0; help.play().catch(function(){}); }
+      // His cry as he's pulled in takes turns between "help!" and "oh no!".
+      // (Remembered between visits, since entering a portal leaves the page.)
+      var cryN = 0;
+      try { cryN = (parseInt(localStorage.getItem('jccPortalCry'), 10) || 0) + 1; localStorage.setItem('jccPortalCry', cryN); }
+      catch(e){ cryN = Math.random() < 0.5 ? 1 : 2; }
+      var cry = document.getElementById(cryN % 2 ? 'helpScream' : 'ohNo');
+      if(cry && !muted){ cry.volume = 0.85; cry.currentTime = 0; cry.play().catch(function(){}); }
       stopGameMusic();
       setTimeout(function(){
         var flash = document.createElement('div');
