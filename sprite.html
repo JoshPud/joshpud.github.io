@@ -1214,7 +1214,7 @@
 <div id="portalFlash"></div>
 
 <!-- Top Bar -->
-<nav id="pageNav" aria-label="Site"><button id="pageAbout"><span class="gx-t" data-t="About me"><span>About me</span></span></button></nav>
+<nav id="pageNav" aria-label="Site"><i class="gx-foot" aria-hidden="true"></i><button id="pageAbout"><span class="gx-t" data-t="About me"><span>About me</span></span></button><i class="gx-foot" aria-hidden="true"></i></nav>
 <header class="top-bar">
   <img src="JCC_LOGO_CHAMPAGNE_NAV.png" alt="Joshua Crossley Creative" class="top-bar-logo"/>
 </header>
@@ -2349,6 +2349,14 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
   #pageNav button:hover .gx-t::after,
   #pageNav button:focus-visible .gx-t::after { opacity: 1; width: 100%; transition: opacity 0.4s, width 0.6s; }
   @media (hover: none) and (pointer: coarse) { #pageNav { display: none; } }
+
+  /* ABOUT ME framed by a gold frog foot either side (desktop) */
+  #pageNav { display: flex; align-items: center; gap: 10px; right: 32px; }   /* 32px clear of the edge, matching the space above */
+  #pageNav .gx-foot {
+    width: 10px; height: 9px; flex-shrink: 0; position: relative; top: -2.4px;   /* optically centred on the capitals (the foot's weight sits low, in its palm) */
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
+    opacity: 0.75; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  }
 </style>
 <button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
@@ -2468,12 +2476,9 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
   var nav = document.getElementById('pageNav'), btn = document.getElementById('pageAbout');
   var logo = document.querySelector('.top-bar-logo');
   if(!nav || !btn) return;
-  function place(){
-    if(!logo) { nav.style.top = '22px'; return; }
-    var r = logo.getBoundingClientRect();
-    // Centred on the logo's lettering, which sits a touch above the middle of its box
-    nav.style.top = Math.round(r.top + r.height * 0.44 - nav.offsetHeight / 2) + 'px';
-  }
+  // Same visible gap above the word as to its right (about 32px each):
+  // the box sits 28px down, and the capitals start 4px inside it.
+  function place(){ nav.style.top = '28px'; }
   place(); window.addEventListener('load', place); window.addEventListener('resize', place);
   setTimeout(function(){ place(); nav.classList.add('on'); }, 400);
   btn.addEventListener('click', function(){
