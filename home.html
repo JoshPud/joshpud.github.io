@@ -1004,8 +1004,8 @@ var RETURN_PORTAL = null;
   // a moment later it pops back out of his mouth, dizzy, and flies back to
   // the pointer. Move away in time and he misses. A cooldown stops him
   // lashing out constantly.
-  var tongue = { phase: 'none', t: 0, tx: 0, ty: 0, notice: 0, cooldown: 120, caught: false };
-  var TONGUE_REACH = 300, TONGUE_OUT = 11, TONGUE_IN = 14, TONGUE_GULP = 42, TONGUE_BURP = 40;   // reach in px; timings in 60ths of a second
+  var tongue = { phase: 'none', t: 0, tx: 0, ty: 0, notice: 0, cooldown: 0, caught: false };
+  var TONGUE_REACH = 175, TONGUE_OUT = 11, TONGUE_IN = 14, TONGUE_GULP = 42, TONGUE_BURP = 40;   // reach in px; timings in 60ths of a second
   // Where the drawn tongue stub ends in the tongue-out image (fractions of
   // the image), and the tongue's thickness as a fraction of its height.
   var TONGUE_END_X = 0.586, TONGUE_END_Y = 0.560, TONGUE_THICK = 0.0295;   // tongue starts deep inside his mouth, so it can point straight at the fairy at any angle
@@ -1028,10 +1028,13 @@ var RETURN_PORTAL = null;
       var fw = fairyWorld(), m = mouthPos();
       if(!fw){ tongue.notice = 0; return; }
       var dx = fw.x - m.x, dy = fw.y - m.y;
-      if(Math.abs(dx) < TONGUE_REACH && dy > -170 && dy < 120 && Math.abs(dx) > 30){
+      // Only within reach, and only from the top of his head down to his feet
+      // (higher than that the tongue would shoot up at an odd angle).
+      var headTop = player.y + player.h * 0.38, feet = player.y + player.h;
+      if(Math.abs(dx) < TONGUE_REACH && Math.abs(dx) > 30 && fw.y >= headTop && fw.y <= feet){
         tongue.notice += dt;
         player.facing = dx > 0 ? 1 : -1;            // he turns to look at it
-        if(tongue.notice > 30){                       // half a second of temptation, then SNAP
+        if(tongue.notice > 4){                        // near-instant: a split second to turn, then SNAP
           tongue.phase = 'out'; tongue.t = 0; tongue.caught = false;
           var m2 = mouthPos(); tongue.tx = fw.x; tongue.ty = fw.y;
           tongue.notice = 0;
@@ -1131,7 +1134,7 @@ var RETURN_PORTAL = null;
   }
   function endTongue(){
     if(tongue.caught && tongue.phase !== 'none' && window.jccFairy){ var m = mouthPos(); window.jccFairy.release(m.x - cam.x, m.y); }
-    tongue.phase = 'none'; tongue.t = 0; tongue.caught = false; tongue.cooldown = 240;   // about 4 seconds
+    tongue.phase = 'none'; tongue.t = 0; tongue.caught = false; tongue.cooldown = 45;   // ready again after about 3/4 of a second
   }
   function drawTongue(){
     if(tongue.phase !== 'out' && tongue.phase !== 'in') return;
