@@ -305,6 +305,8 @@
 <audio id="tortoiseDead" src="TORTOISE_DEAD_2.mp3" preload="auto"></audio>
 <audio id="bgMusic" src="scizzie_-_aquatic_ambience.mp3" preload="auto"></audio>
 <audio id="logoCroak" src="FROG_CROAK.mp3" preload="auto"></audio>
+<audio id="tongueSound" src="frog_tongue.mp3" preload="auto"></audio>
+<audio id="helpScream" src="frog_help_scream.mp3" preload="auto"></audio>
 <nav id="gameNav" aria-label="Site">
   <button id="muteBtn"><span class="gx-t" data-t="Music"><span>Music</span></span></button>
   <i class="gx-foot" aria-hidden="true"></i>
@@ -1036,6 +1038,8 @@ var RETURN_PORTAL = null;
         player.facing = dx > 0 ? 1 : -1;            // he turns to look at it
         if(tongue.notice > 4){                        // near-instant: a split second to turn, then SNAP
           tongue.phase = 'out'; tongue.t = 0; tongue.caught = false;
+          var ts = document.getElementById('tongueSound');
+          if(ts && !muted){ ts.volume = 0.8; ts.currentTime = 0; ts.play().catch(function(){}); }
           var m2 = mouthPos(); tongue.tx = fw.x; tongue.ty = fw.y;
           tongue.notice = 0;
         }
@@ -1886,6 +1890,8 @@ var RETURN_PORTAL = null;
       var destPage = PROJECT_PAGES[pi] + '?from=' + pi;
       var tSound = document.getElementById('teleportSound');
       if(tSound && !muted){ tSound.currentTime = 0; tSound.play(); }
+      var help = document.getElementById('helpScream');
+      if(help && !muted){ help.volume = 0.85; help.currentTime = 0; help.play().catch(function(){}); }
       stopGameMusic();
       setTimeout(function(){
         var flash = document.createElement('div');
