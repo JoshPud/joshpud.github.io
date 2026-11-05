@@ -637,6 +637,13 @@ var RETURN_PORTAL = null;
   sprites["frog-cast"] = new Image();
   sprites["frog-cast"].onload = function(){ spritesLoaded++; };
   sprites["frog-cast"].src = "frog-cast.png";
+  // Tongue-out frog (his own tongue drawn in, cut off just before the tip;
+  // the code draws the rest of it out to the fairy)
+  sprites["frog-tongue"] = new Image();
+  sprites["frog-tongue"].src = "frog-tongue.png";
+  // Swallowed (smug belly pat, glowing tummy) and the burp that follows
+  sprites["frog-gulp"] = new Image(); sprites["frog-gulp"].src = "frog-gulp.png";
+  sprites["frog-burp"] = new Image(); sprites["frog-burp"].src = "frog-burp.png";
   sprites["frog-sleep"] = new Image();
   sprites["frog-sleep"].onload = function(){ spritesLoaded++; };
   sprites["frog-sleep"].src = "frog-sleep.png";
@@ -989,6 +996,167 @@ var RETURN_PORTAL = null;
   }
 
   // ── UPDATE
+
+  // ── FROG VS FAIRY: the frog snaps his tongue at the fairy cursor ──
+  // When he's standing still and the fairy hovers within reach in front of
+  // him for a moment, he turns to face it and flicks his tongue. If the fairy
+  // is still there when the tongue arrives, he reels it in, gulps (croak), and
+  // a moment later it pops back out of his mouth, dizzy, and flies back to
+  // the pointer. Move away in time and he misses. A cooldown stops him
+  // lashing out constantly.
+  var tongue = { phase: 'none', t: 0, tx: 0, ty: 0, notice: 0, cooldown: 120, caught: false };
+  var TONGUE_REACH = 300, TONGUE_OUT = 11, TONGUE_IN = 14, TONGUE_GULP = 42, TONGUE_BURP = 40;   // reach in px; timings in 60ths of a second
+  // Where the drawn tongue stub ends in the tongue-out image (fractions of
+  // the image), and the tongue's thickness as a fraction of its height.
+  var TONGUE_END_X = 0.805, TONGUE_END_Y = 0.554, TONGUE_THICK = 0.0295;
+  function mouthPos(){
+    var img = sprites['frog-tongue'];
+    var aspect = img && img.naturalWidth ? img.naturalWidth / img.naturalHeight : 512 / 457;
+    var drawH = player.h, drawW = drawH * aspect, x0 = player.x - (drawW - player.w) / 2;
+    var fx = player.facing === -1 ? 1 - TONGUE_END_X : TONGUE_END_X;
+    return { x: x0 + drawW * fx, y: player.y + drawH * TONGUE_END_Y, t: drawH * TONGUE_THICK };
+  }
+  function fairyWorld(){
+    var f = window.jccFairy && window.jccFairy.pos();
+    return f ? { x: f.x + cam.x, y: f.y } : null;
+  }
+  function updateTongue(dt){
+    if(tongue.cooldown > 0) tongue.cooldown -= dt;
+    var free = !player.enteringPortal && !player.sleeping && player.onGround && player.vx === 0 && player.castTimer === 0;
+    if(tongue.phase === 'none'){
+      if(!free || tongue.cooldown > 0 || !window.jccFairy){ tongue.notice = 0; return; }
+      var fw = fairyWorld(), m = mouthPos();
+      if(!fw){ tongue.notice = 0; return; }
+      var dx = fw.x - m.x, dy = fw.y - m.y;
+      if(Math.abs(dx) < TONGUE_REACH && dy > -170 && dy < 120 && Math.abs(dx) > 30){
+        tongue.notice += dt;
+        player.facing = dx > 0 ? 1 : -1;            // he turns to look at it
+        if(tongue.notice > 30){                       // half a second of temptation, then SNAP
+          tongue.phase = 'out'; tongue.t = 0; tongue.caught = false;
+          var m2 = mouthPos(); tongue.tx = fw.x; tongue.ty = fw.y;
+          tongue.notice = 0;
+        }
+      } else tongue.notice = 0;
+      return;
+    }
+    // Moving or jumping cancels a flick in progress
+    if(!player.onGround || player.vx !== 0 || player.enteringPortal){ endTongue(); return; }
+    function has(k){ var im = sprites['frog-' + k]; return im && im.complete && im.naturalWidth; }
+    if(tongue.phase === 'gulp') player.state = has('gulp') ? 'gulp' : 'idle';
+    else if(tongue.phase === 'burp') player.state = has('burp') ? 'burp' : 'cast';
+    else player.state = has('tongue') ? 'tongue' : 'cast';
+    tongue.t += dt;
+    if(tongue.phase === 'out'){
+      if(tongue.t >= TONGUE_OUT){
+        var fw2 = fairyWorld();
+        if(fw2 && Math.hypot(fw2.x - tongue.tx, fw2.y - tongue.ty) < 34){
+          tongue.caught = true;
+          window.jccFairy.hold(tongue.tx - cam.x, tongue.ty);
+        }
+        tongue.phase = 'in'; tongue.t = 0;
+      }
+    } else if(tongue.phase === 'in'){
+      if(tongue.caught){
+        var p = tongue.t / TONGUE_IN, m3 = mouthPos();
+        window.jccFairy.hold(tongue.tx + (m3.x - tongue.tx) * p - cam.x, tongue.ty + (m3.y - tongue.ty) * p);
+      }
+      if(tongue.t >= TONGUE_IN){
+        if(tongue.caught){
+          tongue.phase = 'gulp'; tongue.t = 0; window.jccFairy.hide();
+        } else endTongue();
+      }
+    } else if(tongue.phase === 'gulp'){
+      if(tongue.t >= TONGUE_GULP){
+        // BURP: the fairy bursts back out of his mouth in a stream of green bubbles
+        tongue.phase = 'burp'; tongue.t = 0;
+        var bm = burpMouth();
+        window.jccFairy.release(bm.x - cam.x, bm.y);
+        burpBubbles(bm.x, bm.y);
+        var croak = document.getElementById('logoCroak');
+        if(croak && !muted){ croak.volume = 0.7; croak.playbackRate = 0.8; croak.currentTime = 0; croak.play().catch(function(){}); }
+      }
+    } else if(tongue.phase === 'burp'){
+      if(tongue.t >= TONGUE_BURP){ tongue.caught = false; endTongue(); }
+    }
+  }
+  // Burp bubbles: small lime-green bubbles that stream out of his mouth,
+  // wobble as they float up and away, then pop.
+  var bubbles = [];
+  function burpMouth(){
+    var img = sprites['frog-burp'];
+    var aspect = img && img.naturalWidth ? img.naturalWidth / img.naturalHeight : 512 / 457;
+    var drawH = player.h, drawW = drawH * aspect, x0 = player.x - (drawW - player.w) / 2;
+    var fx = player.facing === -1 ? 1 - 0.665 : 0.665;
+    return { x: x0 + drawW * fx, y: player.y + drawH * 0.53 };
+  }
+  function burpBubbles(x, y){
+    for(var i = 0; i < 12; i++){
+      bubbles.push({
+        x: x, y: y + (Math.random() - 0.5) * 8,
+        vx: player.facing * (1.2 + Math.random() * 2.4), vy: -0.4 - Math.random() * 1.1,
+        r: 2.5 + Math.random() * 4, life: 0, max: 40 + Math.random() * 40,
+        delay: i * 1.5, wob: Math.random() * 6.283, pop: 0
+      });
+    }
+  }
+  function updateBubbles(dt){
+    for(var i = 0; i < bubbles.length; i++){
+      var b = bubbles[i];
+      if(b.delay > 0){ b.delay -= dt; continue; }
+      if(b.pop > 0){ b.pop += dt; continue; }
+      b.life += dt; b.wob += 0.15 * dt;
+      b.x += (b.vx + Math.sin(b.wob) * 0.4) * dt; b.y += b.vy * dt;
+      b.vx *= Math.pow(0.97, dt); b.vy -= 0.01 * dt;
+      if(b.life >= b.max) b.pop = 0.01;
+    }
+    bubbles = bubbles.filter(function(b){ return b.pop < 8; });
+  }
+  function drawBubbles(){
+    for(var i = 0; i < bubbles.length; i++){
+      var b = bubbles[i];
+      if(b.delay > 0) continue;
+      ctx.save();
+      if(b.pop > 0){
+        // pop: a quick expanding ring that fades
+        ctx.globalAlpha = Math.max(0, 1 - b.pop / 8);
+        ctx.strokeStyle = '#d5e709'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.r + b.pop * 0.9, 0, 7); ctx.stroke();
+      } else {
+        ctx.fillStyle = 'rgba(213,231,9,0.18)'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill();
+        ctx.strokeStyle = 'rgba(213,231,9,0.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,230,0.85)'; ctx.fillRect(b.x - b.r * 0.45, b.y - b.r * 0.5, Math.max(1, b.r * 0.35), Math.max(1, b.r * 0.35));
+      }
+      ctx.restore();
+    }
+  }
+  function endTongue(){
+    if(tongue.caught && tongue.phase !== 'none' && window.jccFairy){ var m = mouthPos(); window.jccFairy.release(m.x - cam.x, m.y); }
+    tongue.phase = 'none'; tongue.t = 0; tongue.caught = false; tongue.cooldown = 240;   // about 4 seconds
+  }
+  function drawTongue(){
+    if(tongue.phase !== 'out' && tongue.phase !== 'in') return;
+    var m = mouthPos(), p;
+    if(tongue.phase === 'out') p = Math.min(1, tongue.t / TONGUE_OUT);
+    else p = 1 - Math.min(1, tongue.t / TONGUE_IN);
+    p = p * p * (3 - 2 * p);
+    var ex = m.x + (tongue.tx - m.x) * p, ey = m.y + (tongue.ty - m.y) * p;
+    var len = Math.hypot(ex - m.x, ey - m.y), T = Math.max(4, m.t);
+    ctx.save();
+    ctx.translate(m.x, m.y);
+    ctx.rotate(Math.atan2(ey - m.y, ex - m.x));
+    // Bands copied from the drawn tongue, top to bottom: dark outline,
+    // light highlight, main pink, darker underside, dark outline.
+    var bands = [[0.15, '#1a0606'], [0.15, '#f2b2b7'], [0.42, '#ea7c82'], [0.13, '#a8495b'], [0.15, '#1a0606']];
+    var yb = -T / 2;
+    for(var i = 0; i < bands.length; i++){ ctx.fillStyle = bands[i][1]; ctx.fillRect(-4, yb, len + 4, T * bands[i][0] + 0.4); yb += T * bands[i][0]; }   // starts 3px back, over the cut end of the drawn tongue, so there's no seam
+    // Round sticky tip, with the same outline
+    var R = T * 0.78;
+    ctx.fillStyle = '#1a0606'; ctx.beginPath(); ctx.arc(len, 0, R, 0, 7); ctx.fill();
+    ctx.fillStyle = '#ea7c82'; ctx.beginPath(); ctx.arc(len, 0, R - T * 0.15, 0, 7); ctx.fill();
+    ctx.fillStyle = '#f2b2b7'; ctx.beginPath(); ctx.arc(len - R * 0.25, -R * 0.3, R * 0.32, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+
   function update(dt){
     // Player state
     if(player.castTimer > 0) player.castTimer = Math.max(0, player.castTimer - dt);
@@ -1043,6 +1211,9 @@ var RETURN_PORTAL = null;
     } else {
       player.state = 'idle';
     }
+
+    updateTongue(dt);
+    updateBubbles(dt);
 
     // Apply portal bob glue BEFORE gravity
     if(player.onPortal >= 0 && player.onGround && portalPositions.length > 0){
@@ -1559,6 +1730,8 @@ var RETURN_PORTAL = null;
       ctx.fillRect(player.x, player.y, player.w, player.h);
     }
 
+    drawTongue();
+    drawBubbles();
     drawDialogue();
 
     ctx.restore();
@@ -1729,5 +1902,5 @@ window.addEventListener('pageshow', function(e){ if(e.persisted) location.reload
   if(about) about.addEventListener('click', function(){ this.blur(); go('about.html'); });
 })();
 </script>
-<script src="fairy-cursor.js?v=1" defer></script>
+<script src="fairy-cursor.js?v=2" defer></script>
 </body>
