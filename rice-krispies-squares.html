@@ -1242,7 +1242,7 @@
 <section class="context">
   <div class="context-header">
     <div class="context-eyebrow">Rice Krispies Squares</div>
-    <h1 class="context-title">Get<br/><em>Stuck In</em></h1>
+    <h1 class="context-title">Get <br class="phone-br"/><em>Stuck In</em></h1>
     <p class="context-tagline">A cereal treat so irresistible, it derailed the very team hired to sell it.</p>
     <div class="title-divider" aria-hidden="true"><span></span></div>
     <p class="context-role">ROLE</p>
@@ -1386,7 +1386,7 @@
   </a>
   <a href="mccain-lets-all-chip-in.html?from=7" class="project-nav-item next">
     <span class="nav-direction"><span class="nav-text-inner"><span class="nav-label">NEXT</span><svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"></line><polyline points="13 5 20 12 13 19"></polyline></svg></span></span>
-    <span class="nav-title"><span class="nav-text-inner">McCain • Let’s All Chip In</span></span>
+    <span class="nav-title"><span class="nav-text-inner">McCain • Let's All Chip In</span></span>
   </a>
 </nav>
 </div><!-- /smoke-zone -->
@@ -2396,6 +2396,11 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     width: 10px; height: 9px; flex-shrink: 0; position: relative; top: -2.4px;   /* optically centred on the capitals (the foot's weight sits low, in its palm) */
     background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
     opacity: 0.75; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  }
+
+  /* "Get Stuck In" on one line on desktop; phones keep the two-line stack */
+  @media not all and (max-width: 640px) and (hover: none) and (pointer: coarse) {
+    .context-title br.phone-br { display: none; }
   }
 </style>
 <button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
