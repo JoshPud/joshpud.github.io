@@ -1008,7 +1008,7 @@ var RETURN_PORTAL = null;
   var TONGUE_REACH = 300, TONGUE_OUT = 11, TONGUE_IN = 14, TONGUE_GULP = 42, TONGUE_BURP = 40;   // reach in px; timings in 60ths of a second
   // Where the drawn tongue stub ends in the tongue-out image (fractions of
   // the image), and the tongue's thickness as a fraction of its height.
-  var TONGUE_END_X = 0.805, TONGUE_END_Y = 0.554, TONGUE_THICK = 0.0295;
+  var TONGUE_END_X = 0.586, TONGUE_END_Y = 0.560, TONGUE_THICK = 0.0295;   // tongue starts deep inside his mouth, so it can point straight at the fairy at any angle
   function mouthPos(){
     var img = sprites['frog-tongue'];
     var aspect = img && img.naturalWidth ? img.naturalWidth / img.naturalHeight : 512 / 457;
@@ -1146,14 +1146,28 @@ var RETURN_PORTAL = null;
     ctx.rotate(Math.atan2(ey - m.y, ex - m.x));
     // Bands copied from the drawn tongue, top to bottom: dark outline,
     // light highlight, main pink, darker underside, dark outline.
+    // Sticky tip: a slightly long oval, outlined only on its outer edge.
+    // Drawn in three layers: (1) the tip's dark outline, (2) the tongue body
+    // on top (which covers that outline wherever the two overlap), then
+    // (3) the tip's pink fill, shading and highlight.
+    var RX = T * 0.95, RY = T * 0.68, O = T * 0.16;
+    ctx.fillStyle = '#1a0606'; ctx.beginPath(); ctx.ellipse(len, 0, RX + O, RY + O, 0, 0, 7); ctx.fill();
+    // Bands copied from the drawn tongue, top to bottom: dark outline,
+    // light highlight, main pink, darker underside, dark outline.
     var bands = [[0.15, '#1a0606'], [0.15, '#f2b2b7'], [0.42, '#ea7c82'], [0.13, '#a8495b'], [0.15, '#1a0606']];
     var yb = -T / 2;
-    for(var i = 0; i < bands.length; i++){ ctx.fillStyle = bands[i][1]; ctx.fillRect(-4, yb, len + 4, T * bands[i][0] + 0.4); yb += T * bands[i][0]; }   // starts 3px back, over the cut end of the drawn tongue, so there's no seam
-    // Round sticky tip, with the same outline
-    var R = T * 0.78;
-    ctx.fillStyle = '#1a0606'; ctx.beginPath(); ctx.arc(len, 0, R, 0, 7); ctx.fill();
-    ctx.fillStyle = '#ea7c82'; ctx.beginPath(); ctx.arc(len, 0, R - T * 0.15, 0, 7); ctx.fill();
-    ctx.fillStyle = '#f2b2b7'; ctx.beginPath(); ctx.arc(len - R * 0.25, -R * 0.3, R * 0.32, 0, 7); ctx.fill();
+    for(var i = 0; i < bands.length; i++){ ctx.fillStyle = bands[i][1]; ctx.fillRect(-4, yb, len + 4, T * bands[i][0] + 0.4); yb += T * bands[i][0]; }
+    ctx.fillStyle = '#ea7c82'; ctx.beginPath(); ctx.ellipse(len, 0, RX, RY, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = '#a8495b'; ctx.beginPath(); ctx.ellipse(len + RX * 0.1, RY * 0.45, RX * 0.8, RY * 0.45, 0, 0, Math.PI); ctx.fill();   // underside shade
+    ctx.fillStyle = '#f2b2b7'; ctx.beginPath(); ctx.ellipse(len + RX * 0.05, -RY * 0.42, RX * 0.45, RY * 0.22, 0, 0, 7); ctx.fill();    // highlight
+    // Shadow inside his mouth: the part of the tongue still between his lips
+    // is darker, fading to its normal pink where it leaves his mouth.
+    var shadowLen = Math.min(len, T * 3.4);
+    var sg = ctx.createLinearGradient(-4, 0, shadowLen, 0);
+    sg.addColorStop(0, 'rgba(40,6,12,0.62)');
+    sg.addColorStop(0.55, 'rgba(40,6,12,0.32)');
+    sg.addColorStop(1, 'rgba(40,6,12,0)');
+    ctx.fillStyle = sg; ctx.fillRect(-4, -T / 2, shadowLen + 4, T);
     ctx.restore();
   }
 
