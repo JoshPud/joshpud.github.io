@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>[DEPTH preview] Joshua Crossley Creative</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IM+Fell+English:ital@1&family=Spectral:wght@600&display=swap" rel="stylesheet"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #titleScreen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    image-rendering: pixelated;
+  }
+
+  /* Sky gradient - dark swamp */
+  #titleBg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      #0a0a1a 0%,
+      #0f1a0f 40%,
+      #0d1f0d 70%,
+      #060d06 100%
+    );
+  }
+
+  /* Stars */
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle 2s infinite alternate;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.2; }
+    to { opacity: 1; }
+  }
+
+  /* Swamp mist */
+  .mist {
+    position: absolute;
+    bottom: 0;
+    left: -50%;
+    width: 200%;
+    height: 180px;
+    background: radial-gradient(ellipse at center, rgba(20,60,20,0.4) 0%, transparent 70%);
+    animation: driftMist 8s ease-in-out infinite alternate;
+  }
+  @keyframes driftMist {
+    from { transform: translateX(0); }
+    to { transform: translateX(5%); }
+  }
+
+  /* Pixel trees silhouette */
+  .trees {
+    position: absolute;
+    bottom: 120px;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background:
+      /* Tree shapes using box shadows via clip-path workaround - using pure CSS pixel trees */
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px, transparent 60px,
+        #0a1a0a 60px, #0a1a0a 80px,
+        transparent 80px, transparent 140px
+      );
+    opacity: 0.8;
+  }
+
+  /* Vines */
+  .vine {
+    position: absolute;
+    top: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #1a3a1a, #2d5a2d, #1a3a1a, transparent);
+    border-radius: 2px;
+    animation: sway 3s ease-in-out infinite alternate;
+    transform-origin: top center;
+  }
+  @keyframes sway {
+    from { transform: rotate(-3deg); }
+    to { transform: rotate(3deg); }
+  }
+
+
+
+  /* Main content */
+  #titleContent {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 80px;
+  }
+
+  /* Chartreuse decorative line */
+  .title-line {
+    width: 400px;
+    height: 3px;
+    background: linear-gradient(to right, transparent, #d5e709, transparent);
+    margin: 1rem 0;
+  }
+
+  /* Logo */
+  #gameLogo {
+    width: min(55vw, 480px);
+    height: auto;
+    filter: drop-shadow(0 0 20px rgba(213,231,9,0.4));
+    margin-bottom: 0.5rem;
+  }
+
+  /* Subtitle */
+  .title-sub {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: #FF8902;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 8px rgba(255,137,2,0.6));
+  }
+
+  /* Press start */
+  #pressStart {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.75rem, 1.8vw, 1.1rem);
+    color: #d5e709;
+    letter-spacing: 2px;
+    margin-top: 2.5rem;
+    animation: blink 1s steps(1) infinite;
+    filter: drop-shadow(0 0 8px rgba(213,231,9,0.8));
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Fade overlay */
+  #fadeOverlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: opacity 1s ease;
+  }
+  #fadeOverlay.fading {
+    opacity: 1;
+  }
+
+  /* Scanline effect */
+  #scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.15) 3px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  /* CRT vignette */
+  #vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+    z-index: 201;
+  }
+
+  #muteBtn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    visibility: hidden;
+    background: rgba(0,0,0,0.6);
+    border: 2px solid #d5e709;
+    color: #d5e709;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    padding: 6px 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    image-rendering: pixelated;
+  }
+  #muteBtn:hover { background: rgba(213,231,9,0.15); }
+
+  #hud {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 9999;
+    display: none;
+    padding: 14px 8px;
+    background: rgba(0,0,0,0.5);
+    color: #d5e709;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    line-height: 1;
+    white-space: pre;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  #gameplayLogo {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 48px;
+    width: auto;
+    opacity: 1;
+    z-index: 9999;
+    pointer-events: auto;
+    display: none;
+    cursor: pointer;
+  }
+  /* ═══════════ TOP-RIGHT WORD MENU (same as the landing page) ═══════════
+     The three buttons become gold words in the top right (lettered like the
+     project labels), with small frog-foot dividers. On hover, a bright copy
+     of each word fills in from left to right (as on the Shadow of War site). */
+  #gameNav {
+    top: 22px; right: 28px; bottom: auto;
+    gap: 14px; align-items: center;
+  }
+  #gameNav button {
+    height: auto; padding: 4px 0;
+    font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 3px; color: #FBCEA0; text-shadow: none;
+  }
+  #gameNav button::before, #gameNav button::after { content: none; display: none; }
+  #gameNav .gx-t { display: inline-block; position: relative; }
+  #gameNav .gx-t::before {
+    content: attr(data-t); position: absolute; left: 0; top: 0;
+    color: transparent; text-shadow: 0 2px 5px rgba(0,0,0,0.55);
+  }
+  #gameNav .gx-t span {
+    display: block; position: relative;
+    background: linear-gradient(180deg, #FFE9C4 0%, #FBCEA0 45%, #B88A4E 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #gameNav .gx-t::after {
+    content: attr(data-t); position: absolute; top: 0; left: 0; z-index: 2;
+    width: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+    color: #FFF6E2; text-shadow: 0 0 8px rgba(255,214,150,0.55);
+    transition: opacity 0.4s 0.2s, width 0.6s;
+  }
+  #gameNav button:hover .gx-t::after,
+  #gameNav button:focus-visible .gx-t::after { opacity: 1; width: 100%; transition: opacity 0.4s, width 0.6s; }
+  #gameNav .gx-foot {
+    width: 10px; height: 9px; flex-shrink: 0; position: relative; top: -1.5px;   /* centred on the capitals, not the text box */
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
+    opacity: 0.75; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  }
+  #gameNav { position: fixed; z-index: 9999; display: flex; visibility: hidden; }
+  #gameNav button { background: transparent; border: none; cursor: pointer; text-transform: uppercase; line-height: 1; white-space: nowrap; }
+  /* the old pixel SOUND box styling no longer applies */
+  #gameNav #muteBtn { position: static; visibility: inherit; border: none; background: transparent; image-rendering: auto; }
+</style>
+<script>
+  // iPhones mute web page sound effects and music when the phone's silent
+  // switch is on (sound made by the page itself, as opposed to video).
+  // Tell Safari this site's sounds are part of the experience, like a game,
+  // so they play like other media do. Ignored by browsers that don't support it.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+</script>
+</head>
+<body>
+
+<div id="fadeOverlay"></div>
+<audio id="teleportSound" src="TELEPORT_SOUND.MP3" preload="auto"></audio>
+<audio id="fireballScream" src="FROG_SCREAM.mp3" preload="auto"></audio>
+<audio id="tortoiseHit1" src="TORTOISE_HIT_1.mp3" preload="auto"></audio>
+<audio id="tortoiseHit2" src="TORTOISE_HIT_2.mp3" preload="auto"></audio>
+<audio id="tortoiseHit3" src="TORTOISE_HIT_3.mp3" preload="auto"></audio>
+<audio id="tortoiseDead" src="TORTOISE_DEAD_2.mp3" preload="auto"></audio>
+<audio id="bgMusic" src="scizzie_-_aquatic_ambience.mp3" preload="auto"></audio>
+<audio id="logoCroak" src="FROG_CROAK.mp3" preload="auto"></audio>
+<audio id="tongueSound" src="frog_tongue.mp3" preload="auto"></audio>
+<audio id="helpScream" src="frog_help_scream.mp3" preload="auto"></audio>
+<audio id="ohNo" src="frog_ohno.mp3" preload="auto"></audio>
+<nav id="gameNav" aria-label="Site">
+  <button id="muteBtn"><span class="gx-t" data-t="Music"><span>Music</span></span></button>
+  <i class="gx-foot" aria-hidden="true"></i>
+  <button id="hopBtn"><span class="gx-t" data-t="Hop to the work"><span>Hop to the work</span></span></button>
+  <i class="gx-foot" aria-hidden="true"></i>
+  <button id="aboutBtn"><span class="gx-t" data-t="About me"><span>About me</span></span></button>
+</nav>
+<img src="JCC_LOGO_LIME_NAV.png" id="gameplayLogo" alt="Joshua Crossley Creative" decoding="async" loading="eager"/>
+<script>window.JCC_METAL = 'lime';</script>
+<script src="chrome-logo.js?v=4"></script>
+<div id="hud">ARROWS: MOVE / JUMP / NAP   SPACE: FIREBALL</div>
+<div id="scanlines"></div>
+<div id="vignette"></div>
+
+<script>
+var RETURN_PORTAL = null;
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var rp = params.get('returnPortal');
+  if(rp !== null && rp !== '' && !isNaN(parseInt(rp))) RETURN_PORTAL = parseInt(rp);
+})();
+</script>
+<script>
+
+// ── GAME WORLD
+(function(){
+
+  var fadeOverlay = document.getElementById('fadeOverlay');
+
+  // Canvas setup
+  var canvas = document.createElement('canvas');
+  canvas.id = 'gameCanvas';
+  canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;display:none;image-rendering:pixelated;background:#000;';
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false; // crisp pixel art, and cheaper to render than the default bilinear smoothing
+
+  var skyGrad = null;
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    GROUND_Y = Math.floor(canvas.height * 0.85);
+    platforms = makePlatforms();
+    // Rebuild the cached sky gradient only when canvas size actually
+    // changes - it was previously being created from scratch every
+    // single frame in draw(), which gets more expensive the larger the
+    // browser window is (full window vs a small preview pane, say).
+    skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    skyGrad.addColorStop(0, '#0a0a1a');
+    skyGrad.addColorStop(0.6, '#0f1a0f');
+    skyGrad.addColorStop(1, '#0d2006');
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ── WORLD CONSTANTS
+  // Jump is tuned to keep roughly the same height as before (~290px) but
+  // with a snappier arc: gravity and launch speed scaled together
+  var GRAVITY = 0.95;
+  var JUMP_FORCE = -23.5;
+  var MOVE_SPEED = 9;
+  var WORLD_WIDTH = 11300;
+
+  // ── PLATFORMS
+  // Ground height - frog stands here
+  var GROUND_Y = Math.floor(canvas.height * 0.85);
+  var GROUND_H = canvas.height; // extends to bottom of screen
+
+  // Platforms defined relative to GROUND_Y so they scale with screen
+  function makePlatforms(){
+    return []; // Portals replace platforms
+  }
+  var platforms = makePlatforms();
+
+
+  // ── AUDIO ENGINE
+  var audioCtx = null;
+  function getAudio(){
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playTone(freq, type, duration, volume, freqEnd){
+    try {
+      var ctx = getAudio();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = type || 'square';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      if(freqEnd) osc.frequency.linearRampToValueAtTime(freqEnd, ctx.currentTime + duration);
+      gain.gain.setValueAtTime(volume || 0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    } catch(e){}
+  }
+
+  function sfxJump(){ if(muted) return;
+    playTone(180, 'square', 0.12, 0.18, 420);
+  }
+
+  function sfxFireball(){ if(muted) return;
+    var scream = document.getElementById('fireballScream');
+    if(scream){ scream.currentTime = 0; scream.play(); }
+  }
+
+  // Volumes for the tortoise clips (1 = full). About 0.7 is roughly 3dB quieter.
+  var TORTOISE_HIT_VOLUME = 0.7;
+  var TORTOISE_DEAD_VOLUME = 0.7;
+
+  var tortoiseHitSounds = ['tortoiseHit1', 'tortoiseHit2', 'tortoiseHit3'];
+  function sfxHit(){ if(muted) return;
+    var id = tortoiseHitSounds[Math.floor(Math.random() * tortoiseHitSounds.length)];
+    var clip = document.getElementById(id);
+    if(clip){ clip.volume = TORTOISE_HIT_VOLUME; clip.currentTime = 0; clip.play().catch(function(){}); }
+  }
+
+  function sfxDeath(){
+    if(muted) return;
+    var clip = document.getElementById('tortoiseDead');
+    if(clip){ clip.volume = TORTOISE_DEAD_VOLUME; clip.currentTime = 0; clip.play().catch(function(){}); }
+  }
+
+  // Dull "thud" for fireballs landing on the dead tortoise: a low pitch drop
+  // for the body, plus a very short mid-range knock on top so it still reads
+  // on laptop speakers, which can barely reproduce the deep part.
+  function sfxThud(){
+    if(muted) return;
+    playTone(160, 'triangle', 0.22, 0.45, 42);
+    playTone(95, 'square', 0.09, 0.14, 45);
+    playTone(320, 'square', 0.03, 0.07, 140);
+  }
+
+    function sfxBubble(){ if(muted) return;
+    playTone(440, 'square', 0.06, 0.12, 660);
+    setTimeout(function(){ playTone(660, 'square', 0.08, 0.1, 440); }, 60);
+  }
+
+  // Tiny typewriter blip for the frog's intro dialogue. Skipped if the
+  // audio context is not running yet, so a suspended context can never
+  // queue up a burst of blips that all fire at once when it wakes.
+  function sfxType(){
+    if(muted) return;
+    var ctx = getAudio();
+    if(ctx.state !== 'running') return;
+    playTone(640 + Math.random() * 120, 'square', 0.03, 0.04);
+  }
+
+  // ── CHIPTUNE TITLE MUSIC
+  var titleMusicPlaying = false;
+  var titleMusicNodes = [];
+
+  function stopTitleMusic(){
+    titleMusicPlaying = false;
+    titleMusicNodes.forEach(function(n){ try{ n.stop(); }catch(e){} });
+    titleMusicNodes = [];
+  }
+
+  function playTitleMusic(){
+    if(titleMusicPlaying || muted) return;
+    titleMusicPlaying = true;
+    var ctx = getAudio();
+
+    // Simple dark fantasy loop - minor key melody
+    var melody = [
+      [220, 0.25], [261, 0.25], [293, 0.25], [261, 0.25],
+      [220, 0.5],  [196, 0.25], [220, 0.25],
+      [174, 0.25], [196, 0.25], [220, 0.25], [196, 0.25],
+      [174, 0.5],  [155, 0.25], [174, 0.25],
+      [196, 0.25], [220, 0.25], [246, 0.25], [220, 0.25],
+      [196, 0.5],  [174, 0.25], [196, 0.25],
+      [220, 0.25], [196, 0.25], [174, 0.25], [155, 0.25],
+      [146, 1.0]
+    ];
+
+    var bass = [
+      [110, 0.5], [130, 0.5], [146, 0.5], [130, 0.5],
+      [110, 0.5], [98,  0.5], [110, 0.5], [87,  0.5],
+      [98,  0.5], [110, 0.5], [123, 0.5], [110, 0.5],
+      [98,  0.5], [87,  0.5], [98,  0.5], [73,  1.0]
+    ];
+
+    function scheduleMelody(notes, type, vol, loop){
+      if(!titleMusicPlaying) return;
+      var t = ctx.currentTime + 0.1;
+      var totalDur = 0;
+      notes.forEach(function(n){
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = type;
+        osc.frequency.value = n[0];
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + n[1] - 0.02);
+        osc.start(t);
+        osc.stop(t + n[1]);
+        titleMusicNodes.push(osc);
+        t += n[1];
+        totalDur += n[1];
+      });
+      if(loop && titleMusicPlaying){
+        setTimeout(function(){ scheduleMelody(notes, type, vol, loop); }, totalDur * 1000);
+      }
+    }
+
+    scheduleMelody(melody, 'square', 0.08, true);
+    scheduleMelody(bass, 'triangle', 0.06, true);
+  }
+
+  // ── GAME MUSIC (scizzie_-_aquatic_ambience.mp3)
+  // The track fades out at its end and comes back in at full level, so instead
+  // of the audio element's own loop it is restarted by hand with a fade-in.
+  var BG_MUSIC_VOLUME = 0.53;  // 1 = full. This track is about 5dB quieter than the last one, so this gives the same loudness. Lower it if it competes with the sound effects
+  var BG_FADE_IN_MS = 2000;
+  var BG_FADE_OUT_MS = 400;
+  var gameMusicPlaying = false;
+  var bgFadeTimer = null;
+  var bgUnlockPending = false;
+
+  function fadeBgMusicTo(target, ms, done){
+    var el = document.getElementById('bgMusic');
+    if(!el) return;
+    clearInterval(bgFadeTimer);
+    var from = el.volume;
+    var steps = Math.max(1, Math.round(ms / 50));
+    var i = 0;
+    bgFadeTimer = setInterval(function(){
+      i++;
+      el.volume = Math.max(0, Math.min(1, from + (target - from) * (i / steps)));
+      if(i >= steps){
+        clearInterval(bgFadeTimer);
+        if(done) done();
+      }
+    }, 50);
+  }
+
+  // Browsers can refuse to autoplay: if so, start on the first key press or click
+  function unlockBgMusic(){
+    if(bgUnlockPending) return;
+    bgUnlockPending = true;
+    function go(){
+      document.removeEventListener('keydown', go);
+      document.removeEventListener('click', go);
+      bgUnlockPending = false;
+      if(gameMusicPlaying && !muted) startBgMusic();
+    }
+    document.addEventListener('keydown', go);
+    document.addEventListener('click', go);
+  }
+
+  function startBgMusic(){
+    var el = document.getElementById('bgMusic');
+    if(!el) return;
+    el.volume = 0;
+    var p = el.play();
+    if(p && p.then){
+      p.then(function(){
+        if(gameMusicPlaying && !muted) fadeBgMusicTo(BG_MUSIC_VOLUME, BG_FADE_IN_MS);
+      }).catch(function(){ unlockBgMusic(); });
+    } else {
+      fadeBgMusicTo(BG_MUSIC_VOLUME, BG_FADE_IN_MS);
+    }
+  }
+
+  function stopGameMusic(){
+    gameMusicPlaying = false;
+    var el = document.getElementById('bgMusic');
+    if(!el) return;
+    fadeBgMusicTo(0, BG_FADE_OUT_MS, function(){ el.pause(); });
+  }
+
+  function playGameMusic(){
+    if(gameMusicPlaying || muted) return;
+    gameMusicPlaying = true;
+    startBgMusic();
+  }
+
+  (function(){
+    var el = document.getElementById('bgMusic');
+    if(!el) return;
+    el.addEventListener('ended', function(){
+      if(!gameMusicPlaying || muted) return;
+      el.currentTime = 0;
+      startBgMusic();
+    });
+  })();
+
+
+  // ── MUTE TOGGLE
+  var muted = false;
+  document.getElementById('muteBtn').addEventListener('click', function(){
+    muted = !muted;
+    var t = this.querySelector('.gx-t'), inner = t.querySelector('span');
+    t.setAttribute('data-t', muted ? '(Muted)' : 'Music'); inner.textContent = muted ? '(Muted)' : 'Music';
+    this.blur();   // so Space (fireball) and Enter (portals) don't press it again
+    if(audioCtx) audioCtx.suspend && (muted ? audioCtx.suspend() : audioCtx.resume());
+    if(muted){
+      stopTitleMusic();
+      stopGameMusic();
+    } else {
+      if(canvas.style.display === 'block') playGameMusic();
+      else playTitleMusic();
+    }
+  });
+
+  // ── SPRITES
+  var sprites = {};
+  var spritesLoaded = 0;
+  var spritesTotal = 10;
+  sprites["frog-idle"] = new Image();
+  sprites["frog-idle"].onload = function(){ spritesLoaded++; };
+  sprites["frog-idle"].src = "frog-idle.png";
+  sprites["frog-walk1"] = new Image();
+  sprites["frog-walk1"].onload = function(){ spritesLoaded++; };
+  sprites["frog-walk1"].src = "frog-walk1.png";
+  sprites["frog-walk2"] = new Image();
+  sprites["frog-walk2"].onload = function(){ spritesLoaded++; };
+  sprites["frog-walk2"].src = "frog-walk2.png";
+  sprites["frog-walk3"] = new Image();
+  sprites["frog-walk3"].onload = function(){ spritesLoaded++; };
+  sprites["frog-walk3"].src = "frog-walk3.png";
+  sprites["frog-jump-crouch"] = new Image();
+  sprites["frog-jump-crouch"].onload = function(){ spritesLoaded++; };
+  sprites["frog-jump-crouch"].src = "frog-jump-crouch.png";
+  sprites["frog-jump-air"] = new Image();
+  sprites["frog-jump-air"].onload = function(){ spritesLoaded++; };
+  sprites["frog-jump-air"].src = "frog-jump-air.png";
+  sprites["frog-cast"] = new Image();
+  sprites["frog-cast"].onload = function(){ spritesLoaded++; };
+  sprites["frog-cast"].src = "frog-cast.png";
+  // Tongue-out frog (his own tongue drawn in, cut off just before the tip;
+  // the code draws the rest of it out to the fairy)
+  sprites["frog-tongue"] = new Image();
+  sprites["frog-tongue"].src = "frog-tongue.png";
+  // Swallowed (smug belly pat, glowing tummy) and the burp that follows
+  sprites["frog-gulp"] = new Image(); sprites["frog-gulp"].src = "frog-gulp.png";
+  sprites["frog-burp"] = new Image(); sprites["frog-burp"].src = "frog-burp.png";
+  sprites["frog-sleep"] = new Image();
+  sprites["frog-sleep"].onload = function(){ spritesLoaded++; };
+  sprites["frog-sleep"].src = "frog-sleep.png";
+  sprites["tortoise-idle"] = new Image();
+  sprites["tortoise-idle"].onload = function(){ spritesLoaded++; };
+  sprites["tortoise-idle"].src = "tortoise-idle_purple.png";
+  sprites["portal"] = new Image();
+  sprites["portal"].onload = function(){ spritesLoaded++; };
+  sprites["portal"].src = "home-portal.png";
+  // Animated portal frame sequence (44 frames, 12fps), falls back to the
+  // static sprite above until frames finish loading
+  var portalFrames = [];
+  var portalFramesLoaded = 0;
+  var PORTAL_FRAME_COUNT = 44;
+  for(var pfi = 1; pfi <= PORTAL_FRAME_COUNT; pfi++){
+    var pfNum = pfi < 10 ? '0' + pfi : '' + pfi;
+    var pfImg = new Image();
+    pfImg.onload = function(){ portalFramesLoaded++; };
+    pfImg.src = 'portal-frame-' + pfNum + '.webp';
+    portalFrames.push(pfImg);
+  }
+  var portalAnimFrame = 0;
+  var portalAnimTimer = 0;
+  var PORTAL_ANIM_FRAME_SPEED = 8; // ~7.5fps at a ~60fps update loop
+
+  sprites["frog-enter"] = new Image();
+  sprites["frog-enter"].onload = function(){ spritesLoaded++; };
+  sprites["frog-enter"].src = "frog-enter.png";
+  sprites["bgSky"] = new Image();
+  sprites["bgSky"].onload = function(){ spritesLoaded++; };
+  sprites["bgSky"].src = "BACKGROUND.png";
+  sprites["groundTile"] = new Image();
+  sprites["groundTile"].onload = function(){ spritesLoaded++; };
+  sprites["groundTile"].src = "soil-repeat-tile.png";
+  // "BEWARE SHELLTON" sign near the start, hinting at the turtle further on
+  sprites["shelltonSign"] = new Image();
+  sprites["shelltonSign"].src = "beware-shellton.png";
+  sprites["tortoise-ghost"] = new Image();
+  sprites["tortoise-ghost"].onload = function(){ spritesLoaded++; };
+  sprites["tortoise-ghost"].src = "tortoise-ghost.png";
+  sprites["tortoise-hit"] = new Image();
+  sprites["tortoise-hit"].onload = function(){ spritesLoaded++; };
+  sprites["tortoise-hit"].src = "tortoise-hit_purple.png";
+  sprites["tortoise-dead"] = new Image();
+  sprites["tortoise-dead"].onload = function(){ spritesLoaded++; };
+  sprites["tortoise-dead"].src = "tortoise-dead_purple.png";
+
+  // ── PLAYER
+  var player = {
+    x: 80, y: 400,
+    w: 80, h: 200, // collision width (narrower than sprite)
+    spriteW: 160, // drawn width
+    vx: 0, vy: 0,
+    onGround: false,
+    jumpsLeft: 2,
+    facing: 1,
+    state: 'idle',
+    sleeping: false,
+    castTimer: 0,
+    animFrame: 0,
+    animTimer: 0,
+    onPortal: -1,
+    lastBobY: 0,
+    enteringPortal: false,
+    enterTimer: 0
+  };
+
+  // ── ENEMY
+  var enemy = {
+    x: 10800, y: 0,
+    w: 400, h: 440,
+    color: '#6a4378',
+    alive: true,
+    dying: false,
+    hitCount: 0,
+    hitFlash: 0,
+    maxHits: 10,
+    bubble: null,
+    bubbleTimer: 0,
+    ghostY: 0,
+    ghostRisen: false,
+    ghostTimer: 0,
+    ghostBobOffset: 0,
+    ghostHits: 0
+  };
+
+  // One line per hit, in order (hits 1 to 9). The 10th hit is the death line.
+  var enemyMessages = [
+    "What the hell?",
+    "What made you think\nI was an enemy?",
+    "Do you always attack anything\nthat's different from you?",
+    "Why do you think\nthat might be?",
+    "You didn't even say hello.\nYou just opened with a fireball.",
+    "Hurt people hurt people,\nyou know.",
+    "You don't even look angry.\nThat's the worrying part.",
+    "Do you not think I've\nsufficiently been burnt?",
+    "I'm not mad.\nI'm just disappointed."
+  ];
+
+
+
+
+  // ── PORTALS
+  var PORTAL_H = 640;
+  var PORTAL_W = 440;
+  var PORTAL_GRASS_RATIO = 0.65;
+
+  var portalPositions = [];
+  var PORTAL_COUNT = 18;
+
+  // Display name shown above each portal, in order
+  var PROJECT_NAMES = [
+    'Lucozade • Back for the Believers',
+    'Somersby',
+    'Royal British Legion',
+    'McCain • Anything Goes',
+    'Uber Eats',
+    '#PlaywithPringles',
+    'Rice Krispies Squares',
+    'McCain • Let\'s All Chip In',
+    'Lidl • GBBO',
+    'Lidl • Xmas Jumper',
+    'Pringles • Step Up the Spice',
+    'Crunchy Nut',
+    'Sprite',
+    'Audi',
+    'Emirates',
+    'TikTok',
+    'Heinz',
+    'Lego'
+  ];
+
+  // Destination page for each portal, in order
+  var PROJECT_PAGES = [
+    'lucozade-back-for-the-believers.html',
+    'somersby.html',
+    'royal-british-legion.html',
+    'mccain-anything-goes.html',
+    'uber-eats.html',
+    'playwithpringles.html',
+    'rice-krispies-squares.html',
+    'mccain-lets-all-chip-in.html',
+    'lidl-gbbo.html',
+    'lidl-xmas-jumper.html',
+    'pringles-step-up-the-spice.html',
+    'crunchy-nut.html',
+    'sprite.html',
+    'audi.html',
+    'emirates.html',
+    'tiktok.html',
+    'heinz.html',
+    'lego.html'
+  ];
+  function makePlatformPortals(){
+    portalPositions = [];
+    var heightOffsets = [0, -60, -30, -80, -20, -70, -40, -90, -10, -50, -25, -65, -35, -85, -15, -55, -45, -75];
+    for(var i = 0; i < PORTAL_COUNT; i++){
+      var px = 600 + i * 550;
+      var grassY = GROUND_Y - 200 + heightOffsets[i % heightOffsets.length];
+      portalPositions.push({
+        x: px,
+        grassY: grassY,
+        imgY: grassY - PORTAL_H * PORTAL_GRASS_RATIO
+      });
+    }
+  }
+
+
+  // ── ZZZ PARTICLES
+  var zzzParticles = [];
+  var zzzTimer = 0;
+
+  // ── FIREBALLS
+  var fireballs = [];
+
+  // ── CAMERA
+  var cam = { x: 0 };
+
+  // Enemy Y set after GROUND_Y is known
+  function placeEnemy(){ enemy.y = GROUND_Y - enemy.h; }
+
+  // ── FROG INTRO DIALOGUE
+  // One-off speech bubble above the frog on a fresh start (not when arriving
+  // back from a project page). It types itself out, then disappears on the
+  // player's first action: move, jump or fireball.
+  var DIALOGUE_TEXT = 'Embark on your\nperilous journey...';
+  var DIALOGUE_DELAY_MS = 2300;   // wait for the scene fade-in (~2s) plus a beat
+  var DIALOGUE_CHAR_DELAY = 2.5;  // frames per character (~24 chars/sec at 60fps)
+  var DIALOGUE_DOT_DELAY = 10;    // extra pause after each full stop
+  var DIALOGUE_FADE_FRAMES = 12;  // stepped fade-out, 4 steps
+  var DIALOGUE_FONT_PX = 12;
+  var DIALOGUE_GAP = 16;          // gap between bubble and top of the frog
+  var dialogue = {
+    state: 'idle',  // idle | typing | shown | fading | done
+    chars: 0,       // characters revealed so far
+    timer: 0,       // frames since the last character appeared
+    fade: 0         // frames spent fading out
+  };
+
+  function startDialogue(){
+    if(dialogue.state !== 'idle') return;
+    dialogue.state = 'typing';
+    dialogue.chars = 0;
+    dialogue.timer = 0;
+  }
+
+  function dismissDialogue(){
+    if(dialogue.state === 'idle'){
+      dialogue.state = 'done'; // moved before it started, so never show it
+    } else if(dialogue.state === 'typing' || dialogue.state === 'shown'){
+      dialogue.state = 'fading';
+      dialogue.fade = 0;
+    }
+  }
+
+  function updateDialogue(dt){
+    if(dialogue.state === 'typing'){
+      dialogue.timer += dt;
+      var prev = dialogue.chars > 0 ? DIALOGUE_TEXT.charAt(dialogue.chars - 1) : '';
+      var wait = DIALOGUE_CHAR_DELAY + (prev === '.' ? DIALOGUE_DOT_DELAY : 0);
+      if(dialogue.timer >= wait){
+        dialogue.timer -= wait;
+        dialogue.chars++;
+        var ch = DIALOGUE_TEXT.charAt(dialogue.chars - 1);
+        if(ch !== ' ' && ch !== '\n') sfxType();
+        if(dialogue.chars >= DIALOGUE_TEXT.length) dialogue.state = 'shown';
+      }
+    } else if(dialogue.state === 'fading'){
+      dialogue.fade += dt;
+      if(dialogue.fade >= DIALOGUE_FADE_FRAMES) dialogue.state = 'done';
+    }
+  }
+
+  // ── SPEECH BUBBLE STYLE
+  // Dark brown box, lime outline, stepped (notched) corners, pixel drop
+  // shadow, stepped tail. Shared by the frog's dialogue and the tortoise.
+  var BUBBLE_LIME = '#d5e709';
+  var BUBBLE_BROWN = '#2b1a10';
+  var BUBBLE_TEXT = '#f5f2ec';
+  var BUBBLE_SHADOW = 'rgba(0,0,0,0.45)';
+  // One "pixel" of the bubble frame. Sized to sit in step with the 12px type.
+  var BUBBLE_U = 3;
+
+  // Snap a world x so it lands on a whole screen pixel after the camera
+  // translate, which keeps the pixel edges crisp while the camera moves
+  function snapBubbleX(x){ return Math.round(x - cam.x) + cam.x; }
+
+  function notchRects(x, y, w, h, colour){
+    var u = BUBBLE_U;
+    ctx.fillStyle = colour;
+    ctx.fillRect(x + u, y, w - 2 * u, h);
+    ctx.fillRect(x, y + u, w, h - 2 * u);
+  }
+
+  // bx, by, bw, bh: box position and size. tx: x of the tail's centre.
+  function drawBubble(bx, by, bw, bh, tx){
+    var u = BUBBLE_U;
+    notchRects(bx + u, by + u, bw, bh, BUBBLE_SHADOW);
+    notchRects(bx, by, bw, bh, BUBBLE_LIME);
+    notchRects(bx + u, by + u, bw - 2 * u, bh - 2 * u, BUBBLE_BROWN);
+    var ty = by + bh - u;
+    ctx.fillStyle = BUBBLE_LIME;
+    ctx.fillRect(tx - 4 * u, ty,          8 * u, u);
+    ctx.fillRect(tx - 3 * u, ty + u,      6 * u, u);
+    ctx.fillRect(tx - 2 * u, ty + 2 * u,  4 * u, u);
+    ctx.fillRect(tx - u,     ty + 3 * u,  2 * u, u);
+    ctx.fillStyle = BUBBLE_BROWN;
+    ctx.fillRect(tx - 3 * u, ty,          6 * u, u);
+    ctx.fillRect(tx - 2 * u, ty + u,      4 * u, u);
+    ctx.fillRect(tx - u,     ty + 2 * u,  2 * u, u);
+  }
+
+  // Drawn in world space (inside the camera translate), same look as the
+  // tortoise's bubble. The box is sized from the full text so it does not
+  // resize while typing, and the text is left-aligned so letters do not jitter.
+  function drawDialogue(){
+    if(dialogue.state === 'idle' || dialogue.state === 'done') return;
+
+    var alpha = 1;
+    if(dialogue.state === 'fading'){
+      alpha = (4 - Math.floor(dialogue.fade / DIALOGUE_FADE_FRAMES * 4)) / 4;
+      if(alpha <= 0) return;
+    }
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.font = DIALOGUE_FONT_PX + 'px "Press Start 2P"';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+
+    var fullLines = DIALOGUE_TEXT.split('\n');
+    var maxW = 0;
+    for(var i = 0; i < fullLines.length; i++){
+      maxW = Math.max(maxW, ctx.measureText(fullLines[i]).width);
+    }
+    var padX = 18, padY = 14, lineH = 24;
+    var bw = Math.ceil(maxW) + padX * 2;
+    var bh = padY * 2 + DIALOGUE_FONT_PX + (fullLines.length - 1) * lineH;
+
+    var frogCenterX = player.x + player.w / 2;
+    var bx = Math.round(frogCenterX - bw / 2);
+    bx = Math.max(Math.round(cam.x) + 10, Math.min(bx, Math.round(cam.x + canvas.width) - bw - 10));
+    var by = Math.round(player.y - bh - DIALOGUE_GAP);
+    var tailX = Math.round(Math.max(bx + 24, Math.min(frogCenterX, bx + bw - 24)));
+
+    bx = snapBubbleX(bx);
+    tailX = snapBubbleX(tailX);
+    drawBubble(bx, by, bw, bh, tailX);
+
+    // Revealed text only
+    ctx.fillStyle = BUBBLE_TEXT;
+    var shownLines = DIALOGUE_TEXT.substr(0, dialogue.chars).split('\n');
+    for(var l = 0; l < shownLines.length; l++){
+      ctx.fillText(shownLines[l], bx + padX, by + padY + l * lineH);
+    }
+    ctx.restore();
+  }
+
+  // ── KEYS
+  var keys = {};
+  document.addEventListener('keydown', function(e){
+    keys[e.key] = true;
+    // First move, jump or fireball clears the intro dialogue
+    if(e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === ' '){
+      dismissDialogue();
+    }
+    // Prevent page scroll
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].indexOf(e.key) > -1){
+      e.preventDefault();
+    }
+    if(e.key === ' ' && !e.repeat && !player.sleeping){
+      sfxFireball();
+      player.castTimer = 25;
+      player.sleeping = false;
+      fireballs.push({
+        x: player.x + (player.facing === 1 ? player.w : 0),
+        y: player.y + player.h * 0.75,
+        vx: player.facing * 15,
+        w: 28, h: 28,
+        active: true,
+        frame: 0
+      });
+    }
+  });
+  document.addEventListener('keyup', function(e){ keys[e.key] = false; });
+
+  // ── COLLISION
+  function rectOverlap(a, b){
+    return a.x < b.x+b.w && a.x+a.w > b.x && a.y < b.y+b.h && a.y+a.h > b.y;
+  }
+
+  // ── UPDATE
+
+  // ── FROG VS FAIRY: the frog snaps his tongue at the fairy cursor ──
+  // When he's standing still and the fairy hovers within reach in front of
+  // him for a moment, he turns to face it and flicks his tongue. If the fairy
+  // is still there when the tongue arrives, he reels it in, gulps (croak), and
+  // a moment later it pops back out of his mouth, dizzy, and flies back to
+  // the pointer. Move away in time and he misses. A cooldown stops him
+  // lashing out constantly.
+  var tongue = { phase: 'none', t: 0, tx: 0, ty: 0, notice: 0, cooldown: 0, caught: false };
+  var TONGUE_REACH = 175, TONGUE_OUT = 11, TONGUE_IN = 14, TONGUE_GULP = 42, TONGUE_BURP = 40;   // reach in px; timings in 60ths of a second
+  // Where the drawn tongue stub ends in the tongue-out image (fractions of
+  // the image), and the tongue's thickness as a fraction of its height.
+  var TONGUE_END_X = 0.586, TONGUE_END_Y = 0.560, TONGUE_THICK = 0.0295;   // tongue starts deep inside his mouth, so it can point straight at the fairy at any angle
+  function mouthPos(){
+    var img = sprites['frog-tongue'];
+    var aspect = img && img.naturalWidth ? img.naturalWidth / img.naturalHeight : 512 / 457;
+    var drawH = player.h, drawW = drawH * aspect, x0 = player.x - (drawW - player.w) / 2;
+    var fx = player.facing === -1 ? 1 - TONGUE_END_X : TONGUE_END_X;
+    return { x: x0 + drawW * fx, y: player.y + drawH * TONGUE_END_Y, t: drawH * TONGUE_THICK };
+  }
+  function fairyWorld(){
+    var f = window.jccFairy && window.jccFairy.pos();
+    return f ? { x: f.x + cam.x, y: f.y } : null;
+  }
+  function updateTongue(dt){
+    if(tongue.cooldown > 0) tongue.cooldown -= dt;
+    var free = !player.enteringPortal && !player.sleeping && player.onGround && player.vx === 0 && player.castTimer === 0;
+    if(tongue.phase === 'none'){
+      if(!free || tongue.cooldown > 0 || !window.jccFairy){ tongue.notice = 0; return; }
+      var fw = fairyWorld(), m = mouthPos();
+      if(!fw){ tongue.notice = 0; return; }
+      var dx = fw.x - m.x, dy = fw.y - m.y;
+      // Only within reach, and only from the top of his head down to his feet
+      // (higher than that the tongue would shoot up at an odd angle).
+      var headTop = player.y + player.h * 0.38, feet = player.y + player.h;
+      if(Math.abs(dx) < TONGUE_REACH && Math.abs(dx) > 30 && fw.y >= headTop && fw.y <= feet){
+        tongue.notice += dt;
+        player.facing = dx > 0 ? 1 : -1;            // he turns to look at it
+        if(tongue.notice > 4){                        // near-instant: a split second to turn, then SNAP
+          tongue.phase = 'out'; tongue.t = 0; tongue.caught = false;
+          var ts = document.getElementById('tongueSound');
+          if(ts && !muted){ ts.volume = 0.8; ts.currentTime = 0; ts.play().catch(function(){}); }
+          var m2 = mouthPos(); tongue.tx = fw.x; tongue.ty = fw.y;
+          tongue.notice = 0;
+        }
+      } else tongue.notice = 0;
+      return;
+    }
+    // Moving or jumping cancels a flick in progress
+    if(!player.onGround || player.vx !== 0 || player.enteringPortal){ endTongue(); return; }
+    function has(k){ var im = sprites['frog-' + k]; return im && im.complete && im.naturalWidth; }
+    if(tongue.phase === 'gulp') player.state = has('gulp') ? 'gulp' : 'idle';
+    else if(tongue.phase === 'burp') player.state = has('burp') ? 'burp' : 'cast';
+    else player.state = has('tongue') ? 'tongue' : 'cast';
+    tongue.t += dt;
+    if(tongue.phase === 'out'){
+      if(tongue.t >= TONGUE_OUT){
+        var fw2 = fairyWorld();
+        if(fw2 && Math.hypot(fw2.x - tongue.tx, fw2.y - tongue.ty) < 34){
+          tongue.caught = true;
+          window.jccFairy.hold(tongue.tx - cam.x, tongue.ty);
+        }
+        tongue.phase = 'in'; tongue.t = 0;
+      }
+    } else if(tongue.phase === 'in'){
+      if(tongue.caught){
+        var p = tongue.t / TONGUE_IN, m3 = mouthPos();
+        window.jccFairy.hold(tongue.tx + (m3.x - tongue.tx) * p - cam.x, tongue.ty + (m3.y - tongue.ty) * p);
+      }
+      if(tongue.t >= TONGUE_IN){
+        if(tongue.caught){
+          tongue.phase = 'gulp'; tongue.t = 0; window.jccFairy.hide();
+        } else endTongue();
+      }
+    } else if(tongue.phase === 'gulp'){
+      if(tongue.t >= TONGUE_GULP){
+        // BURP: the fairy bursts back out of his mouth in a stream of green bubbles
+        tongue.phase = 'burp'; tongue.t = 0;
+        var bm = burpMouth();
+        window.jccFairy.release(bm.x - cam.x, bm.y);
+        burpBubbles(bm.x, bm.y);
+        var croak = document.getElementById('logoCroak');
+        if(croak && !muted){ croak.volume = 0.7; croak.playbackRate = 0.8; croak.currentTime = 0; croak.play().catch(function(){}); }
+      }
+    } else if(tongue.phase === 'burp'){
+      if(tongue.t >= TONGUE_BURP){ tongue.caught = false; endTongue(); }
+    }
+  }
+  // Burp bubbles: small lime-green bubbles that stream out of his mouth,
+  // wobble as they float up and away, then pop.
+  var bubbles = [];
+  function burpMouth(){
+    var img = sprites['frog-burp'];
+    var aspect = img && img.naturalWidth ? img.naturalWidth / img.naturalHeight : 512 / 457;
+    var drawH = player.h, drawW = drawH * aspect, x0 = player.x - (drawW - player.w) / 2;
+    var fx = player.facing === -1 ? 1 - 0.665 : 0.665;
+    return { x: x0 + drawW * fx, y: player.y + drawH * 0.53 };
+  }
+  function burpBubbles(x, y){
+    for(var i = 0; i < 12; i++){
+      bubbles.push({
+        x: x, y: y + (Math.random() - 0.5) * 8,
+        vx: player.facing * (1.2 + Math.random() * 2.4), vy: -0.4 - Math.random() * 1.1,
+        r: 2.5 + Math.random() * 4, life: 0, max: 40 + Math.random() * 40,
+        delay: i * 1.5, wob: Math.random() * 6.283, pop: 0
+      });
+    }
+  }
+  function updateBubbles(dt){
+    for(var i = 0; i < bubbles.length; i++){
+      var b = bubbles[i];
+      if(b.delay > 0){ b.delay -= dt; continue; }
+      if(b.pop > 0){ b.pop += dt; continue; }
+      b.life += dt; b.wob += 0.15 * dt;
+      b.x += (b.vx + Math.sin(b.wob) * 0.4) * dt; b.y += b.vy * dt;
+      b.vx *= Math.pow(0.97, dt); b.vy -= 0.01 * dt;
+      if(b.life >= b.max) b.pop = 0.01;
+    }
+    bubbles = bubbles.filter(function(b){ return b.pop < 8; });
+  }
+  function drawBubbles(){
+    for(var i = 0; i < bubbles.length; i++){
+      var b = bubbles[i];
+      if(b.delay > 0) continue;
+      ctx.save();
+      if(b.pop > 0){
+        // pop: a quick expanding ring that fades
+        ctx.globalAlpha = Math.max(0, 1 - b.pop / 8);
+        ctx.strokeStyle = '#d5e709'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.r + b.pop * 0.9, 0, 7); ctx.stroke();
+      } else {
+        ctx.fillStyle = 'rgba(213,231,9,0.18)'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill();
+        ctx.strokeStyle = 'rgba(213,231,9,0.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,230,0.85)'; ctx.fillRect(b.x - b.r * 0.45, b.y - b.r * 0.5, Math.max(1, b.r * 0.35), Math.max(1, b.r * 0.35));
+      }
+      ctx.restore();
+    }
+  }
+  function endTongue(){
+    if(tongue.caught && tongue.phase !== 'none' && window.jccFairy){ var m = mouthPos(); window.jccFairy.release(m.x - cam.x, m.y); }
+    tongue.phase = 'none'; tongue.t = 0; tongue.caught = false; tongue.cooldown = 45;   // ready again after about 3/4 of a second
+  }
+  function drawTongue(){
+    if(tongue.phase !== 'out' && tongue.phase !== 'in') return;
+    var m = mouthPos(), p;
+    if(tongue.phase === 'out') p = Math.min(1, tongue.t / TONGUE_OUT);
+    else p = 1 - Math.min(1, tongue.t / TONGUE_IN);
+    p = p * p * (3 - 2 * p);
+    var ex = m.x + (tongue.tx - m.x) * p, ey = m.y + (tongue.ty - m.y) * p;
+    var len = Math.hypot(ex - m.x, ey - m.y), T = Math.max(4, m.t);
+    ctx.save();
+    ctx.translate(m.x, m.y);
+    ctx.rotate(Math.atan2(ey - m.y, ex - m.x));
+    // Bands copied from the drawn tongue, top to bottom: dark outline,
+    // light highlight, main pink, darker underside, dark outline.
+    // Sticky tip: a slightly long oval, outlined only on its outer edge.
+    // Drawn in three layers: (1) the tip's dark outline, (2) the tongue body
+    // on top (which covers that outline wherever the two overlap), then
+    // (3) the tip's pink fill, shading and highlight.
+    var RX = T * 0.95, RY = T * 0.68, O = T * 0.16;
+    ctx.fillStyle = '#1a0606'; ctx.beginPath(); ctx.ellipse(len, 0, RX + O, RY + O, 0, 0, 7); ctx.fill();
+    // Bands copied from the drawn tongue, top to bottom: dark outline,
+    // light highlight, main pink, darker underside, dark outline.
+    var bands = [[0.15, '#1a0606'], [0.15, '#f2b2b7'], [0.42, '#ea7c82'], [0.13, '#a8495b'], [0.15, '#1a0606']];
+    var yb = -T / 2;
+    for(var i = 0; i < bands.length; i++){ ctx.fillStyle = bands[i][1]; ctx.fillRect(-4, yb, len + 4, T * bands[i][0] + 0.4); yb += T * bands[i][0]; }
+    ctx.fillStyle = '#ea7c82'; ctx.beginPath(); ctx.ellipse(len, 0, RX, RY, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = '#a8495b'; ctx.beginPath(); ctx.ellipse(len + RX * 0.1, RY * 0.45, RX * 0.8, RY * 0.45, 0, 0, Math.PI); ctx.fill();   // underside shade
+    ctx.fillStyle = '#f2b2b7'; ctx.beginPath(); ctx.ellipse(len + RX * 0.05, -RY * 0.42, RX * 0.45, RY * 0.22, 0, 0, 7); ctx.fill();    // highlight
+    // Shadow inside his mouth: the part of the tongue still between his lips
+    // is darker, fading to its normal pink where it leaves his mouth.
+    var shadowLen = Math.min(len, T * 3.4);
+    var sg = ctx.createLinearGradient(-4, 0, shadowLen, 0);
+    sg.addColorStop(0, 'rgba(40,6,12,0.62)');
+    sg.addColorStop(0.55, 'rgba(40,6,12,0.32)');
+    sg.addColorStop(1, 'rgba(40,6,12,0)');
+    ctx.fillStyle = sg; ctx.fillRect(-4, -T / 2, shadowLen + 4, T);
+    ctx.restore();
+  }
+
+  function update(dt){
+    // Player state
+    if(player.castTimer > 0) player.castTimer = Math.max(0, player.castTimer - dt);
+
+    // Sleep: press down while on ground
+    if(keys['ArrowDown'] && player.onGround && player.castTimer === 0){
+      player.sleeping = true;
+      player.vx = 0;
+    } else if(!keys['ArrowDown'] || !player.onGround){
+      player.sleeping = false;
+    }
+
+    // Movement (blocked while sleeping, casting or entering portal)
+    if(!player.sleeping && player.castTimer === 0 && !player.enteringPortal){
+      if(keys['ArrowLeft'])  { player.vx = -MOVE_SPEED; player.facing = -1; }
+      else if(keys['ArrowRight']) { player.vx = MOVE_SPEED; player.facing = 1; }
+      else player.vx = 0;
+    } else {
+      player.vx = 0;
+    }
+
+    if(keys['ArrowUp'] && player.jumpsLeft > 0 && !player._jumpHeld && !player.sleeping){
+      player.vy = JUMP_FORCE;
+      player.onGround = false;
+      player.jumpsLeft--;
+      player._jumpHeld = true;
+      player.sleeping = false;
+      sfxJump();
+    }
+    if(!keys['ArrowUp']) player._jumpHeld = false;
+
+    // Determine sprite state
+    if(player.enteringPortal){
+      player.state = 'enter';
+      player.enterTimer += dt;
+    } else if(player.sleeping){
+      player.state = 'sleep';
+    } else if(player.castTimer > 0){
+      player.state = 'cast';
+    } else if(!player.onGround){
+      player.state = player.vy < -2 ? 'jump-air' : 'jump-crouch';
+    } else if(player.vx !== 0){
+      // Walk animation - alternate frames
+      player.animTimer += dt;
+      if(player.animTimer > 5.5){
+        player.animFrame = (player.animFrame + 1) % 3;
+        player.animTimer = 0;
+      }
+      if(player.animFrame === 0) player.state = 'walk1';
+      else if(player.animFrame === 1) player.state = 'walk2';
+      else player.state = 'walk3';
+    } else {
+      player.state = 'idle';
+    }
+
+    updateTongue(dt);
+    updateBubbles(dt);
+
+    // Apply portal bob glue BEFORE gravity
+    if(player.onPortal >= 0 && player.onGround && portalPositions.length > 0){
+      var activeBob = portalPositions[player.onPortal].bobY || 0;
+      var bobDelta = activeBob - player.lastBobY;
+      player.y += bobDelta;
+      player.lastBobY = activeBob;
+    }
+
+    // Gravity
+    player.vy += GRAVITY * dt;
+    player.x += player.vx * dt;
+    player.y += player.vy * dt;
+
+    // Clamp to world
+    if(player.x < 0) player.x = 0;
+    if(player.x + player.w > WORLD_WIDTH) player.x = WORLD_WIDTH - player.w;
+
+    // Ground collision - continuous ground across world
+    player.onGround = false;
+    if(player.y + player.h >= GROUND_Y){
+      player.y = GROUND_Y - player.h;
+      player.vy = 0;
+      player.onGround = true;
+      player.jumpsLeft = 2;
+    }
+
+    // Platform collision
+    for(var i = 0; i < platforms.length; i++){
+      var p = platforms[i];
+      if(rectOverlap(player, p)){
+        if(player.vy >= 0 && player.y + player.h - player.vy <= p.y + 4){
+          player.y = p.y - player.h;
+          player.vy = 0;
+          player.onGround = true;
+          player.jumpsLeft = 2;
+        }
+      }
+    }
+
+
+
+    // Portal platform collision + onPortal tracking
+    player.onPortal = -1;
+    for(var pi = 0; pi < portalPositions.length; pi++){
+      var port = portalPositions[pi];
+      var bobY = port.bobY || 0;
+      var platTop = port.grassY + bobY;
+      var platRect = { x: port.x + 80, y: platTop, w: PORTAL_W - 160, h: 30 };
+      if(rectOverlap(player, platRect)){
+        // Also count it as a landing if last frame's bottom edge was above
+        // the platform: at low frame rates a fast fall can travel further in
+        // one step than the platform is thick and would otherwise pass through
+        var prevBottom = player.y + player.h - player.vy * dt;
+        if(player.vy >= 0 && (player.y + player.h <= platTop + 30 || prevBottom <= platTop + 8)){
+          player.y = platTop - player.h;
+          player.vy = 0;
+          player.onGround = true;
+          player.jumpsLeft = 2;
+          player.onPortal = pi;
+        }
+      }
+    }
+
+    // Fireballs
+    for(var f = fireballs.length - 1; f >= 0; f--){
+      var fb = fireballs[f];
+      fb.x += fb.vx * dt;
+      // Off screen
+      if(fb.x < cam.x - 50 || fb.x > cam.x + canvas.width + 50){
+        fireballs.splice(f, 1);
+        continue;
+      }
+      // Hit enemy
+      if((enemy.alive || enemy.dying) && rectOverlap(fb, enemy)){
+        fireballs.splice(f, 1);
+        enemy.hitFlash = 20;
+        if(enemy.dying){
+          // Post-death hits on the ghost: a dull thud (no hit clips or grunts)
+          // plus the speech bubble reaction
+          enemy.ghostHits++;
+          sfxThud();
+          if(enemy.ghostHits <= 1){
+            enemy.bubble = "I have literally perished.\nStop attacking me.";
+          } else {
+            enemy.bubble = "Seriously. I think you should\nspeak with someone.\nThis isn't normal behaviour.";
+          }
+          enemy.bubbleTimer = 240;
+        } else {
+          sfxHit();
+          enemy.hitCount++;
+          if(enemy.hitCount >= enemy.maxHits){
+            enemy.alive = false;
+            enemy.dying = true;
+            enemy.bubble = "I just wanted to be\nleft alone.";
+            enemy.bubbleTimer = 300;
+            sfxDeath();
+          } else {
+            setTimeout(sfxBubble, 80);
+            var msg = enemyMessages[(enemy.hitCount - 1) % enemyMessages.length];
+            enemy.bubble = msg;
+            enemy.bubbleTimer = 180;
+          }
+        } // 3 seconds at 60fps
+        continue;
+      }
+    }
+
+    // Keep enemy grounded
+    enemy.y = GROUND_Y - enemy.h;
+    if(enemy.hitFlash > 0) enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
+
+    // Ghost rise animation
+    if(enemy.dying){
+      enemy.ghostTimer += dt;
+      var ghostTargetY = enemy.y - enemy.h * 0.3; // final resting position just above body
+      if(!enemy.ghostRisen){
+        // Rise from body up to target position over ~120 frames
+        var riseProgress = Math.min(enemy.ghostTimer / 120, 1);
+        enemy.ghostY = enemy.y + enemy.h * 0.3 - (enemy.h * 0.6 * riseProgress);
+        if(riseProgress >= 1) enemy.ghostRisen = true;
+      } else {
+        // Bob gently in place
+        enemy.ghostBobOffset = Math.sin(enemy.ghostTimer * 0.04) * 8;
+        enemy.ghostY = ghostTargetY + enemy.ghostBobOffset;
+      }
+    }
+
+
+    // Portal platform collision
+    for(var pi = 0; pi < portalPositions.length; pi++){
+      var port = portalPositions[pi];
+      var platRect = { x: port.x + 80, y: port.grassY + (port.bobY || 0), w: PORTAL_W - 160, h: 20 };
+      if(rectOverlap(player, platRect)){
+        if(player.vy >= 0 && player.y + player.h - player.vy <= port.grassY + 4){
+          player.y = port.grassY + (port.bobY || 0) - player.h;
+          player.vy = 0;
+          player.onGround = true;
+          player.jumpsLeft = 2;
+        }
+      }
+    }
+
+    // Portal swirl animation
+    if(portalFramesLoaded >= PORTAL_FRAME_COUNT){
+      portalAnimTimer += dt;
+      if(portalAnimTimer >= PORTAL_ANIM_FRAME_SPEED){
+        portalAnimTimer = 0;
+        portalAnimFrame = (portalAnimFrame + 1) % PORTAL_FRAME_COUNT;
+      }
+    }
+
+    // Portal floating bob
+    for(var pi = 0; pi < portalPositions.length; pi++){
+      var bobAmount = Math.sin(Date.now() * 0.0015 + pi * 0.7) * 4;
+      portalPositions[pi].bobY = bobAmount;
+    }
+
+    // ZZZ particles when sleeping
+    if(player.sleeping){
+      zzzTimer += dt;
+      if(zzzTimer >= 40){
+        zzzTimer = 0;
+        zzzParticles.push({
+          x: player.x + player.w * 0.7,
+          y: player.y + player.h * 0.2,
+          opacity: 1,
+          size: 14 + Math.random() * 8,
+          vy: -0.8 - Math.random() * 0.4,
+          vx: 0.3 + Math.random() * 0.3,
+          life: 90
+        });
+      }
+    } else {
+      zzzTimer = 0;
+    }
+    // Update zzz particles
+    for(var z = zzzParticles.length - 1; z >= 0; z--){
+      var zp = zzzParticles[z];
+      zp.x += zp.vx * dt;
+      zp.y += zp.vy * dt;
+      zp.life -= dt;
+      zp.opacity = zp.life / 90;
+      zp.size += 0.08 * dt;
+      if(zp.life <= 0) zzzParticles.splice(z, 1);
+    }
+
+    // Enemy bubble timer
+    if(enemy.bubbleTimer > 0){
+      enemy.bubbleTimer -= dt;
+      if(enemy.bubbleTimer <= 0){ enemy.bubbleTimer = 0; enemy.bubble = null; }
+    }
+
+    updateDialogue(dt);
+
+    // Camera - follow player
+    var targetCamX = player.x - canvas.width * 0.35;
+    cam.x += (targetCamX - cam.x) * Math.min(0.1 * dt, 1);
+    if(cam.x < 0) cam.x = 0;
+    if(cam.x > WORLD_WIDTH - canvas.width) cam.x = WORLD_WIDTH - canvas.width;
+    window.jccLightPos = cam.x; // read by chrome-logo.js so the logo's light follows the frog through the world
+  }
+
+  // ── DRAW
+
+  // ── DEPTH: pixel-art parallax layers ──────────────────────────────────
+  // Everything here is built from square pixels, like the rest of the game,
+  // with no smooth blurs: depth comes from speed, size and tone instead.
+  //   far mist   : faint stepped haze, slow (behind everything in the world)
+  //   far motes  : tiny dim pixel specks, slow
+  //   near motes : bigger, brighter pixel specks, faster than the frog
+  //   foreground : dark pixel reeds and hanging moss right by the "camera",
+  //                with chunkier pixels, sliding past fastest
+  var DEPTH_ON = true;
+  var depth = null;
+  function bayer(x, y){ var m = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5]; return m[(y & 3) * 4 + (x & 3)] / 16; }
+  // Wavy edge profile that repeats seamlessly across the layer's width
+  // (whole numbers of waves), so tiles join without a visible step.
+  function noise1(n, seed){ var a = [], T = Math.PI * 2 / n; for(var i = 0; i < n; i++) a.push(Math.sin(i * T * 3 + seed) * 0.5 + Math.sin(i * T * 7 + seed * 2.1) * 0.3 + Math.sin(i * T * 13 + seed * 0.7) * 0.2); return a; }
+  function mistLayer(wu, hu, seed, density){
+    // a low-resolution haze band; its top and bottom edges are wavy and
+    // dithered (never blurred), and stay well inside the layer so no edge
+    // is ever cut off in a straight line
+    var c = document.createElement('canvas'); c.width = wu; c.height = hu;
+    var g = c.getContext('2d'), top = noise1(wu, seed), bot = noise1(wu, seed + 3);
+    for(var x = 0; x < wu; x++){
+      var t = hu * (0.42 + top[x] * 0.14), b = hu * (0.70 + bot[x] * 0.1);
+      var fadeT = hu * 0.22, fadeB = hu * 0.16;
+      for(var y = 0; y < hu; y++){
+        var d = Math.min((y - (t - fadeT)) / fadeT, ((b + fadeB) - y) / fadeB);
+        if(d <= 0) continue;
+        var lvl = Math.min(1, d);
+        if(lvl <= bayer(x, y)) continue;                      // dithered edge
+        var a = (lvl > 0.75 ? 0.15 : 0.08) * density;
+        g.fillStyle = 'rgba(232,214,190,' + a + ')'; g.fillRect(x, y, 1, 1);
+      }
+    }
+    return c;
+  }
+  function reedLayer(wu, hu, seed){
+    // pixel reeds and grass tufts along the bottom edge
+    var c = document.createElement('canvas'); c.width = wu; c.height = hu;
+    var g = c.getContext('2d'), r = seed;
+    function rnd(){ r = (r * 9301 + 49297) % 233280; return r / 233280; }
+    var x = 0;
+    while(x < wu){
+      x += 30 + Math.floor(rnd() * 70);            // sparse clumps
+      var blades = 2 + Math.floor(rnd() * 4);
+      for(var k = 0; k < blades; k++){
+        var bx = x + Math.floor(rnd() * 6) - 3, h = Math.floor(hu * (0.3 + rnd() * 0.7)), lean = (rnd() - 0.5) * 0.5;
+        for(var y = 0; y < h; y++){
+          var px = Math.round(bx + lean * y * (y / h));
+          g.fillStyle = y > h - 3 ? '#1d1209' : '#120b07';
+          g.fillRect(((px % wu) + wu) % wu, hu - 1 - y, 1, 1);
+          if(y < h * 0.4) g.fillRect(((px + 1) % wu + wu) % wu, hu - 1 - y, 1, 1);
+        }
+      }
+    }
+    return c;
+  }
+  function mossLayer(wu, hu, seed){
+    // hanging moss strands along the top edge
+    var c = document.createElement('canvas'); c.width = wu; c.height = hu;
+    var g = c.getContext('2d'), r = seed;
+    function rnd(){ r = (r * 9301 + 49297) % 233280; return r / 233280; }
+    var x = 0;
+    while(x < wu){
+      x += 90 + Math.floor(rnd() * 140);           // the odd clump, not a curtain
+      var strands = 3 + Math.floor(rnd() * 4);
+      for(var k = 0; k < strands; k++){
+        var sx = x + Math.floor(rnd() * 14) - 7, len = Math.floor(hu * (0.3 + rnd() * 0.7));
+        for(var y = 0; y < len; y++){
+          var px = sx + Math.round(Math.sin(y * 0.35 + k) * 0.6);
+          g.fillStyle = y > len - 2 ? '#1f2a12' : '#0f140a';
+          g.fillRect(((px % wu) + wu) % wu, y, 1, 1);
+        }
+      }
+      g.fillStyle = '#0f140a'; g.fillRect(x - 10, 0, 22, 2);
+    }
+    return c;
+  }
+  function makeMotes(n, seed){
+    var a = [], r = seed;
+    function rnd(){ r = (r * 9301 + 49297) % 233280; return r / 233280; }
+    for(var i = 0; i < n; i++) a.push({ x: rnd(), y: rnd(), ph: rnd() * 6.28, sp: 0.3 + rnd() * 0.7 });
+    return a;
+  }
+  function buildDepth(){
+    depth = {
+      mistFar: mistLayer(480, 60, 1.3, 1.0),
+      mistNear: mistLayer(480, 50, 4.7, 0.8),
+      reeds: reedLayer(520, 20, 77),
+      moss: mossLayer(560, 14, 31),
+      motesFar: makeMotes(46, 11),
+      motesNear: makeMotes(14, 53)
+    };
+  }
+  function tileLayer(img, scale, offsetX, y){
+    var w = img.width * scale, h = img.height * scale;
+    var x0 = -((offsetX % w) + w) % w;
+    for(var x = x0; x < canvas.width; x += w) ctx.drawImage(img, Math.round(x), Math.round(y), w, h);
+  }
+  function drawMotes(list, size, parallax, rgb, alpha, t){
+    var W = canvas.width + 200, H = GROUND_Y + 40;
+    for(var i = 0; i < list.length; i++){
+      var m = list[i];
+      var x = ((m.x * W - cam.x * parallax + t * 6 * m.sp) % W + W) % W - 100;
+      var y = (m.y * H + Math.sin(t * 0.6 * m.sp + m.ph) * 10);
+      var flick = Math.sin(t * 1.3 * m.sp + m.ph) > -0.3 ? 1 : 0.45;       // stepped flicker, not a smooth fade
+      ctx.fillStyle = 'rgba(' + rgb + ',' + (alpha * flick) + ')';
+      ctx.fillRect(Math.round(x / size) * size, Math.round(y / size) * size, size, size);
+    }
+  }
+  function drawDepthBack(){
+    if(!DEPTH_ON) return;
+    if(!depth) buildDepth();
+    var t = performance.now() / 1000;
+    ctx.imageSmoothingEnabled = false;
+    tileLayer(depth.mistFar, 4, cam.x * 0.18 + t * 5, GROUND_Y - 330);
+    drawMotes(depth.motesFar, 2, 0.3, '255,226,180', 0.45, t);
+    tileLayer(depth.mistNear, 5, cam.x * 0.4 + t * 9, GROUND_Y - 190);
+  }
+  function drawDepthFront(){
+    if(!DEPTH_ON) return;
+    var t = performance.now() / 1000;
+    ctx.imageSmoothingEnabled = false;
+    drawMotes(depth.motesNear, 5, 1.35, '213,231,9', 0.75, t);
+    ctx.globalAlpha = 0.85;
+    tileLayer(depth.moss, 6, cam.x * 1.5, -6);
+    tileLayer(depth.reeds, 6, cam.x * 1.5, canvas.height - 20 * 6 + 6);   // kept down in the soil, below the frog's feet
+    ctx.globalAlpha = 1;
+  }
+
+  function draw(dt){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Fallback gradient - always drawn first as a base layer, so any gap
+    // never shows as blank/black. Cached in resize() rather than rebuilt
+    // every frame.
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Sky background with parallax - drawn once, never tiled, since this
+    // is a single scenic image rather than a seamless pattern. It pans
+    // across as the camera moves, then holds at its edge once it runs
+    // out, rather than ever wrapping around and showing a repeat.
+    var bgImg = sprites['bgSky'];
+    if(bgImg && bgImg.complete && bgImg.naturalWidth > 0){
+      var bgW = bgImg.naturalWidth;
+      var bgH = bgImg.naturalHeight;
+      // Scale to fill screen height
+      var bgDrawH = canvas.height;
+      var bgDrawW = bgW * (bgDrawH / bgH);
+      // Parallax at 10% of camera speed, clamped so it never runs out of image
+      var maxBgScroll = Math.max(0, bgDrawW - canvas.width);
+      var bgScrollX = Math.min(cam.x * 0.1, maxBgScroll);
+      ctx.drawImage(bgImg, -bgScrollX, 0, bgDrawW, bgDrawH);
+    }
+    drawDepthBack();
+
+    ctx.save();
+    ctx.translate(-cam.x, 0);
+
+
+
+    // Ground - tiled image
+    var gTile = sprites['groundTile'];
+    if(gTile && gTile.complete && gTile.naturalWidth > 0){
+      var tileH = 220; // drawn height of tile
+      var tileW = Math.ceil(gTile.naturalWidth * (tileH / gTile.naturalHeight));
+      var groundDrawY = GROUND_Y - 20; // raised slightly
+      // Fill below ground with solid colour first
+      ctx.fillStyle = '#0d1a06';
+      ctx.fillRect(0, groundDrawY + tileH, WORLD_WIDTH, canvas.height);
+      // Tile with 1px overlap to eliminate seam - only draw tiles that
+      // are actually within (or just outside) the visible camera range,
+      // rather than the entire world width every frame. Drawing all
+      // ~38 tiles across the full 11300px world regardless of what's
+      // on screen was the main cause of the page feeling slow overall.
+      var tileStep = tileW - 1;
+      var visStart = Math.floor(cam.x / tileStep) * tileStep - tileStep;
+      var visEnd = Math.min(WORLD_WIDTH, cam.x + canvas.width + tileStep);
+      for(var gx = Math.max(0, visStart); gx < visEnd; gx += tileStep){
+        ctx.drawImage(gTile, gx, groundDrawY, tileW + 1, tileH);
+      }
+    } else {
+      // Fallback solid ground
+      ctx.fillStyle = '#1a3a0a';
+      ctx.fillRect(0, GROUND_Y, WORLD_WIDTH, canvas.height);
+    }
+
+    // Elevated Platforms
+    for(var i = 0; i < platforms.length; i++){
+      var p = platforms[i];
+      var ptileW = 32;
+      for(var px = p.x; px < p.x + p.w; px += ptileW){
+        var pw = Math.min(ptileW, p.x + p.w - px);
+        // Platform body
+        ctx.fillStyle = '#1a3a0a';
+        ctx.fillRect(px, p.y, pw - 1, p.h);
+        // Grass top
+        ctx.fillStyle = '#d5e709';
+        ctx.fillRect(px, p.y, pw - 1, 4);
+        ctx.fillStyle = '#3a8a0a';
+        ctx.fillRect(px, p.y + 4, pw - 1, 8);
+        // Grass blades
+        ctx.fillStyle = '#4aaa0a';
+        ctx.fillRect(px + 4, p.y - 4, 4, 6);
+        ctx.fillRect(px + 14, p.y - 6, 4, 8);
+      }
+    }
+
+    // "BEWARE SHELLTON" sign, planted in the grass between the frog's
+    // starting spot and the first portal (world space, behind the frog).
+    var signImg = sprites['shelltonSign'];
+    if(signImg && signImg.complete && signImg.naturalWidth > 0){
+      var SIGN_H = 170, SIGN_X = 360;
+      var signW = SIGN_H * signImg.naturalWidth / signImg.naturalHeight;
+      if(SIGN_X + signW > cam.x - 50 && SIGN_X < cam.x + canvas.width + 50){
+        // Bottom of the post on the same line as the frog's feet (GROUND_Y),
+        // so the sign reads as standing on the same ground as him.
+        ctx.drawImage(signImg, SIGN_X, GROUND_Y - SIGN_H, signW, SIGN_H);
+      }
+    }
+
+    // Enemy
+
+    // Draw portals
+    var pImg = (portalFramesLoaded >= PORTAL_FRAME_COUNT) ? portalFrames[portalAnimFrame] : sprites['portal'];
+    if(pImg && pImg.complete && pImg.naturalWidth > 0){
+      var pAspect = pImg.naturalWidth / pImg.naturalHeight;
+      var pDrawW = PORTAL_H * pAspect;
+      for(var pi = 0; pi < portalPositions.length; pi++){
+        var port = portalPositions[pi];
+        // Skip portals nowhere near the camera's current view - this was
+        // previously drawing every portal's glowing title text (with
+        // shadowBlur, one of the most expensive canvas operations there
+        // is) for all 18 portals every frame regardless of whether any
+        // of them were even on screen.
+        if(port.x + PORTAL_W < cam.x - 100 || port.x > cam.x + canvas.width + 100){
+          continue;
+        }
+        var pDrawX = port.x + (PORTAL_W - pDrawW) / 2;
+        var bobY = port.bobY || 0;
+        ctx.save();
+        ctx.globalAlpha = 1.0;
+        ctx.drawImage(pImg, pDrawX, port.imgY + bobY, pDrawW, PORTAL_H);
+        ctx.restore();
+
+        // PRESS ENTER CTA when player is on this portal
+        if(player.onPortal === pi && !player.enteringPortal){
+          ctx.save();
+          ctx.font = '9px "Press Start 2P"';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = Math.floor(Date.now() / 400) % 2 === 0 ? '#ffffff' : '#d5e709';
+          ctx.shadowColor = 'rgba(213,231,9,0.8)';
+          ctx.shadowBlur = 8;
+          var halfwayY = port.imgY + (port.grassY - port.imgY) * 0.58 + (port.bobY||0);
+          ctx.shadowColor = 'rgba(0,0,0,0.9)';
+          ctx.shadowBlur = 10;
+          ctx.shadowOffsetY = 2;
+          ctx.fillText('PRESS ENTER', port.x + PORTAL_W / 2, halfwayY);
+          // Second pass for chartreuse glow
+          ctx.shadowColor = '#d5e709';
+          ctx.shadowBlur = 16;
+          ctx.shadowOffsetY = 0;
+          ctx.fillText('PRESS ENTER', port.x + PORTAL_W / 2, halfwayY);
+          ctx.restore();
+        }
+        // Floating title above portal
+        var floatOffset = Math.sin(Date.now() * 0.002 + pi * 0.8) * 6;
+        ctx.save();
+        ctx.font = 'italic 32px "IM Fell English"';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#d5e709';
+        ctx.shadowColor = 'rgba(213,231,9,0.6)';
+        ctx.shadowBlur = 12;
+        ctx.fillText(PROJECT_NAMES[pi] || ('Project ' + (pi + 1)), port.x + PORTAL_W / 2, port.imgY + 60 + (port.bobY || 0));
+        ctx.restore();
+      }
+    }
+
+    if(enemy.alive || enemy.dying){
+      // Draw body
+      var eKey = enemy.dying ? 'tortoise-dead' : (enemy.hitFlash > 0 ? 'tortoise-hit' : 'tortoise-idle');
+      var eImg = sprites[eKey];
+      var eAspect = eImg && eImg.naturalWidth > 0 ? eImg.naturalWidth / eImg.naturalHeight : 1;
+      var eDrawW = enemy.h * eAspect;
+      if(eImg && eImg.complete && eImg.naturalWidth > 0){
+        ctx.drawImage(eImg, enemy.x, enemy.y, eDrawW, enemy.h);
+      } else {
+        ctx.fillStyle = '#6a4378';
+        ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
+      }
+
+      // Draw ghost rising above body when dying
+      if(enemy.dying){
+        var gImg = sprites['tortoise-ghost'];
+        if(gImg && gImg.complete && gImg.naturalWidth > 0){
+          var gAspect = gImg.naturalWidth / gImg.naturalHeight;
+          var gH = enemy.h * 0.8;
+          var gW = gH * gAspect;
+          ctx.save();
+          // Fade in ghost as it rises
+          var ghostAlpha = enemy.ghostRisen ? 0.85 : Math.min(enemy.ghostTimer / 60, 0.85);
+          ctx.globalAlpha = ghostAlpha;
+          ctx.drawImage(gImg, enemy.x + (eDrawW - gW) / 2, enemy.ghostY, gW, gH);
+          ctx.restore();
+        }
+      }
+
+      // Speech bubble
+      if(enemy.bubble){
+        var lines = enemy.bubble.split('\n');
+        ctx.font = '12px "Press Start 2P"';
+        var maxLineW = 0;
+        for(var ml = 0; ml < lines.length; ml++){
+          var lw = ctx.measureText(lines[ml]).width;
+          if(lw > maxLineW) maxLineW = lw;
+        }
+        var bw = Math.ceil(Math.max(maxLineW + 36, 220) / 2) * 2;
+        var bh = lines.length * 22 + 28;
+        var bx = snapBubbleX(enemy.x + enemy.w/2 - bw/2);
+        // If dying, position bubble above ghost
+        var bubbleRef = enemy.dying ? enemy.ghostY : enemy.y;
+        var by = Math.max(12, Math.round(bubbleRef - bh - 16)); // never clip off the top of the screen
+        var tailX = snapBubbleX(enemy.x + enemy.w/2);
+        drawBubble(bx, by, bw, bh, tailX);
+        // Text
+        ctx.fillStyle = BUBBLE_TEXT;
+        ctx.font = '12px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        var textStartY = by + (bh - lines.length * 22) / 2 + 17;
+        for(var l = 0; l < lines.length; l++){
+          ctx.fillText(lines[l], bx + bw/2, textStartY + l * 22);
+        }
+      }
+    }
+
+    // ZZZ particles
+    for(var z = 0; z < zzzParticles.length; z++){
+      var zp = zzzParticles[z];
+      ctx.save();
+      ctx.globalAlpha = zp.opacity;
+      ctx.font = 'bold ' + Math.floor(zp.size) + 'px "Press Start 2P"';
+      ctx.fillStyle = '#d5e709';
+      ctx.textAlign = 'center';
+      ctx.fillText('Z', zp.x, zp.y);
+      ctx.restore();
+    }
+
+    // Fireballs
+    for(var f = 0; f < fireballs.length; f++){
+      var fb = fireballs[f];
+      fb.frame = (fb.frame || 0) + dt;
+      var cx = fb.x + fb.w / 2;
+      var cy = fb.y + fb.h / 2;
+      var r = fb.w / 2;
+      var wobble = Math.sin(fb.frame * 0.4) * 2;
+      ctx.save();
+      // Outer glow
+      var grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r + 6);
+      grd.addColorStop(0, 'rgba(255,255,100,0.9)');
+      grd.addColorStop(0.3, 'rgba(255,140,0,0.8)');
+      grd.addColorStop(0.7, 'rgba(255,60,0,0.5)');
+      grd.addColorStop(1, 'rgba(255,60,0,0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+      // Core
+      ctx.beginPath();
+      ctx.arc(cx, cy + wobble, r * 0.6, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff8aa';
+      ctx.fill();
+      // Flame trails
+      ctx.fillStyle = 'rgba(255,140,0,0.7)';
+      for(var t = 0; t < 3; t++){
+        var tx = cx - (fb.vx > 0 ? 1 : -1) * (r * 0.5 + t * 6);
+        var ty = cy + Math.sin(fb.frame * 0.3 + t) * 4;
+        ctx.beginPath();
+        ctx.arc(tx, ty, r * 0.3 - t * 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // Player sprite - preserve natural aspect ratio
+    var spriteKey = player.state === 'enter' ? 'frog-enter' : 'frog-' + player.state;
+    var img = sprites[spriteKey];
+    if(img && img.complete && img.naturalWidth > 0){
+      var aspect = img.naturalWidth / img.naturalHeight;
+      var drawH = player.h;
+      var drawW = drawH * aspect;
+      player.spriteW = drawW;
+      // Keep collision width narrower (60% of sprite)
+      player.w = drawW * 0.55;
+
+      // Scale down when entering portal
+      var enterScale = 1;
+      if(player.enteringPortal){
+        var shrinkProgress = Math.max(0, player.enterTimer - 30);
+        enterScale = Math.max(0.9, 1 - (shrinkProgress / 480));
+      }
+
+      ctx.save();
+      var spriteOffsetX = (drawW - player.w) / 2;
+      var scaledW = drawW * enterScale;
+      var scaledH = drawH * enterScale;
+      var scaleOffsetX = (drawW - scaledW) / 2;
+      var scaleOffsetY = drawH - scaledH;
+
+      // ── Pulled into the portal: the frog lifts off, drifts to the centre
+      // of the green swirl, spins faster and faster, stretches slightly and
+      // shrinks away to nothing, just before the screen fades to black.
+      var pullPortal = player.enteringPortal && player.onPortal >= 0 ? portalPositions[player.onPortal] : null;
+      if(pullPortal){
+        var t = Math.min(1, Math.max(0, (player.enterTimer - 6) / 62));   // ~1s, starting just after Enter
+        var ease = t * t * (3 - 2 * t);                                     // smooth glide to the swirl
+        var pull = t * t * t;                                               // spin and shrink accelerate
+        var fromX = player.x - spriteOffsetX + drawW / 2;
+        var fromY = player.y + drawH / 2;
+        var toX = pullPortal.x + PORTAL_W / 2;
+        var toY = pullPortal.imgY + (pullPortal.bobY || 0) + PORTAL_H * 0.42;   // centre of the swirl
+        var cx = fromX + (toX - fromX) * ease;
+        var cy = fromY + (toY - fromY) * ease;
+        var size = 1 - 0.94 * (t * t);
+        var spin = (player.facing === -1 ? -1 : 1) * Math.PI * 2 * 2.5 * pull;
+        ctx.globalAlpha = t > 0.85 ? Math.max(0, 1 - (t - 0.85) / 0.15) : 1;
+        ctx.translate(cx, cy);
+        ctx.rotate(spin);
+        ctx.scale((player.facing === -1 ? -1 : 1) * size * (1 - 0.22 * ease), size * (1 + 0.12 * ease));
+        ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+      } else if(player.facing === -1){
+        ctx.translate(player.x + drawW - spriteOffsetX + scaleOffsetX, player.y + scaleOffsetY);
+        ctx.scale(-1, 1);
+        ctx.drawImage(img, 0, 0, scaledW, scaledH);
+      } else {
+        ctx.drawImage(img, player.x - spriteOffsetX + scaleOffsetX, player.y + scaleOffsetY, scaledW, scaledH);
+      }
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#d5e709';
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+    }
+
+    drawTongue();
+    drawBubbles();
+    drawDialogue();
+
+    ctx.restore();
+    drawDepthFront();
+
+  }
+
+  var gameStarted = true;
+
+  // ── LOOP
+  // Movement/animation previously assumed requestAnimationFrame always
+  // fires at 60fps (e.g. player.x += player.vx, one fixed step per call).
+  // If it fires slower than that for any reason - display refresh rate,
+  // browser/OS throttling, whatever the specific cause on a given
+  // machine - the whole game runs proportionally slower, uniformly,
+  // since every timer and movement is tied directly to call count rather
+  // than real elapsed time. dt below is 1.0 at a true 60fps and scales
+  // accordingly (e.g. 2.0 at 30fps), and every per-frame change is now
+  // multiplied by it, so real-world speed stays correct regardless of
+  // how often the browser actually calls this loop.
+  var lastFrameTime = performance.now();
+  function loop(){
+    var now = performance.now();
+    var dt = (now - lastFrameTime) / (1000 / 60);
+    dt = Math.min(Math.max(dt, 0), 3); // clamp to guard against huge gaps (e.g. backgrounded tab)
+    lastFrameTime = now;
+    update(dt);
+    draw(dt);
+    requestAnimationFrame(loop);
+  }
+
+  // ── AUTO START (no title screen - the intro sequence covers that now)
+  {
+    canvas.style.display = 'block';
+    placeEnemy();
+    makePlatformPortals();
+
+    // Cover the screen immediately, before the first frame renders, so the
+    // frog is never visible at its default start position while we
+    // reposition it onto the return portal below
+    var flash = document.createElement('div');
+    flash.style.cssText = 'position:fixed;inset:0;background:#000;opacity:1;z-index:999999;pointer-events:none;';
+    document.body.appendChild(flash);
+
+    // Safe to reveal the sound button now - it's hidden underneath the
+    // opaque flash above until that fades away below
+    var navEl = document.getElementById('gameNav');
+    if(navEl) navEl.style.setProperty('visibility', 'visible', 'important');
+
+    var hudEl = document.getElementById('hud');
+    if(hudEl) hudEl.style.display = 'block';
+
+    var gameplayLogoEl = document.getElementById('gameplayLogo');
+    if(gameplayLogoEl){
+      gameplayLogoEl.style.display = 'block';
+
+      // Clicking the logo goes back to the landing page, fading out first
+      var leavingToLanding = false;
+      gameplayLogoEl.addEventListener('click', function(){
+        if(leavingToLanding || player.enteringPortal) return;
+        leavingToLanding = true;
+        stopGameMusic();
+        var fade = document.createElement('div');
+        fade.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;z-index:999999;transition:opacity 0.5s ease;pointer-events:none;';
+        document.body.appendChild(fade);
+        setTimeout(function(){ fade.style.opacity = '1'; }, 20);
+        setTimeout(function(){ window.location.href = 'index.html'; }, 700);
+      });
+
+      // Hover bounce + croak, same as the logo on the landing page: a stepped,
+      // low-framerate bob (70ms per step) with the croak at half volume
+      var logoBobPlaying = false;
+      var LOGO_BOB_OFFSETS = [0, -4, -6, -4, 0, 2, 0];
+      gameplayLogoEl.addEventListener('mouseenter', function(){
+        if(logoBobPlaying) return;
+        logoBobPlaying = true;
+        var croak = document.getElementById('logoCroak');
+        if(croak && !muted){
+          croak.volume = 0.5;
+          croak.currentTime = 0;
+          croak.play().catch(function(){});
+        }
+        var step = 0;
+        (function nextStep(){
+          if(step < LOGO_BOB_OFFSETS.length){
+            gameplayLogoEl.style.transform = 'translateX(-50%) translateY(' + LOGO_BOB_OFFSETS[step] + 'px)';
+            step++;
+            setTimeout(nextStep, 70);
+          } else {
+            gameplayLogoEl.style.transform = 'translateX(-50%)';
+            logoBobPlaying = false;
+          }
+        })();
+      });
+    }
+
+    // Position frog on the correct portal before anything gets drawn,
+    // or the normal ground start if there's no valid return portal
+    if(RETURN_PORTAL !== null && RETURN_PORTAL < portalPositions.length){
+      var rport = portalPositions[RETURN_PORTAL];
+      player.x = rport.x + PORTAL_W / 2 - player.w / 2;
+      player.y = rport.grassY - player.h;
+      cam.x = Math.max(0, rport.x - canvas.width * 0.35);
+    } else {
+      player.y = GROUND_Y - player.h;
+      // Fresh arrival (not coming back from a project page): frog says hello
+      setTimeout(startDialogue, DIALOGUE_DELAY_MS);
+    }
+
+    setTimeout(playGameMusic, 300);
+    loop();
+
+    // Now reveal the correctly-positioned scene - stepped fade, matching
+    // the same speed/style as the campfire scene's fade-in on the intro
+    // page (10 steps, 180ms each), rather than a smooth CSS transition
+    setTimeout(function(){
+      var steps = 10, stepDelay = 180, i = 0;
+      function stepFade(){
+        i++;
+        flash.style.opacity = 1 - (i / steps);
+        if(i < steps){
+          setTimeout(stepFade, stepDelay);
+        } else {
+          flash.remove();
+        }
+      }
+      stepFade();
+    }, 200);
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && gameStarted && !player.enteringPortal && player.onPortal >= 0){
+      var pi = player.onPortal;
+      player.enteringPortal = true;
+      player.vx = 0;
+      var destPage = PROJECT_PAGES[pi] + '?from=' + pi;
+      var tSound = document.getElementById('teleportSound');
+      if(tSound && !muted){ tSound.currentTime = 0; tSound.play(); }
+      // His cry as he's pulled in takes turns between "help!" and "oh no!".
+      // (Remembered between visits, since entering a portal leaves the page.)
+      var cryN = 0;
+      try { cryN = (parseInt(localStorage.getItem('jccPortalCry'), 10) || 0) + 1; localStorage.setItem('jccPortalCry', cryN); }
+      catch(e){ cryN = Math.random() < 0.5 ? 1 : 2; }
+      var cry = document.getElementById(cryN % 2 ? 'helpScream' : 'ohNo');
+      if(cry && !muted){ cry.volume = 0.85; cry.currentTime = 0; cry.play().catch(function(){}); }
+      stopGameMusic();
+      setTimeout(function(){
+        var flash = document.createElement('div');
+        flash.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;z-index:999999;transition:opacity 0.5s ease;pointer-events:none;';
+        document.body.appendChild(flash);
+        setTimeout(function(){ flash.style.opacity = '1'; }, 20);
+        setTimeout(function(){ window.location.href = destPage; }, 700);
+      }, 1200);
+    }
+  });
+
+})();
+</script>
+<script>
+// Back button: the game was left mid-fade, so start it fresh instead of
+// showing the black screen it was left on.
+window.addEventListener('pageshow', function(e){ if(e.persisted) location.reload(); });
+</script>
+<script>
+// Word menu: HOP TO THE WORK and ABOUT ME, with the site's fade to black.
+(function(){
+  function go(url){
+    var f = document.createElement('div');
+    f.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;z-index:999999;transition:opacity 0.5s ease;pointer-events:none;';
+    document.body.appendChild(f);
+    requestAnimationFrame(function(){ f.style.opacity = '1'; });
+    setTimeout(function(){ window.location.href = url; }, 550);
+  }
+  var hop = document.getElementById('hopBtn'), about = document.getElementById('aboutBtn');
+  if(hop) hop.addEventListener('click', function(){ this.blur(); go('lucozade-back-for-the-believers.html?from=0'); });
+  if(about) about.addEventListener('click', function(){ this.blur(); go('about.html'); });
+})();
+</script>
+<script src="fairy-cursor.js?v=2" defer></script>
+</body>
