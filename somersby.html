@@ -2935,7 +2935,8 @@ initMomentumCarousel('sbCarouselStrip', 'sbCarouselTrack', { baseSpeed: 60 });
   function place(){
     if(!logo) { nav.style.top = '22px'; return; }
     var r = logo.getBoundingClientRect();
-    nav.style.top = Math.round(r.top + r.height / 2 - nav.offsetHeight / 2) + 'px';
+    // Centred on the logo's lettering, which sits a touch above the middle of its box
+    nav.style.top = Math.round(r.top + r.height * 0.44 - nav.offsetHeight / 2) + 'px';
   }
   place(); window.addEventListener('load', place); window.addEventListener('resize', place);
   setTimeout(function(){ place(); nav.classList.add('on'); }, 400);
