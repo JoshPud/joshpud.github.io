@@ -1683,7 +1683,11 @@ var RETURN_PORTAL = null;
       var eImg = sprites[eKey];
       var eAspect = eImg && eImg.naturalWidth > 0 ? eImg.naturalWidth / eImg.naturalHeight : 1;
       var eDrawW = enemy.h * eAspect;
-      var slamY = enemy.dying ? slamOffset() : 0;
+      // The collapsed image is drawn in slight perspective: his back foot sits
+      // higher in the picture than his front. Lowering the whole body a touch
+      // (4% of his height) plants that back foot on the floor; his front half
+      // settles into the grass, nearer the viewer.
+      var slamY = enemy.dying ? slamOffset() + enemy.h * 0.04 : 0;
       if(eImg && eImg.complete && eImg.naturalWidth > 0){
         ctx.drawImage(eImg, enemy.x, enemy.y + slamY, eDrawW, enemy.h);
       } else {
