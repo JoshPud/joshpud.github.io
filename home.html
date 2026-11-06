@@ -1518,9 +1518,10 @@ var RETURN_PORTAL = null;
         enemy.hitFlash = 20;
         enemy.recoilDir = (fb.vx || 1) > 0 ? 1 : -1;
         if(enemy.dying){
-          // Post-death hits on the ghost: a dull thud (no hit clips or grunts)
-          // plus the speech bubble reaction
+          // Post-death hits: the fiery sizzle of the fireball plus a dull thud
+          // on the body (no voice clips), plus the speech bubble reaction
           enemy.ghostHits++;
+          sfxHit(false);
           sfxThud();
           if(enemy.ghostHits <= 1){
             enemy.bubble = "I have literally perished.\nStop attacking me.";
