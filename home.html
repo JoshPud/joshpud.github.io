@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Joshua Crossley Creative</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IM+Fell+English:ital@1&family=Spectral:wght@600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IM+Fell+English:ital@1&family=Spectral:wght@600&family=Inter:wght@400&display=swap" rel="stylesheet"/>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -285,6 +285,36 @@
   #gameNav button { background: transparent; border: none; cursor: pointer; text-transform: uppercase; line-height: 1; white-space: nowrap; }
   /* the old pixel SOUND box styling no longer applies */
   #gameNav #muteBtn { position: static; visibility: inherit; border: none; background: transparent; image-rendering: auto; }
+
+  /* ═══════════ ACHIEVEMENT POP-UP (Xbox-style) ═══════════
+     The badge pops in, the box stretches out to the left to reveal the text,
+     holds, then the text fades and the box shrinks back around the badge
+     before it pops away. Sits just below the top-right menu. */
+  .ach-toast {
+    position: fixed; top: 64px; right: 28px; z-index: 100000;
+    height: 76px; width: 76px; border-radius: 38px; overflow: hidden;
+    display: flex; align-items: center; pointer-events: none;
+    background: linear-gradient(180deg, rgba(30,24,18,0.95), rgba(12,10,8,0.97));
+    border: 1px solid rgba(251,206,160,0.45);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    transform: scale(0); opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.3,1.6,0.5,1), opacity 0.25s, width 0.55s cubic-bezier(0.6,0,0.2,1);
+  }
+  .ach-toast.pop { transform: scale(1); opacity: 1; }
+  .ach-toast.out { transform: scale(0); opacity: 0; transition: transform 0.35s cubic-bezier(0.6,-0.4,0.7,0), opacity 0.35s 0.1s; }
+  .ach-badge {
+    flex: 0 0 52px; height: 52px; margin: 0 11px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 40% 35%, #ffe9c4, #d9a46a 60%, #8a5a2a);
+    box-shadow: 0 0 0 2px rgba(251,206,160,0.6), 0 0 14px rgba(251,206,160,0.4);
+  }
+  .ach-badge i { width: 24px; height: 22px; background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iIzJhMWEwYyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat; }
+  .ach-txt { white-space: nowrap; padding-right: 24px; opacity: 0; transform: translateX(-8px); transition: opacity 0.3s, transform 0.3s; }
+  .ach-toast.open .ach-txt { opacity: 1; transform: none; transition: opacity 0.35s 0.3s, transform 0.35s 0.3s; }
+  .ach-small { font-family: 'Spectral', Georgia, serif; font-weight: 600; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(251,206,160,0.78); }
+  .ach-name { font-family: 'Spectral', Georgia, serif; font-weight: 600; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: #FFE9C4; margin: 2px 0 3px; }
+  .ach-desc { font-family: 'Inter', system-ui, sans-serif; font-weight: 400; font-size: 12px; line-height: 1.35; color: #d9cdb8; }
+  @media (max-width: 640px) { .ach-toast { top: 12px; right: 10px; } .ach-txt { white-space: normal; } }
 </style>
 <script>
   // iPhones mute web page sound effects and music when the phone's silent
@@ -1180,6 +1210,49 @@ var RETURN_PORTAL = null;
   }
 
 
+
+  // ── ACHIEVEMENTS ────────────────────────────────────────────────────────
+  // Xbox-style pop-up in the top right. Each one is only awarded once per
+  // visitor (remembered in their browser), so it stays a surprise.
+  var ACHIEVEMENTS = {
+    turtley: { name: 'Turtley Uncalled For', desc: 'You killed a defenceless NPC. That\u2019s kinda fucked up.' }
+  };
+  // soft "bloop" as it opens (rising), and the same in reverse as it closes (falling)
+  function achOpenSound(){ if(muted) return; playTone(523, 'sine', 0.35, 0.22); setTimeout(function(){ playTone(784, 'sine', 0.5, 0.2); playTone(1047, 'sine', 0.5, 0.06); }, 90); }
+  function achCloseSound(){ if(muted) return; playTone(784, 'sine', 0.28, 0.12); setTimeout(function(){ playTone(523, 'sine', 0.4, 0.11); playTone(392, 'sine', 0.4, 0.03); }, 80); }
+  // How long a pop-up is on screen, from popping in to popping away (7.55s)
+  var ACH_ON_SCREEN_FRAMES = Math.round(7.55 * 60);
+  function achievementEarned(id){ try { return !!localStorage.getItem('jccAch:' + id); } catch(e){ return false; } }
+  function awardAchievement(id){
+    var a = ACHIEVEMENTS[id]; if(!a) return;
+    try { if(localStorage.getItem('jccAch:' + id)) return; localStorage.setItem('jccAch:' + id, '1'); } catch(e){}
+    var t = document.createElement('div');
+    t.className = 'ach-toast'; t.setAttribute('role', 'status');
+    t.innerHTML = '<div class="ach-badge"><i></i></div><div class="ach-txt"><div class="ach-small">New achievement!</div>' +
+                  '<div class="ach-name"></div><div class="ach-desc"></div></div>';
+    t.querySelector('.ach-name').textContent = a.name;
+    t.querySelector('.ach-desc').textContent = a.desc;
+    document.body.appendChild(t);
+    var txt = t.querySelector('.ach-txt');
+    var fullW = function(){ return Math.min(76 + txt.scrollWidth, window.innerWidth - 20); };
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      t.classList.add('pop'); achOpenSound();                                   // 1. badge pops in
+      setTimeout(function(){ t.style.width = fullW() + 'px'; t.classList.add('open'); }, 450);   // 2. box stretches out
+      setTimeout(function(){ t.classList.remove('open'); }, 6600);              // 3. text fades (about 6 seconds to read)
+      setTimeout(function(){ t.style.width = '76px'; achCloseSound(); }, 6900); // 4. box shrinks back around the badge
+      setTimeout(function(){ t.classList.add('out'); }, 7550);                  // 5. badge pops away
+      setTimeout(function(){ t.remove(); }, 8100);
+    }); });
+  }
+
+
+
+  // Ghost sizing and spacing (fractions measured from the images themselves)
+  var GHOST_SCALE = 0.6;            // ghost drawn at 60% of his body's height
+  var GHOST_GAP = 26;               // clear space between ghost and body (px)
+  var GHOST_INK_TOP = 257 / 914, GHOST_INK_BOT = 902 / 914, GHOST_INK_L = 108 / 1024;
+  var DEAD_INK_TOP = 336 / 914;     // top of the collapsed shell's spikes
+
   // ── SHELLTON'S DEATH SLAM ──────────────────────────────────────────────
   // Like a boss going down: his body drops the last stretch to the floor,
   // lands with a heavy thud, the whole page shakes, and chunky pixel dust
@@ -1200,6 +1273,9 @@ var RETURN_PORTAL = null;
         shake = 1;
         sfxThud(); setTimeout(sfxThud, 70);
         spawnDust();
+        var willShow = !achievementEarned('turtley');
+        enemy.ghostRiseFrames = willShow ? ACH_ON_SCREEN_FRAMES : 180;   // with the pop-up: rise for its whole stay; otherwise 3s
+        setTimeout(function(){ awardAchievement('turtley'); }, 900);   // once the dust has burst out
       }
     }
     // dust clouds drift out and up, then fade in steps
@@ -1417,8 +1493,8 @@ var RETURN_PORTAL = null;
             enemy.alive = false;
             enemy.dying = true;
             enemy.slam = { t: 0, landed: false };   // boss-style collapse: drop, THUD, shake, dust
-            enemy.bubble = "I just wanted to be\nleft alone.";
-            enemy.bubbleTimer = 300;
+            enemy.bubble = null;
+            enemy.pendingBubble = "I just wanted to be\nleft alone.";   // he speaks once his ghost has risen
             sfxDeath();
           } else {
             setTimeout(sfxBubble, 80);
@@ -1438,17 +1514,27 @@ var RETURN_PORTAL = null;
     updateSlam(dt);
 
     // Ghost rise animation (waits until he has hit the floor and the dust has settled a little)
-    if(enemy.dying && (!enemy.slam || (enemy.slam.landed && enemy.slam.t > 40))){
+    if(enemy.dying && (!enemy.slam || (enemy.slam.landed && enemy.slam.t > 54))){
       enemy.ghostTimer += dt;
-      var ghostTargetY = enemy.y - enemy.h * 0.3; // final resting position just above body
+      // Ghost floats clear of his body: the bottom of the ghost (its lowest
+      // drawn pixel) rests GHOST_GAP px above the top of the collapsed shell.
+      var bodyTop = enemy.y + enemy.h * 0.04 + enemy.h * DEAD_INK_TOP;
+      var gH0 = enemy.h * GHOST_SCALE;
+      var ghostTargetY = bodyTop - GHOST_GAP - gH0 * GHOST_INK_BOT;
+      var ghostStartY = bodyTop - gH0 * GHOST_INK_BOT + gH0 * 0.25;   // starts half-sunk into the body, then rises out of it
       if(!enemy.ghostRisen){
-        // Rise from body up to target position over ~120 frames
-        var riseProgress = Math.min(enemy.ghostTimer / 120, 1);
-        enemy.ghostY = enemy.y + enemy.h * 0.3 - (enemy.h * 0.6 * riseProgress);
-        if(riseProgress >= 1) enemy.ghostRisen = true;
+        // A slow, steady rise (eases in and out) lasting as long as the pop-up
+        var riseProgress = Math.min(enemy.ghostTimer / (enemy.ghostRiseFrames || 180), 1);
+        var e = 0.5 - 0.5 * Math.cos(Math.PI * riseProgress);
+        enemy.ghostY = ghostStartY + (ghostTargetY - ghostStartY) * e;
+        if(riseProgress >= 1){
+          enemy.ghostRisen = true;
+          // ...and only now does he speak
+          if(enemy.pendingBubble){ enemy.bubble = enemy.pendingBubble; enemy.bubbleTimer = 300; enemy.pendingBubble = null; }
+        }
       } else {
-        // Bob gently in place
-        enemy.ghostBobOffset = Math.sin(enemy.ghostTimer * 0.04) * 8;
+        // Bob gently in place (only upwards, so it never dips back towards the body)
+        enemy.ghostBobOffset = -Math.abs(Math.sin(enemy.ghostTimer * 0.03)) * 10;
         enemy.ghostY = ghostTargetY + enemy.ghostBobOffset;
       }
     }
@@ -1698,17 +1784,22 @@ var RETURN_PORTAL = null;
       drawDust();
 
       // Draw ghost rising above body when dying
-      if(enemy.dying && (!enemy.slam || (enemy.slam.landed && enemy.slam.t > 40))){
+      if(enemy.dying && (!enemy.slam || (enemy.slam.landed && enemy.slam.t > 54))){
         var gImg = sprites['tortoise-ghost'];
         if(gImg && gImg.complete && gImg.naturalWidth > 0){
           var gAspect = gImg.naturalWidth / gImg.naturalHeight;
-          var gH = enemy.h * 0.8;
+          var gH = enemy.h * GHOST_SCALE;
           var gW = gH * gAspect;
+          var gX = enemy.x + (eDrawW - gW) / 2;
+          enemy.ghostDraw = { x: gX, y: enemy.ghostY, w: gW, h: gH };   // remembered for the speech bubble
           ctx.save();
-          // Fade in ghost as it rises
-          var ghostAlpha = enemy.ghostRisen ? 0.85 : Math.min(enemy.ghostTimer / 60, 0.85);
-          ctx.globalAlpha = ghostAlpha;
-          ctx.drawImage(gImg, enemy.x + (eDrawW - gW) / 2, enemy.ghostY, gW, gH);
+          // See-through and softly glowing, with a faint flicker
+          var flicker = 0.06 * Math.sin(enemy.ghostTimer * 0.11) + 0.03 * Math.sin(enemy.ghostTimer * 0.37);
+          var ghostAlpha = (enemy.ghostRisen ? 0.7 : Math.min(enemy.ghostTimer / Math.max(60, (enemy.ghostRiseFrames || 180) * 0.35), 1) * 0.7) + flicker;
+          ctx.globalAlpha = Math.max(0, ghostAlpha);
+          ctx.shadowColor = 'rgba(165, 218, 255, 0.85)';
+          ctx.shadowBlur = 22 + 6 * Math.sin(enemy.ghostTimer * 0.06);
+          ctx.drawImage(gImg, gX, enemy.ghostY, gW, gH);
           ctx.restore();
         }
       }
@@ -1725,10 +1816,16 @@ var RETURN_PORTAL = null;
         var bw = Math.ceil(Math.max(maxLineW + 36, 220) / 2) * 2;
         var bh = lines.length * 22 + 28;
         var bx = snapBubbleX(enemy.x + enemy.w/2 - bw/2);
-        // If dying, position bubble above ghost
-        var bubbleRef = enemy.dying ? enemy.ghostY : enemy.y;
-        var by = Math.max(12, Math.round(bubbleRef - bh - 16)); // never clip off the top of the screen
+        var by = Math.max(12, Math.round(enemy.y - bh - 16)); // never clip off the top of the screen
         var tailX = snapBubbleX(enemy.x + enemy.w/2);
+        if(enemy.dying && enemy.ghostDraw){
+          // Once he's dead: beside the ghost's face, in front of him (towards
+          // the frog), so it never sits on top of the ghost or the pop-up
+          var gd = enemy.ghostDraw;
+          bx = snapBubbleX(gd.x + gd.w * GHOST_INK_L - bw - 14);
+          by = Math.max(152, Math.round(gd.y + gd.h * GHOST_INK_TOP - bh * 0.35));   // and always below the achievement pop-up
+          tailX = snapBubbleX(bx + bw - 30);
+        }
         drawBubble(bx, by, bw, bh, tailX);
         // Text
         ctx.fillStyle = BUBBLE_TEXT;
