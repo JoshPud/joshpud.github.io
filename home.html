@@ -722,6 +722,11 @@ var RETURN_PORTAL = null;
   sprites["bgSky"] = new Image();
   sprites["bgSky"].onload = function(){ spritesLoaded++; };
   sprites["bgSky"].src = "BACKGROUND.png";
+  // Parallax background layers (moonlit sky, moon, wisps, distant clouds with
+  // the castle, near clouds). The old single BACKGROUND.png is the fallback.
+  ["bg-sky.webp","bg-wisps.webp","bg-distant.webp","bg-near.webp","bg-moon.png"].forEach(function(src){
+    var k = src.split('.')[0]; sprites[k] = new Image(); sprites[k].src = src;
+  });
   sprites["groundTile"] = new Image();
   sprites["groundTile"].onload = function(){ spritesLoaded++; };
   sprites["groundTile"].src = "soil-repeat-tile.png";
@@ -1640,6 +1645,121 @@ var RETURN_PORTAL = null;
   }
 
   // ── DRAW
+
+  // ── PARALLAX BACKGROUND ────────────────────────────────────────────────
+  // Layers from back to front, each moving at its own fraction of the
+  // camera's movement (so they only move when the frog does):
+  //   stars + shooting stars (with the sky) → moon (2%) with a pixel halo →
+  //   sky (4%) → wisps over the moon (with the sky, half transparent) →
+  //   distant cloud sea and castle (8%) → near clouds (18%).
+  // Nothing repeats: each layer is one image, scaled up just enough to cover
+  // the whole level at its speed. Floating specks drift in front of the world.
+  var BGL = { moon:{speed:2, y:0.34}, sky:{speed:4}, distant:{speed:8, y:-0.20}, near:{speed:18, y:0.34} };
+  function bgReady(){ var k = ['bg-sky','bg-distant','bg-near','bg-moon']; for(var i = 0; i < k.length; i++){ var im = sprites[k[i]]; if(!im || !im.complete || !im.naturalWidth) return false; } return true; }
+  function bgMaxCam(){ return Math.max(1, WORLD_WIDTH - canvas.width); }
+  function bgSpan(im, speed, yFrac){
+    var H = canvas.height, s0 = H / im.naturalHeight, w0 = im.naturalWidth * s0;
+    var k = Math.max(1, (canvas.width + bgMaxCam() * speed / 100) / w0);   // scale up just enough to span the level
+    var w = w0 * k, h = H * k;
+    var off = Math.min(w - canvas.width, Math.max(0, cam.x) * speed / 100);
+    ctx.drawImage(im, -Math.round(off), Math.round(H * yFrac), Math.round(w), Math.round(h));
+  }
+  var _bgHalo = null, _bgT = 0;
+  function bgHalo(R){
+    if(_bgHalo && _bgHalo.R === R) return _bgHalo.c;
+    var P = 4, G = R * 1.15, size = Math.ceil((R + G) * 2 / P), cv = document.createElement('canvas'); cv.width = cv.height = size * P;
+    var g = cv.getContext('2d'), c = size / 2, bay = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+    for(var y = 0; y < size; y++) for(var x = 0; x < size; x++){
+      var dx = (x + 0.5 - c) * P, dy = (y + 0.5 - c) * P, d = Math.sqrt(dx*dx + dy*dy);
+      if(d < R - 2) continue;
+      var ang = Math.atan2(dy, dx), wob = 1 + 0.10*Math.sin(ang*3 + 1.3) + 0.07*Math.sin(ang*7 + 0.4) + 0.05*Math.sin(ang*13);
+      var k = 1 - (d - R) / (G * wob); if(k <= 0) continue;
+      k = k * k * (dy > 0 ? 0.85 : 1);
+      var lv = k * 4, base = Math.floor(lv); if(lv - base > bay[(y&3)*4 + (x&3)] / 16) base++;
+      if(base <= 0) continue;
+      g.fillStyle = 'rgba(255,232,196,' + [0,0.05,0.09,0.14,0.2][Math.min(4, base)] + ')'; g.fillRect(x*P, y*P, P, P);
+    }
+    _bgHalo = { R: R, c: cv }; return cv;
+  }
+  // stars: fixed pattern, thinning towards the horizon, twinkling in steps
+  var BG_STARS = (function(){ var a = [], seed = 7; function rnd(){ seed = (seed*9301 + 49297) % 233280; return seed / 233280; }
+    for(var i = 0; i < 150; i++){ a.push({ x: rnd()*1.35, y: Math.pow(rnd(), 1.7)*0.4, big: rnd() < 0.06, size: rnd() < 0.3 ? 2 : 1, ph: rnd()*6.28, sp: 0.6 + rnd()*1.6, warm: rnd() < 0.3 }); } return a; })();
+  var bgShooting = [], bgNextShoot = 4;
+  function bgStars(skyOff, dt){
+    var W = canvas.width, H = canvas.height, P = Math.max(2, Math.round(3 * H / 720)), t = _bgT;
+    for(var i = 0; i < BG_STARS.length; i++){ var s = BG_STARS[i];
+      var x = Math.round((s.x * W - skyOff) / P) * P; if(x < -10 || x > W + 10) continue;
+      var y = Math.round(s.y * H / P) * P, fade = 1 - Math.min(1, s.y / 0.4);
+      var tw = Math.sin(t * s.sp + s.ph), lv = tw > 0.55 ? 1 : (tw > -0.4 ? 0.7 : 0.35);
+      var a = (0.35 + 0.6 * fade) * lv, col = s.warm ? '255,226,180' : '240,244,226';
+      var sz = Math.max(2, s.size * P / 1.5 | 0);
+      ctx.fillStyle = 'rgba(' + col + ',' + a.toFixed(2) + ')'; ctx.fillRect(x, y, sz, sz);
+      if(s.big && tw > 0.9){ var cx = x + Math.floor(sz/2), cy = y + Math.floor(sz/2);
+        for(var k = 1; k <= 4; k++){ var ga = a * (0.75 - k*0.16); if(ga <= 0) break; ctx.fillStyle = 'rgba(' + col + ',' + ga.toFixed(2) + ')';
+          ctx.fillRect(cx - sz/2 - k, cy, 1, 1); ctx.fillRect(cx + sz/2 + k - 1, cy, 1, 1); ctx.fillRect(cx, cy - sz/2 - k, 1, 1); ctx.fillRect(cx, cy + sz/2 + k - 1, 1, 1); } }
+    }
+    // the odd shooting star (roughly every 15-30 seconds)
+    bgNextShoot -= dt / 60;
+    if(bgNextShoot <= 0){ var dir = Math.random() < 0.5 ? -1 : 1;
+      bgShooting.push({ x: W*(0.25 + Math.random()*0.5), y: H*(0.04 + Math.random()*0.16), vx: dir*(7 + Math.random()*4)*H/720, vy: (2.2 + Math.random()*1.4)*H/720, life: 0, max: 28 + Math.random()*14 });
+      bgNextShoot = 15 + Math.random()*15; }
+    for(var j = 0; j < bgShooting.length; j++){ var sh = bgShooting[j]; sh.life += dt; sh.x += sh.vx*dt; sh.y += sh.vy*dt;
+      var f = sh.life < 6 ? sh.life/6 : Math.max(0, 1 - (sh.life - 6)/(sh.max - 6));
+      var sp = Math.hypot(sh.vx, sh.vy), ux = sh.vx/sp, uy = sh.vy/sp, len = Math.round(sp*7);
+      for(var q = len; q >= 0; q--){ var aa = f * Math.pow(1 - q/len, 1.4) * 0.85; ctx.fillStyle = 'rgba(255,246,222,' + aa.toFixed(2) + ')'; ctx.fillRect(Math.round(sh.x - ux*q), Math.round(sh.y - uy*q), 1, 1); }
+      ctx.fillStyle = 'rgba(255,250,236,' + f.toFixed(2) + ')'; ctx.fillRect(Math.round(sh.x) - 1, Math.round(sh.y) - 1, 2, 2);
+    }
+    bgShooting = bgShooting.filter(function(sh){ return sh.life < sh.max; });
+  }
+  function drawParallaxBackground(dt){
+    if(!bgReady()) return false;
+    _bgT += (dt || 1) / 60;
+    var W = canvas.width, H = canvas.height, camx = Math.max(0, cam.x);
+    ctx.save(); ctx.imageSmoothingEnabled = false;
+    // sky
+    var sky = sprites['bg-sky'], sw = sky.naturalWidth * H / sky.naturalHeight;
+    var skyOff = Math.min(Math.max(0, sw - W), camx * BGL.sky.speed / 100);
+    ctx.drawImage(sky, -Math.round(skyOff), 0, Math.round(sw), H);
+    bgStars(skyOff, dt || 1);
+    // moon and its soft pixel halo (gently pulsing)
+    var moon = sprites['bg-moon'], R = Math.round(H * 0.116);
+    var mx = Math.round(W * 0.42 - camx * BGL.moon.speed / 100), my = Math.round(H * BGL.moon.y);
+    var halo = bgHalo(R); ctx.globalAlpha = 0.75 + 0.25 * (0.5 + 0.5 * Math.sin(_bgT * 1.1));
+    ctx.drawImage(halo, mx - halo.width/2, my - halo.height/2); ctx.globalAlpha = 1;
+    ctx.drawImage(moon, mx - R, my - R, R*2, R*2);
+    // wisps passing in front of the moon
+    var wisps = sprites['bg-wisps'];
+    if(wisps && wisps.complete && wisps.naturalWidth){ ctx.globalAlpha = 0.5; ctx.drawImage(wisps, -Math.round(skyOff), 0, Math.round(sw), H); ctx.globalAlpha = 1; }
+    // distant cloud sea with the castle, then the near clouds
+    bgSpan(sprites['bg-distant'], BGL.distant.speed, BGL.distant.y);
+    bgSpan(sprites['bg-near'], BGL.near.speed, BGL.near.y);
+    ctx.restore();
+    return true;
+  }
+  // ── FLOATING SPECKS (like the drifting motes in Hollow Knight) ──
+  // Small pale specks hovering like gnats. Most are small and further back;
+  // about a quarter are larger, softer and in front of the frog.
+  var BG_MOTES = (function(){ var a = [], seed = 23; function rnd(){ seed = (seed*9301 + 49297) % 233280; return seed / 233280; }
+    for(var i = 0; i < 46; i++){ var near = rnd() < 0.28;
+      a.push({ x: rnd()*2.4, y: 0.12 + rnd()*0.8, size: near ? (rnd() < 0.5 ? 8 : 12) : (rnd() < 0.5 ? 3 : 4), near: near,
+        par: near ? (1.15 + rnd()*0.25) : (0.55 + rnd()*0.4), ph: rnd()*100, sp: 0.6 + rnd()*1.2, wx: 10 + rnd()*22, wy: 6 + rnd()*14 }); }
+    return a; })();
+  function drawFloatingSpecks(){
+    if(!bgReady()) return;
+    var W = canvas.width, H = canvas.height, k = H / 720, span = W * 2.4, t = _bgT, camx = Math.max(0, cam.x);
+    for(var i = 0; i < BG_MOTES.length; i++){ var m = BG_MOTES[i], tt = t * m.sp + m.ph;
+      var dx = (Math.sin(tt*0.7)*m.wx + Math.sin(tt*3.1)*3 + Math.sin(tt*5.3)*1.5) * k;
+      var dy = (Math.cos(tt*0.9)*m.wy + Math.sin(tt*4.3)*2.5) * k;
+      var x = ((m.x*span - camx*m.par + dx) % span + span) % span - W*0.7, y = m.y*H + dy;
+      if(x < -20 || x > W + 20) continue;
+      var P = m.near ? 2 : 1, s = Math.round(m.size * k), X = Math.round(x/P)*P, Y = Math.round(y/P)*P;
+      if(m.near){
+        ctx.fillStyle = 'rgba(236,242,220,0.32)'; ctx.fillRect(X - s/2, Y - s/2 + 2, s, s - 4); ctx.fillRect(X - s/2 + 2, Y - s/2, s - 4, s);
+        ctx.fillStyle = 'rgba(236,242,220,0.6)'; ctx.fillRect(X - s/2 + 2, Y - s/2 + 2, s - 4, s - 4);
+      } else { ctx.fillStyle = 'rgba(236,242,220,0.8)'; ctx.fillRect(X, Y, s, s); }
+    }
+  }
+
   function draw(dt){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1654,7 +1774,8 @@ var RETURN_PORTAL = null;
     // across as the camera moves, then holds at its edge once it runs
     // out, rather than ever wrapping around and showing a repeat.
     var bgImg = sprites['bgSky'];
-    if(bgImg && bgImg.complete && bgImg.naturalWidth > 0){
+    if(drawParallaxBackground(dt)){ /* layered background drawn */ }
+    else if(bgImg && bgImg.complete && bgImg.naturalWidth > 0){
       var bgW = bgImg.naturalWidth;
       var bgH = bgImg.naturalHeight;
       // Scale to fill screen height
@@ -1993,6 +2114,7 @@ var RETURN_PORTAL = null;
     drawDialogue();
 
     ctx.restore();
+    drawFloatingSpecks();
 
   }
 
