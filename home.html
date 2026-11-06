@@ -1750,7 +1750,7 @@ var RETURN_PORTAL = null;
     return true;
   }
   // ── FLOATING SPECKS (like the drifting motes in Hollow Knight) ──
-  // Small pale specks hovering like gnats. Most are small and further back;
+  // Small lime-green specks hovering like gnats. Most are small and further back;
   // about a quarter are larger, softer and in front of the frog.
   var BG_MOTES = (function(){ var a = [], seed = 23; function rnd(){ seed = (seed*9301 + 49297) % 233280; return seed / 233280; }
     for(var i = 0; i < 46; i++){ var near = rnd() < 0.28;
@@ -1767,9 +1767,9 @@ var RETURN_PORTAL = null;
       if(x < -20 || x > W + 20) continue;
       var P = m.near ? 2 : 1, s = Math.round(m.size * k), X = Math.round(x/P)*P, Y = Math.round(y/P)*P;
       if(m.near){
-        ctx.fillStyle = 'rgba(236,242,220,0.32)'; ctx.fillRect(X - s/2, Y - s/2 + 2, s, s - 4); ctx.fillRect(X - s/2 + 2, Y - s/2, s - 4, s);
-        ctx.fillStyle = 'rgba(236,242,220,0.6)'; ctx.fillRect(X - s/2 + 2, Y - s/2 + 2, s - 4, s - 4);
-      } else { ctx.fillStyle = 'rgba(236,242,220,0.8)'; ctx.fillRect(X, Y, s, s); }
+        ctx.fillStyle = 'rgba(200,232,90,0.32)'; ctx.fillRect(X - s/2, Y - s/2 + 2, s, s - 4); ctx.fillRect(X - s/2 + 2, Y - s/2, s - 4, s);
+        ctx.fillStyle = 'rgba(200,232,90,0.6)'; ctx.fillRect(X - s/2 + 2, Y - s/2 + 2, s - 4, s - 4);
+      } else { ctx.fillStyle = 'rgba(200,232,90,0.8)'; ctx.fillRect(X, Y, s, s); }
     }
   }
 
