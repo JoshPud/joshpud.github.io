@@ -451,10 +451,24 @@ var RETURN_PORTAL = null;
   var TORTOISE_DEAD_VOLUME = 0.7;
 
   var tortoiseHitSounds = ['tortoiseHit1', 'tortoiseHit2', 'tortoiseHit3'];
+  // Fireball hit: a fiery sizzle, a hissing searing burn with a light impact
+  // (made in the browser, no sound files)
   function sfxHit(){ if(muted) return;
-    var id = tortoiseHitSounds[Math.floor(Math.random() * tortoiseHitSounds.length)];
-    var clip = document.getElementById(id);
-    if(clip){ clip.volume = TORTOISE_HIT_VOLUME; clip.currentTime = 0; clip.play().catch(function(){}); }
+    try {
+      var a = getAudio(), t0 = a.currentTime;
+      function noiseBurst(start, dur, vol, type, f, q, fEnd){
+        var len = Math.floor(a.sampleRate * (dur + 0.1)), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+        for(var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+        var src = a.createBufferSource(); src.buffer = buf;
+        var fl = a.createBiquadFilter(); fl.type = type; fl.frequency.setValueAtTime(f, t0 + start); if(q) fl.Q.value = q;
+        if(fEnd) fl.frequency.exponentialRampToValueAtTime(fEnd, t0 + start + dur);
+        var g = a.createGain(); g.gain.setValueAtTime(0.0001, t0 + start); g.gain.exponentialRampToValueAtTime(vol, t0 + start + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t0 + start + dur);
+        src.connect(fl); fl.connect(g); g.connect(a.destination); src.start(t0 + start); src.stop(t0 + start + dur + 0.1);
+      }
+      noiseBurst(0, 0.6, 0.25, 'bandpass', 5000, 1.2, 1500);   // the sizzle
+      noiseBurst(0, 0.15, 0.35, 'lowpass', 1200, 0.8, 200);    // the light impact
+      playTone(220, 'triangle', 0.2, 0.12, 90);
+    } catch(e){}
   }
 
   function sfxDeath(){
@@ -1253,6 +1267,16 @@ var RETURN_PORTAL = null;
   var GHOST_INK_TOP = 257 / 914, GHOST_INK_BOT = 902 / 914, GHOST_INK_L = 108 / 1024;
   var DEAD_INK_TOP = 336 / 914;     // top of the collapsed shell's spikes
 
+  var _redTint = null;
+  function redTint(img, w, h){
+    w = Math.round(w); h = Math.round(h);
+    if(_redTint && _redTint.src === img && _redTint.c.width === w && _redTint.c.height === h) return _redTint.c;
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var o = c.getContext('2d'); o.drawImage(img, 0, 0, w, h);
+    o.globalCompositeOperation = 'source-atop'; o.fillStyle = 'rgba(255,40,40,0.7)'; o.fillRect(0, 0, w, h);
+    _redTint = { src: img, c: c }; return c;
+  }
+
   // ── SHELLTON'S DEATH SLAM ──────────────────────────────────────────────
   // Like a boss going down: his body drops the last stretch to the floor,
   // lands with a heavy thud, the whole page shakes, and chunky pixel dust
@@ -1475,6 +1499,7 @@ var RETURN_PORTAL = null;
       if((enemy.alive || enemy.dying) && rectOverlap(fb, enemy)){
         fireballs.splice(f, 1);
         enemy.hitFlash = 20;
+        enemy.recoilDir = (fb.vx || 1) > 0 ? 1 : -1;
         if(enemy.dying){
           // Post-death hits on the ghost: a dull thud (no hit clips or grunts)
           // plus the speech bubble reaction
@@ -1773,9 +1798,27 @@ var RETURN_PORTAL = null;
       // higher in the picture than his front. Lowering the whole body a touch
       // (4% of his height) plants that back foot on the floor; his front half
       // settles into the grass, nearer the viewer.
-      var slamY = enemy.dying ? slamOffset() + enemy.h * 0.04 : 0;
+      // The standing and hit images are also drawn in slight perspective: his
+      // back foot sits about 3.4% of his height above his nearest front foot.
+      // Lowering him by that much plants the back foot on the floor, with his
+      // nearer feet settling into the grass.
+      var slamY = enemy.dying ? slamOffset() + enemy.h * 0.04 : enemy.h * 0.034;
+      // Hit reaction (while alive): he jolts back away from the fireball and
+      // settles, and flashes red for the first split second
+      var recoilX = 0, redFlash = false;
+      if(!enemy.dying && enemy.hitFlash > 0){
+        var hp = (20 - enemy.hitFlash) / 20;
+        recoilX = Math.round((enemy.recoilDir || 1) * 14 * Math.sin(Math.PI * Math.min(1, hp * 2)) * (1 - hp));
+        redFlash = enemy.hitFlash > 13;
+      }
       if(eImg && eImg.complete && eImg.naturalWidth > 0){
-        ctx.drawImage(eImg, enemy.x, enemy.y + slamY, eDrawW, enemy.h);
+        ctx.drawImage(eImg, enemy.x + recoilX, enemy.y + slamY, eDrawW, enemy.h);
+        if(redFlash){
+          var tint = redTint(eImg, eDrawW, enemy.h);
+          ctx.globalAlpha = enemy.hitFlash > 17 ? 1 : 0.5;
+          ctx.drawImage(tint, enemy.x + recoilX, enemy.y + slamY, eDrawW, enemy.h);
+          ctx.globalAlpha = 1;
+        }
       } else {
         ctx.fillStyle = '#6a4378';
         ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
