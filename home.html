@@ -329,10 +329,12 @@
 <div id="fadeOverlay"></div>
 <audio id="teleportSound" src="TELEPORT_SOUND.MP3" preload="auto"></audio>
 <audio id="fireballScream" src="FROG_SCREAM.mp3" preload="auto"></audio>
-<audio id="tortoiseHit1" src="TORTOISE_HIT_1.mp3" preload="auto"></audio>
-<audio id="tortoiseHit2" src="TORTOISE_HIT_2.mp3" preload="auto"></audio>
-<audio id="tortoiseHit3" src="TORTOISE_HIT_3.mp3" preload="auto"></audio>
-<audio id="tortoiseDead" src="TORTOISE_DEAD_2.mp3" preload="auto"></audio>
+<audio id="tortoiseHit1" src="shellton_hit_1.mp3" preload="auto"></audio>
+<audio id="tortoiseHit2" src="shellton_hit_2.mp3" preload="auto"></audio>
+<audio id="tortoiseHit3" src="shellton_hit_3.mp3" preload="auto"></audio>
+<audio id="tortoiseHit4" src="shellton_hit_4.mp3" preload="auto"></audio>
+<audio id="tortoiseHit5" src="shellton_hit_5.mp3" preload="auto"></audio>
+<audio id="tortoiseDead" src="shellton_dead.mp3" preload="auto"></audio>
 <audio id="bgMusic" src="scizzie_-_aquatic_ambience.mp3" preload="auto"></audio>
 <audio id="logoCroak" src="FROG_CROAK.mp3" preload="auto"></audio>
 <audio id="tongueSound" src="frog_tongue.mp3" preload="auto"></audio>
@@ -450,10 +452,11 @@ var RETURN_PORTAL = null;
   var TORTOISE_HIT_VOLUME = 0.7;
   var TORTOISE_DEAD_VOLUME = 0.7;
 
-  var tortoiseHitSounds = ['tortoiseHit1', 'tortoiseHit2', 'tortoiseHit3'];
+  var tortoiseHitSounds = ['tortoiseHit1', 'tortoiseHit2', 'tortoiseHit3', 'tortoiseHit4', 'tortoiseHit5'];
+  var lastTortoiseHit = -1;
   // Fireball hit: a fiery sizzle, a hissing searing burn with a light impact
   // (made in the browser, no sound files)
-  function sfxHit(){ if(muted) return;
+  function sfxHit(withVoice){ if(muted) return;
     try {
       var a = getAudio(), t0 = a.currentTime;
       function noiseBurst(start, dur, vol, type, f, q, fEnd){
@@ -469,6 +472,13 @@ var RETURN_PORTAL = null;
       noiseBurst(0, 0.15, 0.35, 'lowpass', 1200, 0.8, 200);    // the light impact
       playTone(220, 'triangle', 0.2, 0.12, 90);
     } catch(e){}
+    // ...and Shellton's own reaction, one of five, never the same one twice in a row
+    if(withVoice === false) return;
+    var n = Math.floor(Math.random() * tortoiseHitSounds.length);
+    if(n === lastTortoiseHit) n = (n + 1 + Math.floor(Math.random() * (tortoiseHitSounds.length - 1))) % tortoiseHitSounds.length;
+    lastTortoiseHit = n;
+    var clip = document.getElementById(tortoiseHitSounds[n]);
+    if(clip){ clip.volume = TORTOISE_HIT_VOLUME; clip.currentTime = 0; clip.play().catch(function(){}); }
   }
 
   function sfxDeath(){
@@ -1231,8 +1241,8 @@ var RETURN_PORTAL = null;
 
 
   // ── ACHIEVEMENTS ────────────────────────────────────────────────────────
-  // Xbox-style pop-up in the top right. Each one is only awarded once per
-  // visitor (remembered in their browser), so it stays a surprise.
+  // Xbox-style pop-up in the top right. Each one is awarded once per page
+  // load, so it shows again whenever the page is refreshed.
   var ACHIEVEMENTS = {
     turtley: { name: 'Turtley Uncalled For', desc: 'You killed a defenceless NPC. That\u2019s kinda fucked up.' }
   };
@@ -1241,10 +1251,12 @@ var RETURN_PORTAL = null;
   function achCloseSound(){ if(muted) return; playTone(784, 'sine', 0.28, 0.12); setTimeout(function(){ playTone(523, 'sine', 0.4, 0.11); playTone(392, 'sine', 0.4, 0.03); }, 80); }
   // How long a pop-up is on screen, from popping in to popping away (7.55s)
   var ACH_ON_SCREEN_FRAMES = Math.round(7.55 * 60);
-  function achievementEarned(id){ try { return !!localStorage.getItem('jccAch:' + id); } catch(e){ return false; } }
+  // Each achievement shows once per page load (refreshing the page resets it)
+  var achShown = {};
+  function achievementEarned(id){ return !!achShown[id]; }
   function awardAchievement(id){
     var a = ACHIEVEMENTS[id]; if(!a) return;
-    try { if(localStorage.getItem('jccAch:' + id)) return; localStorage.setItem('jccAch:' + id, '1'); } catch(e){}
+    if(achShown[id]) return; achShown[id] = true;
     var t = document.createElement('div');
     t.className = 'ach-toast'; t.setAttribute('role', 'status');
     t.innerHTML = '<div class="ach-badge"><i></i></div><div class="ach-txt"><div class="ach-small">New achievement!</div>' +
@@ -1517,8 +1529,8 @@ var RETURN_PORTAL = null;
           }
           enemy.bubbleTimer = 240;
         } else {
-          sfxHit();
           enemy.hitCount++;
+          sfxHit(enemy.hitCount < enemy.maxHits);   // the final blow: just the sizzle, then his death sound
           if(enemy.hitCount >= enemy.maxHits){
             enemy.alive = false;
             enemy.dying = true;
