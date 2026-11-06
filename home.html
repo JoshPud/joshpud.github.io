@@ -1179,6 +1179,92 @@ var RETURN_PORTAL = null;
     ctx.restore();
   }
 
+
+  // ── SHELLTON'S DEATH SLAM ──────────────────────────────────────────────
+  // Like a boss going down: his body drops the last stretch to the floor,
+  // lands with a heavy thud, the whole page shakes, and chunky pixel dust
+  // clouds burst out from under him along the ground.
+  var SLAM_DROP = 70, SLAM_FALL = 12;   // how far (px) and how long (60ths of a second) the final drop takes
+  var dust = [], shake = 0;
+  function slamOffset(){
+    var sl = enemy.slam; if(!sl || sl.landed) return 0;
+    var p = Math.min(1, sl.t / SLAM_FALL);
+    return -SLAM_DROP * (1 - p * p);                  // speeds up as he falls, like real weight
+  }
+  function updateSlam(dt){
+    var sl = enemy.slam;
+    if(sl){
+      sl.t += dt;
+      if(!sl.landed && sl.t >= SLAM_FALL){
+        sl.landed = true; sl.t = 0;
+        shake = 1;
+        sfxThud(); setTimeout(sfxThud, 70);
+        spawnDust();
+      }
+    }
+    // dust clouds drift out and up, then fade in steps
+    for(var i = 0; i < dust.length; i++){
+      var d = dust[i];
+      d.x += d.vx * dt; d.y += d.vy * dt; d.vx *= Math.pow(0.95, dt); d.vy *= Math.pow(0.95, dt);
+      d.life += dt; d.r = d.r0 + (d.grow * Math.min(1, d.life / 30));
+    }
+    dust = dust.filter(function(d){ return d.life < d.max; });
+    // page shake, easing off over about half a second
+    if(shake > 0){
+      shake = Math.max(0, shake - dt / 32);
+      var amt = 9 * shake * shake;
+      var sx = Math.round((Math.random() * 2 - 1) * amt), sy = Math.round((Math.random() * 2 - 1) * amt);
+      document.body.style.transform = shake > 0 ? 'translate(' + sx + 'px,' + sy + 'px)' : '';
+    }
+  }
+  function spawnDust(){
+    var eImg = sprites['tortoise-dead'];
+    var aspect = eImg && eImg.naturalWidth ? eImg.naturalWidth / eImg.naturalHeight : 1;
+    var x0 = enemy.x + enemy.h * aspect * 0.08, x1 = enemy.x + enemy.h * aspect * 0.95;
+    var cx = (x0 + x1) / 2, gy = GROUND_Y;
+    for(var i = 0; i < 26; i++){
+      var x = x0 + (x1 - x0) * Math.random();
+      var dir = x < cx ? -1 : 1;
+      dust.push({ x: x, y: gy - 6 - Math.random() * 18,
+        vx: dir * (1.2 + Math.random() * 3.2) * (0.4 + Math.abs(x - cx) / ((x1 - x0) / 2)),
+        vy: -(0.3 + Math.random() * 1.4),
+        r0: 8 + Math.random() * 10, grow: 10 + Math.random() * 16, r: 0,
+        life: 0, max: 45 + Math.random() * 40,
+        tone: Math.floor(Math.random() * 3) });
+    }
+    // a low burst rolling out along the ground either side
+    for(var k = 0; k < 10; k++){
+      var side = k % 2 ? -1 : 1;
+      dust.push({ x: side < 0 ? x0 + 20 : x1 - 20, y: gy - 4,
+        vx: side * (4 + Math.random() * 4), vy: -Math.random() * 0.4,
+        r0: 6 + Math.random() * 6, grow: 8 + Math.random() * 8, r: 0,
+        life: 0, max: 35 + Math.random() * 25, tone: Math.floor(Math.random() * 3) });
+    }
+  }
+  function drawDust(){
+    if(!dust.length) return;
+    var P = 5;                                       // pixel size: chunky squares, no soft edges
+    var tones = [[150,132,108],[118,104,88],[178,160,134]];
+    ctx.save();
+    for(var i = 0; i < dust.length; i++){
+      var d = dust[i], fade = 1 - d.life / d.max;
+      var a = fade > 0.66 ? 0.85 : fade > 0.33 ? 0.55 : 0.28;   // fades in three steps
+      var c = tones[d.tone];
+      var R = Math.round(d.r / P);
+      var cxp = Math.round(d.x / P), cyp = Math.round(d.y / P);
+      for(var yy = -R; yy <= R; yy++){
+        for(var xx = -R; xx <= R; xx++){
+          var dist2 = xx * xx + yy * yy * 1.6;          // slightly flattened puffs
+          if(dist2 > R * R) continue;
+          var edge = dist2 > (R - 1) * (R - 1);
+          ctx.fillStyle = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + (edge ? a * 0.6 : a) + ')';
+          ctx.fillRect((cxp + xx) * P, (cyp + yy) * P, P, P);
+        }
+      }
+    }
+    ctx.restore();
+  }
+
   function update(dt){
     // Player state
     if(player.castTimer > 0) player.castTimer = Math.max(0, player.castTimer - dt);
@@ -1330,6 +1416,7 @@ var RETURN_PORTAL = null;
           if(enemy.hitCount >= enemy.maxHits){
             enemy.alive = false;
             enemy.dying = true;
+            enemy.slam = { t: 0, landed: false };   // boss-style collapse: drop, THUD, shake, dust
             enemy.bubble = "I just wanted to be\nleft alone.";
             enemy.bubbleTimer = 300;
             sfxDeath();
@@ -1348,8 +1435,10 @@ var RETURN_PORTAL = null;
     enemy.y = GROUND_Y - enemy.h;
     if(enemy.hitFlash > 0) enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
 
-    // Ghost rise animation
-    if(enemy.dying){
+    updateSlam(dt);
+
+    // Ghost rise animation (waits until he has hit the floor and the dust has settled a little)
+    if(enemy.dying && (!enemy.slam || (enemy.slam.landed && enemy.slam.t > 40))){
       enemy.ghostTimer += dt;
       var ghostTargetY = enemy.y - enemy.h * 0.3; // final resting position just above body
       if(!enemy.ghostRisen){
@@ -1594,15 +1683,18 @@ var RETURN_PORTAL = null;
       var eImg = sprites[eKey];
       var eAspect = eImg && eImg.naturalWidth > 0 ? eImg.naturalWidth / eImg.naturalHeight : 1;
       var eDrawW = enemy.h * eAspect;
+      var slamY = enemy.dying ? slamOffset() : 0;
       if(eImg && eImg.complete && eImg.naturalWidth > 0){
-        ctx.drawImage(eImg, enemy.x, enemy.y, eDrawW, enemy.h);
+        ctx.drawImage(eImg, enemy.x, enemy.y + slamY, eDrawW, enemy.h);
       } else {
         ctx.fillStyle = '#6a4378';
         ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
       }
 
+      drawDust();
+
       // Draw ghost rising above body when dying
-      if(enemy.dying){
+      if(enemy.dying && (!enemy.slam || (enemy.slam.landed && enemy.slam.t > 40))){
         var gImg = sprites['tortoise-ghost'];
         if(gImg && gImg.complete && gImg.naturalWidth > 0){
           var gAspect = gImg.naturalWidth / gImg.naturalHeight;
