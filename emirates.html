@@ -1250,8 +1250,8 @@
   </div>
   <div class="context-description-wrap">
   <div class="context-description">
-    <p class="context-text">Kid’s imaginations are ignited when they travel.</p>
-    <p class="context-text">An amazing partnership with Emirates and an award-winning writer and illustrator duo (Phillip Reeve & Sarah Mcintyre), to turn your child’s holiday story into their next book release. Launched on social media, with digital support, we asked parents to send us their kid’s holiday stories and pictures for a chance to win a family holiday to Dubai. The best entries were judged by Phillip and Sarah, who then transformed charming stories and pictures into a beautiful children’s book.</p>
+    <p class="context-text">Kids’ imaginations are ignited when they travel. So I came up with an idea to turn that into something they’d treasure forever: their very own book.</p>
+    <p class="context-text">I brought Emirates together with award-winning writer and illustrator duo Philip Reeve and Sarah McIntyre to make it happen. Launched on social media with digital support, we invited parents to send in their kids’ front cover designs for a book inspired by their holidays, complete with their own character and title, for the chance to win a family holiday to Dubai.</p>
   </div>
   </div>
 </section>
@@ -1279,7 +1279,7 @@
 
 <div class="context-description-wrap">
   <div class="context-description">
-    <p class="context-text">We received thousands of entries. After tough deliberation, our judges selected 4 year old, Maddison Penney's ‘Monkey on a Plane’ as their inspiration. Creating a printed book that brought her idea to life, and serving as the perfect flight time story for other children on our flights.</p>
+    <p class="context-text">We received thousands of entries. After tough deliberation, Philip and Sarah chose 4-year-old Maddison Penney’s ‘Monkey on a Plane’ as the winner, then turned her cover into a full children’s book, using her character and title as the inspiration for the story and illustrations. It became the perfect flight-time story for other children on Emirates flights.</p>
   </div>
 </div>
 
@@ -1368,7 +1368,7 @@
     <span class="nav-direction" style="position:absolute; visibility:hidden;"><span class="nav-text-inner">placeholder</span></span>
     <span class="nav-title"><span class="nav-text-inner">Return to the Kingdom of Portfolia</span></span>
   </a>
-  <a href="tiktok.html?from=15" class="project-nav-item next">
+  <a href="tiktok.html?from=16" class="project-nav-item next">
     <span class="nav-direction"><span class="nav-text-inner"><span class="nav-label">NEXT</span><svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"></line><polyline points="13 5 20 12 13 19"></polyline></svg></span></span>
     <span class="nav-title"><span class="nav-text-inner">TikTok</span></span>
   </a>
@@ -2535,6 +2535,17 @@ document.querySelectorAll('.video-wrap').forEach(initVideoPlayer);
     if(!last) return;
     if(p.textContent.trim().split(/\s+/).length < 4) return;          // leave very short lines alone
     last.nodeValue = last.nodeValue.replace(/\s+(\S+\s*)$/, '\u00A0$1');
+  });
+  // No stranded sentence starts: when a new sentence begins with a short word
+  // (like "We", "So", "It", "A"), glue it to the word after it, so it can't be
+  // left dangling at the end of a line after the previous sentence's full stop.
+  document.querySelectorAll('.context-text, .quote-text, .context-tagline, .lore, .origin-line, .skill-display-desc, .raven-success-desc').forEach(function(p){
+    var walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT), n;
+    while((n = walker.nextNode())){
+      n.nodeValue = n.nodeValue.replace(/([.!?\u2026]['\u2019"\u201d)]?\s*(?:\p{Extended_Pictographic}\S*\s*)?[.!?]?\s+)([A-Za-z\u2019']{1,3})\s+/gu, '$1$2\u00A0')
+        // keep an emoji with the word before it, so it never starts a line on its own
+        .replace(/\s+(\p{Extended_Pictographic})/gu, '\u00A0$1');
+    }
   });
 })();
 </script>
