@@ -295,8 +295,7 @@
     transition: opacity 0.45s ease;
     pointer-events: none;
   }
-  .stone-plate:hover::before,
-  .stone-plate:focus-within::before{ opacity: 1; }
+  /* (no hover glow: the stone plates are labels, not buttons) */
   .stone-plate > span{
     position: relative;
   }
@@ -994,6 +993,7 @@
 </script>
 </head>
 <body>
+<nav id="pageNav" aria-label="Site"><i class="gx-foot" aria-hidden="true"></i><a id="hopTop" href="lucozade-back-for-the-believers.html?from=0" style="text-decoration:none"><span class="hop-word"><span class="gx-t" data-t="Hop to the work"><span>Hop to the work</span></span></span></a><i class="gx-foot" aria-hidden="true"></i></nav>
 <div class="stage">
   <video class="bg-video" autoplay loop muted playsinline preload="auto">
           <source src="JCC_CharacterSelect.mp4" type="video/mp4">
@@ -1186,12 +1186,21 @@
     function sizeCrowCanvas(){
       var titleEl = document.querySelector('.raven-modal-title');
       var topGap = titleEl.getBoundingClientRect().top;
-      var h = Math.max(40, Math.round(topGap));
+      // Twice the size: the frame is twice as tall, but its bottom stays on the
+      // title, so the raven (which perches at the bottom of the frame) doubles
+      // in size while still standing on the window.
+      var h = Math.max(80, Math.round(topGap * 2));
       var w = Math.round(h * CROW_ASPECT);
-      crowCanvas.width = w;
-      crowCanvas.height = h;
+      // The cut-out is worked out at the video's own resolution (340 x 610)
+      // for cleaner edges, then scaled to size on screen.
+      if (crowCanvas.width !== 340) { crowCanvas.width = 340; crowCanvas.height = 610; }
       crowCanvas.style.width = w + 'px';
       crowCanvas.style.height = h + 'px';
+      // Stand him on the window's top edge: his feet sit 93.6% of the way down
+      // his frame (measured from the animation), so line that up with the box.
+      var boxTop = document.querySelector('.raven-modal').getBoundingClientRect().top;
+      // ...and a touch lower, so his claws curl over the edge, gripping it
+      crowCanvas.style.top = Math.round(boxTop - h * 0.936 + h * 0.014) + 'px';
     }
 
     function drawCrowFrame(){
@@ -1201,17 +1210,24 @@
         crowCtx.drawImage(src, 0, 0, crowCanvas.width, crowCanvas.height);
         var frame = crowCtx.getImageData(0, 0, crowCanvas.width, crowCanvas.height);
         var d = frame.data;
-        var lowT = 15, highT = 80;
+        // Green-screen key, refined:
+        //  - judged on how green a pixel is RELATIVE to its brightness, so dark
+        //    green shadows under his feet are removed as well as bright green
+        //  - a tighter edge (the soft edge is pulled in), so there's no halo
+        //  - any green tint left on his edges is taken out (despill)
         for (var i = 0; i < d.length; i += 4) {
           var r = d[i], g = d[i+1], b = d[i+2];
           var maxRB = r > b ? r : b;
           var excess = g - maxRB;
-          if (excess > lowT) {
-            var t = (excess - lowT) / (highT - lowT);
-            if (t > 1) t = 1;
-            d[i+3] = d[i+3] * (1 - t);
-            var newG = g - (g - maxRB) * t;
-            d[i+1] = newG;
+          if (excess > 0) {
+            var rel = excess / (g + 8);
+            var t = (rel - 0.14) / 0.24;
+            if (t > 0) {
+              if (t > 1) t = 1;
+              var a = d[i+3] * (1 - t);
+              d[i+3] = a * (0.45 + 0.55 * a / 255);
+            }
+            d[i+1] = maxRB + excess * 0.12;
           }
         }
         crowCtx.putImageData(frame, 0, 0);
@@ -1594,6 +1610,67 @@ window.addEventListener('pageshow', function(e){
      below also glues the last two words of each paragraph together, so
      older browsers behave the same. */
   .context-text, .lore, .origin-line, .skill-display-desc, .raven-success-desc { text-wrap: pretty; }
+  /* ═══════════ HOP TO THE WORK, top right (desktop) ═══════════
+     Gold word lettered like the project labels; lights up left to right on
+     hover, as on the landing page. Phones use the menu button instead. */
+  #pageNav { position: fixed; right: 28px; z-index: 1001; opacity: 0; transition: opacity 0.8s ease; }
+  #pageNav.on { opacity: 1; }
+  #pageNav button, #pageNav .hop-word {
+    display: inline-block; background: transparent; border: none; cursor: pointer; padding: 4px 0;
+    font-family: 'Quadraat Offc Pro', 'Spectral', Georgia, serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 3px; text-transform: uppercase; line-height: 1; white-space: nowrap;
+  }
+  #pageNav .gx-t { display: inline-block; position: relative; }
+  #pageNav .gx-t::before {
+    content: attr(data-t); position: absolute; left: 0; top: 0;
+    color: transparent; text-shadow: 0 2px 5px rgba(0,0,0,0.55);
+  }
+  #pageNav .gx-t span {
+    display: block; position: relative;
+    background: linear-gradient(180deg, #FFE9C4 0%, #FBCEA0 45%, #B88A4E 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #pageNav .gx-t::after {
+    content: attr(data-t); position: absolute; top: 0; left: 0; z-index: 2;
+    width: 0; overflow: hidden; white-space: nowrap; opacity: 0;
+    color: #FFF6E2; text-shadow: 0 0 8px rgba(255,214,150,0.55);
+    transition: opacity 0.4s 0.2s, width 0.6s;
+  }
+  #pageNav a:hover .gx-t::after,
+  #pageNav a:focus-visible .gx-t::after { opacity: 1; width: 100%; transition: opacity 0.4s, width 0.6s; }
+  @media (hover: none) and (pointer: coarse) { #pageNav { display: none; } }
+  /* HOP TO THE WORK framed by a gold frog foot either side (desktop) */
+  #pageNav { display: flex; align-items: center; gap: 10px; right: 32px; }   /* 32px clear of the edge, matching the space above */
+  #pageNav .gx-foot {
+    width: 10px; height: 9px; flex-shrink: 0; position: relative; top: 0px;   /* centred on the capitals, measured in a Mac browser (Linux test browsers render the font slightly differently) */
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyMiI+PGcgZmlsbD0iI0ZCQ0VBMCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIzLjIiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjMuMiIgY3k9IjkuNiIgcj0iMy4yIi8+PGNpcmNsZSBjeD0iMjAuOCIgY3k9IjkuNiIgcj0iMy4yIi8+PHBhdGggZD0iTTEwLjkgNS41aDIuMnY4LjJsNS4zLTMuNCAxLjIgMS44LTYuNCA2LjFjLS43LjctMS43LjctMi40IDBMNC40IDEyLjFsMS4yLTEuOCA1LjMgMy40eiIvPjxlbGxpcHNlIGN4PSIxMiIgY3k9IjE3LjYiIHJ4PSIzLjMiIHJ5PSIyLjYiLz48L2c+PC9zdmc+Cg==') center / contain no-repeat;
+    opacity: 0.75; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
+  }
+
+  /* Desktop: the framed words in the top right replace the footer button
+     (phones keep the footer button, as the menu sits top right there) */
+  @media not all and (hover: none) and (pointer: coarse) { .hop-btn { display: none !important; } }
+
+  /* ═══════════ SKILLS & PASSIVES: inviting a click ═══════════
+     Icons you haven't opened yet glint gold one after another, and a small
+     counter shows how many you've discovered. */
+  @keyframes skillGlint {
+    0%, 70%, 100% { box-shadow: 0 0 0 0 rgba(216,181,89,0); }
+    80% { box-shadow: 0 0 0 2px rgba(216,181,89,0.6), 0 0 10px 2px rgba(216,181,89,0.4); }
+  }
+  .skill-icon-btn.unseen { animation: skillGlint 3.2s ease-in-out infinite; }
+  .skill-icon-btn.unseen:nth-child(2) { animation-delay: 0.5s; }
+  .skill-icon-btn.unseen:nth-child(3) { animation-delay: 1s; }
+  .skill-icon-btn.unseen:nth-child(4) { animation-delay: 1.5s; }
+  .skill-icon-btn.unseen:nth-child(5) { animation-delay: 2s; }
+  .skill-count {
+    font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(216,181,89,0.75); text-align: right; margin: -0.35rem 0 0.2rem;
+  }
+  @media (prefers-reduced-motion: reduce) { .skill-icon-btn.unseen { animation: none; } }
+
+  /* phones: the menu button sits top right instead */
+  @media (hover: none) and (pointer: coarse) { #pageNav { display: none !important; } }
 </style>
 <button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
@@ -1663,6 +1740,40 @@ window.addEventListener('pageshow', function(e){
         // keep an emoji with the word before it, so it never starts a line on its own
         .replace(/\s+(\p{Extended_Pictographic})/gu, '\u00A0$1');
     }
+  });
+})();
+</script>
+<script>
+// HOP TO THE WORK (top right, desktop): 28px down, fades in with the page,
+// fades to black on click like the footer button did.
+(function(){
+  var nav = document.getElementById('pageNav'), link = document.getElementById('hopTop'), veil = document.getElementById('pageLeave');
+  if(!nav || !link) return;
+  nav.style.top = '28px';
+  var logo = document.querySelector('.top-bar-logo'), t0 = performance.now();
+  (function wait(){
+    var shown = logo ? parseFloat(getComputedStyle(logo.closest('header, .topbar, h1') || logo).opacity || 1) > 0.5 : true;
+    if(shown || performance.now() - t0 > 6000) nav.classList.add('on'); else setTimeout(wait, 150);
+  })();
+  link.addEventListener('click', function(e){
+    if(e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    if(veil) veil.classList.add('on');
+    setTimeout(function(){ window.location.href = link.href; }, 450);
+  });
+})();
+// Skills & passives: glint on icons not yet opened, and a "discovered" counter
+(function(){
+  document.querySelectorAll('.skill-icons').forEach(function(group){
+    var btns = group.querySelectorAll('.skill-icon-btn'); if(!btns.length) return;
+    var seen = {}, count = document.createElement('p'); count.className = 'skill-count';
+    group.parentNode.insertBefore(count, group);
+    function update(){ count.textContent = Object.keys(seen).length + ' / ' + btns.length + ' discovered'; }
+    btns.forEach(function(b, i){
+      if(b.classList.contains('active')) seen[i] = true; else b.classList.add('unseen');
+      b.addEventListener('click', function(){ b.classList.remove('unseen'); seen[i] = true; update(); });
+    });
+    update();
   });
 })();
 </script>
