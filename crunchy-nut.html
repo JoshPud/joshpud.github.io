@@ -2425,7 +2425,8 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
      balance the last lines themselves (text-wrap: pretty); the small script
      below also glues the last two words of each paragraph together, so
      older browsers behave the same. */
-  .context-text, .lore, .origin-line, .skill-display-desc, .raven-success-desc { text-wrap: pretty; }
+  .context-text, .quote-text, .lore, .origin-line, .skill-display-desc, .raven-success-desc { text-wrap: pretty; }
+  .context-tagline { text-wrap: balance; }   /* short centred lines: even out, never a lone last word */
 </style>
 <button class="pm-btn" id="pmBtn" aria-label="Menu" aria-expanded="false" aria-controls="pmMenu"><i></i><i></i><i></i></button>
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
@@ -2566,7 +2567,7 @@ document.querySelectorAll('.video-backdrop').forEach(function(backdrop){
 // No widows: join the last two words of each body-copy paragraph with a
 // non-breaking space, so a paragraph can never end with one word on its own.
 (function(){
-  document.querySelectorAll('.context-text, .lore, .origin-line, .skill-display-desc, .raven-success-desc').forEach(function(p){
+  document.querySelectorAll('.context-text, .quote-text, .context-tagline, .lore, .origin-line, .skill-display-desc, .raven-success-desc').forEach(function(p){
     var walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT), last = null, n;
     while((n = walker.nextNode())) if(/\S/.test(n.nodeValue)) last = n;
     if(!last) return;
