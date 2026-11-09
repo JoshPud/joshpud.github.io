@@ -1308,6 +1308,14 @@ var RETURN_PORTAL = null;
   // Where each character's drawing actually starts within its image (fractions of height)
   var FROG_INK_TOP = 133 / 457, SHELLTON_INK_TOP = 257 / 914;
 
+  // How long Shellton's speech bubble stays up, based on how much there is to
+  // read: about 3 seconds for a short line, plus roughly a third of a second
+  // for every 5 characters, up to 10 seconds for the longest ones.
+  function bubbleTime(text){
+    var chars = (text || '').replace(/\n/g, ' ').length;
+    return Math.max(180, Math.min(600, 120 + chars * 4));   // in 60ths of a second
+  }
+
   // ── SHELLTON'S DEATH SLAM ──────────────────────────────────────────────
   // Like a boss going down: his body drops the last stretch to the floor,
   // lands with a heavy thud, the whole page shakes, and chunky pixel dust
@@ -1542,7 +1550,7 @@ var RETURN_PORTAL = null;
           } else {
             enemy.bubble = "Seriously. I think you should\nspeak with someone.\nThis isn't normal behaviour.";
           }
-          enemy.bubbleTimer = 240;
+          enemy.bubbleTimer = bubbleTime(enemy.bubble);
         } else {
           enemy.hitCount++;
           sfxHit(enemy.hitCount < enemy.maxHits);   // the final blow: just the sizzle, then his death sound
@@ -1557,7 +1565,7 @@ var RETURN_PORTAL = null;
             setTimeout(sfxBubble, 80);
             var msg = enemyMessages[(enemy.hitCount - 1) % enemyMessages.length];
             enemy.bubble = msg;
-            enemy.bubbleTimer = 180;
+            enemy.bubbleTimer = bubbleTime(enemy.bubble);
           }
         } // 3 seconds at 60fps
         continue;
@@ -1587,7 +1595,7 @@ var RETURN_PORTAL = null;
         if(riseProgress >= 1){
           enemy.ghostRisen = true;
           // ...and only now does he speak
-          if(enemy.pendingBubble){ enemy.bubble = enemy.pendingBubble; enemy.bubbleTimer = 300; enemy.pendingBubble = null; }
+          if(enemy.pendingBubble){ enemy.bubble = enemy.pendingBubble; enemy.bubbleTimer = Math.max(300, bubbleTime(enemy.pendingBubble)); enemy.pendingBubble = null; }
         }
       } else {
         // Bob gently in place (only upwards, so it never dips back towards the body)
