@@ -789,7 +789,7 @@ var RETURN_PORTAL = null;
     dying: false,
     hitCount: 0,
     hitFlash: 0,
-    maxHits: 10,
+    maxHits: 13,   // 12 lines of complaint, then the 13th fireball finishes him
     bubble: null,
     bubbleTimer: 0,
     ghostY: 0,
@@ -800,16 +800,20 @@ var RETURN_PORTAL = null;
   };
 
   // One line per hit, in order (hits 1 to 9). The 10th hit is the death line.
+  // One line per hit, in order. He dies on the hit after the last line.
   var enemyMessages = [
     "What the hell?",
-    "What made you think\nI was an enemy?",
-    "Do you always attack anything\nthat's different from you?",
-    "Why do you think\nthat might be?",
-    "You didn't even say hello.\nYou just opened with a fireball.",
-    "Hurt people hurt people,\nyou know.",
-    "You don't even look angry.\nThat's the worrying part.",
-    "Do you not think I've\nsufficiently been burnt?",
-    "I'm not mad.\nI'm just disappointed."
+    "I mean, the first fireball I\ncan let slide as pure curiosity,\nbut you're consciously\nhurting me now.",
+    "Seriously, that really\nbloody hurt.",
+    "Did you just assume\nI was an enemy?",
+    "God forbid you meet someone\ndifferent from you.",
+    "This nose ring is something\nnew I'm trying, and now you've\nmade me feel incredibly\nself-conscious about it.",
+    "Please STOP. You're LITERALLY\nburning me with fire.",
+    "Is this a JOKE to you?",
+    "OK. OW.",
+    "Please stop before\nit's too late.",
+    "Stop it, you foul beast.",
+    "I fear the long night\ncalls for me."
   ];
 
 
@@ -1300,6 +1304,9 @@ var RETURN_PORTAL = null;
     o.globalCompositeOperation = 'source-atop'; o.fillStyle = 'rgba(255,40,40,0.7)'; o.fillRect(0, 0, w, h);
     _redTint = { src: img, c: c }; return c;
   }
+
+  // Where each character's drawing actually starts within its image (fractions of height)
+  var FROG_INK_TOP = 133 / 457, SHELLTON_INK_TOP = 257 / 914;
 
   // ── SHELLTON'S DEATH SLAM ──────────────────────────────────────────────
   // Like a boss going down: his body drops the last stretch to the floor,
@@ -2000,7 +2007,12 @@ var RETURN_PORTAL = null;
         var bw = Math.ceil(Math.max(maxLineW + 36, 220) / 2) * 2;
         var bh = lines.length * 22 + 28;
         var bx = snapBubbleX(enemy.x + enemy.w/2 - bw/2);
-        var by = Math.max(12, Math.round(enemy.y - bh - 16)); // never clip off the top of the screen
+        // Same visible gap as the frog's own speech bubble: measured from the
+        // top of the actual drawing (his images have empty space above him),
+        // matching the frog's gap between his bubble and the top of his hat.
+        var frogGap = DIALOGUE_GAP + player.h * FROG_INK_TOP;
+        var shelltonTop = enemy.y + enemy.h * 0.034 + enemy.h * SHELLTON_INK_TOP;
+        var by = Math.max(12, Math.round(shelltonTop - bh - frogGap)); // never clip off the top of the screen
         var tailX = snapBubbleX(enemy.x + enemy.w/2);
         if(enemy.dying && enemy.ghostDraw){
           // Once he's dead: beside the ghost's face, in front of him (towards
