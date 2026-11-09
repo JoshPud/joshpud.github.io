@@ -323,6 +323,13 @@
   // so they play like other media do. Ignored by browsers that don't support it.
   try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 </script>
+<link rel="preload" as="image" href="bg-sky.webp">
+<link rel="preload" as="image" href="bg-distant.webp">
+<link rel="preload" as="image" href="bg-near.webp">
+<link rel="preload" as="image" href="bg-wisps.webp">
+<link rel="preload" as="image" href="bg-moon.png">
+<link rel="preload" as="image" href="home-portal.png">
+<link rel="preload" as="image" href="frog-idle.png">
 </head>
 <body>
 
@@ -2238,8 +2245,20 @@ var RETURN_PORTAL = null;
 
     // Now reveal the correctly-positioned scene - stepped fade, matching
     // the same speed/style as the campfire scene's fade-in on the intro
-    // page (10 steps, 180ms each), rather than a smooth CSS transition
-    setTimeout(function(){
+    // page (10 steps, 180ms each), rather than a smooth CSS transition.
+    // The fade waits until every image has loaded (or failed), so the scene
+    // never appears with placeholder shapes before the art clicks in. If
+    // something is very slow, it goes ahead after 6 seconds anyway.
+    function imagesReady(){
+      for(var k in sprites){ var im = sprites[k]; if(im && !im.complete) return false; }
+      return true;
+    }
+    var waitStart = performance.now();
+    (function waitForImages(){
+      if(!imagesReady() && performance.now() - waitStart < 6000){ setTimeout(waitForImages, 50); return; }
+      revealScene();
+    })();
+    function revealScene(){ setTimeout(function(){
       var steps = 10, stepDelay = 180, i = 0;
       function stepFade(){
         i++;
@@ -2251,7 +2270,7 @@ var RETURN_PORTAL = null;
         }
       }
       stepFade();
-    }, 200);
+    }, 200); }
   }
 
   document.addEventListener('keydown', function(e){
