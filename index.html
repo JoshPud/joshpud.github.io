@@ -634,7 +634,7 @@ async function hopToWork(){
   await juddyFadeIn(blackCover, 6, 50, null, setOpacity);
   // Straight to the first project, passing the same ?from= the home page
   // portals pass (portal 0 is this one)
-  window.location.href = 'lucozade-back-for-the-believers.html?from=0';
+  window.location.href = 'lucozade-back-for-the-believers?from=0';
 }
 document.getElementById('hopBtn').addEventListener('click', hopToWork);
 
@@ -646,7 +646,7 @@ async function launchGame(){
   // Fade everything to black, in the same stepped style as the rest
   // of the intro, before handing off to the actual site.
   await juddyFadeIn(blackCover, 8, 60, null, setOpacity);
-  window.location.href = isMobileDevice ? 'mobile.html' : 'home.html';
+  window.location.href = isMobileDevice ? 'mobile' : 'home';
 }
 document.addEventListener('keydown', function(e){
   if(e.key === 'Enter') launchGame();
@@ -660,7 +660,7 @@ document.getElementById('aboutBtn').addEventListener('click', async function(){
   launching = true;
   stopIntroMusic();
   await juddyFadeIn(blackCover, 6, 50, null, setOpacity);
-  window.location.href = 'about.html';
+  window.location.href = 'about';
 });
 
 document.getElementById('muteBtn').addEventListener('click', function(){
@@ -845,9 +845,9 @@ window.addEventListener('pageshow', function(e){
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
   <img src="JCC_LOGO_CHAMPAGNE_NAV.png" alt="" class="pm-logo" id="pmLogo">
   <button class="pm-close" id="pmClose" aria-label="Close menu"><i></i><i></i></button>
-  <a class="pm-item" href="mobile.html">PROJECTS<span class="pm-sub">Choose your quest</span></a>
+  <a class="pm-item" href="mobile">PROJECTS<span class="pm-sub">Choose your quest</span></a>
   <div class="pm-div" aria-hidden="true"><span></span></div>
-  <a class="pm-item" href="about.html">ABOUT ME<span class="pm-sub">Meet the storyteller</span></a>
+  <a class="pm-item" href="about">ABOUT ME<span class="pm-sub">Meet the storyteller</span></a>
 </div>
 <style>
   @media (max-width: 980px) and (hover: none) and (pointer: coarse) {

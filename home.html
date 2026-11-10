@@ -851,24 +851,24 @@ var RETURN_PORTAL = null;
 
   // Destination page for each portal, in order
   var PROJECT_PAGES = [
-    'lucozade-back-for-the-believers.html',
-    'somersby.html',
-    'royal-british-legion.html',
-    'mccain-anything-goes.html',
-    'uber-eats.html',
-    'playwithpringles.html',
-    'rice-krispies-squares.html',
-    'mccain-lets-all-chip-in.html',
-    'lidl-gbbo.html',
-    'lidl-xmas-jumper.html',
-    'pringles-step-up-the-spice.html',
-    'crunchy-nut.html',
-    'sprite.html',
-    'audi.html',
-    'lego.html',
-    'emirates.html',
-    'tiktok.html',
-    'heinz.html'
+    'lucozade-back-for-the-believers',
+    'somersby',
+    'royal-british-legion',
+    'mccain-anything-goes',
+    'uber-eats',
+    'playwithpringles',
+    'rice-krispies-squares',
+    'mccain-lets-all-chip-in',
+    'lidl-gbbo',
+    'lidl-xmas-jumper',
+    'pringles-step-up-the-spice',
+    'crunchy-nut',
+    'sprite',
+    'audi',
+    'lego',
+    'emirates',
+    'tiktok',
+    'heinz'
   ];
   function makePlatformPortals(){
     portalPositions = [];
@@ -2217,7 +2217,7 @@ var RETURN_PORTAL = null;
         fade.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;z-index:999999;transition:opacity 0.5s ease;pointer-events:none;';
         document.body.appendChild(fade);
         setTimeout(function(){ fade.style.opacity = '1'; }, 20);
-        setTimeout(function(){ window.location.href = 'index.html'; }, 700);
+        setTimeout(function(){ window.location.href = '/'; }, 700);
       });
 
       // Hover bounce + croak, same as the logo on the landing page: a stepped,
@@ -2337,8 +2337,8 @@ window.addEventListener('pageshow', function(e){ if(e.persisted) location.reload
     setTimeout(function(){ window.location.href = url; }, 550);
   }
   var hop = document.getElementById('hopBtn'), about = document.getElementById('aboutBtn');
-  if(hop) hop.addEventListener('click', function(){ this.blur(); go('lucozade-back-for-the-believers.html?from=0'); });
-  if(about) about.addEventListener('click', function(){ this.blur(); go('about.html'); });
+  if(hop) hop.addEventListener('click', function(){ this.blur(); go('lucozade-back-for-the-believers?from=0'); });
+  if(about) about.addEventListener('click', function(){ this.blur(); go('about'); });
 })();
 </script>
 <script src="fairy-cursor.js?v=2" defer></script>

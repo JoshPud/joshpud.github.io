@@ -1514,11 +1514,11 @@
 <audio id="teleportSound" src="TELEPORT_SOUND.MP3" preload="auto"></audio>
 <audio id="fireballScream" src="FROG_SCREAM.mp3" preload="auto"></audio>
 <nav class="project-nav">
-  <a href="home.html" class="project-nav-item prev" id="returnBtn">
+  <a href="home" class="project-nav-item prev" id="returnBtn">
     <span class="nav-direction" style="position:absolute; visibility:hidden;"><span class="nav-text-inner">placeholder</span></span>
     <span class="nav-title"><span class="nav-text-inner">Return to the Kingdom of Portfolia</span></span>
   </a>
-  <a href="lidl-gbbo.html?from=8" class="project-nav-item next">
+  <a href="lidl-gbbo?from=8" class="project-nav-item next">
     <span class="nav-direction"><span class="nav-text-inner"><span class="nav-label">NEXT</span><svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"></line><polyline points="13 5 20 12 13 19"></polyline></svg></span></span>
     <span class="nav-title"><span class="nav-text-inner">Lidl • GBBO</span></span>
   </a>
@@ -1742,7 +1742,7 @@ document.querySelectorAll('.project-nav-item').forEach(function(item){
       if(tSound){ tSound.currentTime = 0; tSound.play(); }
       setTimeout(function(){
         var isPhone = window.matchMedia('(hover: none) and (pointer: coarse)').matches && Math.min(window.innerWidth, window.innerHeight) <= 500;
-        window.location.href = isPhone ? 'mobile.html' : ('home.html?returnPortal=' + fromPortal + '&_=' + Date.now());
+        window.location.href = isPhone ? 'mobile' : ('home?returnPortal=' + fromPortal + '&_=' + Date.now());
       }, 1200);
     } else {
       clearTimeout(portalFadeInTimer);
@@ -2120,7 +2120,7 @@ initMomentumCarousel('laciCarouselStrip', 'laciCarouselTrack', { baseSpeed: 72 }
     if(typeof portalFadeInTimer !== 'undefined') clearTimeout(portalFadeInTimer);
     var flash = document.getElementById('portalFlash');
     if(flash) flash.style.opacity = '1';
-    setTimeout(function(){ window.location.href = 'index.html'; }, 700);
+    setTimeout(function(){ window.location.href = '/'; }, 700);
   });
 })();
 </script>
@@ -2682,9 +2682,9 @@ initMomentumCarousel('laciCarouselStrip', 'laciCarouselTrack', { baseSpeed: 72 }
 <div class="pm-menu" id="pmMenu" role="dialog" aria-modal="true" aria-label="Menu">
   <img src="JCC_LOGO_CHAMPAGNE_NAV.png" alt="" class="pm-logo" id="pmLogo">
   <button class="pm-close" id="pmClose" aria-label="Close menu"><i></i><i></i></button>
-  <a class="pm-item" href="mobile.html">PROJECTS<span class="pm-sub">Choose your quest</span></a>
+  <a class="pm-item" href="mobile">PROJECTS<span class="pm-sub">Choose your quest</span></a>
   <div class="pm-div" aria-hidden="true"><span></span></div>
-  <a class="pm-item" href="about.html">ABOUT ME<span class="pm-sub">Meet the storyteller</span></a>
+  <a class="pm-item" href="about">ABOUT ME<span class="pm-sub">Meet the storyteller</span></a>
 </div>
 <script>
 (function(){
@@ -2807,7 +2807,7 @@ initMomentumCarousel('laciCarouselStrip', 'laciCarouselTrack', { baseSpeed: 72 }
     f.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;z-index:1000002;transition:opacity 0.5s ease;pointer-events:none;';
     document.body.appendChild(f);
     requestAnimationFrame(function(){ f.style.opacity = '1'; });
-    setTimeout(function(){ window.location.href = 'about.html'; }, 550);
+    setTimeout(function(){ window.location.href = 'about'; }, 550);
   });
   window.addEventListener('pageshow', function(e){ if(e.persisted) document.querySelectorAll('body > div[style*="z-index:1000002"]').forEach(function(d){ d.remove(); }); });
 })();
