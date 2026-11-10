@@ -1384,7 +1384,23 @@ var portalFadeInTimer = null;
   var flash = document.getElementById('portalFlash');
   if(flash){
     sfxSunriseArpeggio();
-    portalFadeInTimer = setTimeout(function(){ flash.style.opacity = '0'; }, 100);
+    // Fade in gently from black, matching the fade out when you leave the
+    // last page. It waits (briefly) for the headline font and the header
+    // image or video to be ready, so the page doesn't pop in half-drawn.
+    var started = performance.now(), hero = document.querySelector('.hero-media');
+    function heroReady(){
+      if(!hero) return true;
+      if(hero.tagName === 'IMG') return hero.complete;
+      return hero.readyState >= 2;
+    }
+    var fontsReady = false;
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ fontsReady = true; }); else fontsReady = true;
+    (function waitThenFade(){
+      if((!fontsReady || !heroReady()) && performance.now() - started < 1500){ portalFadeInTimer = setTimeout(waitThenFade, 50); return; }
+      flash.style.transition = 'opacity 1s ease-out';
+      flash.style.opacity = '0';
+      setTimeout(function(){ flash.style.transition = ''; }, 1100);   // back to the quicker fade for leaving
+    })();
   }
 })();
 
